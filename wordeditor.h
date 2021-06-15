@@ -76,6 +76,7 @@ private slots:
 private:
     bool wordInit(); // инициализация ворда
     bool wordQuit(); // завершение ворда
+    QString getFileNameInPDFFormat(QString sourceFileName); // изменяет расширение файла на .pdf и возвращает его
     QAxObject *word = nullptr; // объект ворда
     QAxObject *documents = nullptr; //получаем коллекцию документов
     QAxObject *document = nullptr; // открытый документ

@@ -80,6 +80,8 @@ void SignProcessor::runProcessing()
 //    PDFOptions.htmlParams.lineOwner = "Владелец: " + CryptoPROOptions.sign.subname; // ЗАМЕНИТЬ!!!!!
 //    PDFOptions.htmlParams.lineDate = "Действителен с 09.09.2021 до 10.10.2021";
 
+    WordEditor word; // создаем обработчик ворда
+
     for(auto &&file : filesList) // перебераем все файлы
     {
         QApplication::processEvents(); // прогружаем интерфейс
@@ -114,7 +116,7 @@ void SignProcessor::runProcessing()
             }
             if(WordOptions.insertType == insert_standart) // если выбран классический вариант создания подписи
             {
-                WordEditor word; // создаем обработчик ворда
+//                WordEditor word; // создаем обработчик ворда
 
                 assert(word.openDocument(tempFile), "openDocument"); // открываем документ
                 int pagesCountBefore = word.getPagesCount(); // получаем количество страниц

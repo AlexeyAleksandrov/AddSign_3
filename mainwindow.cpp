@@ -1142,7 +1142,7 @@ void MainWindow::filesTableMouseRightClick(QTableWidgetItem *item)
     if(item != nullptr)
     {
         filename = getFileDirByIndex(item->row());
-        QAction *menuDeleteFile = menu.addAction("Удалить " + filename);
+        QAction *menuDeleteFile = menu.addAction("Удалить " + QFileInfo(filename).fileName());
         QObject::connect(menuDeleteFile, &QAction::triggered, this, [=]() { removeFile(getFileDirByIndex(item->row())); }); // удаление файла
     }
 

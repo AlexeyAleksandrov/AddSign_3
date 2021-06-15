@@ -26,10 +26,10 @@ bool WordEditor::openDocument(QString fileDir)
     QString f_dir;
     QString f_name;
 
-    if(opened) // если уже открыт документ
-    {
-        closeDocument(); // закрываем открытый
-    }
+//    if(opened) // если уже открыт документ
+//    {
+//        closeDocument(); // закрываем открытый
+//    }
 
     f_dir = QFileInfo(fileDir).absolutePath() + "/";
     f_name = QFileInfo(fileDir).fileName();
@@ -206,10 +206,11 @@ bool WordEditor::exportToPdf(QString outputFileName)
     }
     qDebug() << "Сохряняем файл в PDF: " << exportFilename;
     QString change_dir = QFileInfo(exportFilename).absolutePath() + "/";
+    QString exportName = getFileNameInPDFFormat(outputFileName.remove(change_dir)); // получаем имя файла в формате PDF
 
     word->dynamicCall("ChangeFileOpenDirectory(String)", change_dir); // устанавливаем рабочую директорию
     ActiveDocument->dynamicCall("ExportAsFixedFormat(String, WdExportFormat, Boolean, WdExportOptimizeFor, WdExportRange, Long, Long, WdExportItem, Boolean, Boolean, WdExportCreateBookmarks, Boolean, Boolean, Boolean)",
-                                                          QFileInfo(exportFilename).baseName() + ".pdf", "wdExportFormatPDF", false);
+                                                          exportName, "wdExportFormatPDF", false);
     word->dynamicCall("ChangeFileOpenDirectory(String)", change_dir); // устанавливаем рабочую директорию
     return true;
 }
@@ -301,6 +302,30 @@ bool WordEditor::wordQuit()
     }
     word->dynamicCall("Quit()");
     return true;
+}
+
+QString WordEditor::getFileNameInPDFFormat(QString sourceFileName)
+{
+    // теоритически - это не очень рационально,
+    // но практически, если нам нужно будет добавить новое расширение файла,
+    // то это будет сделать очень удобно
+    QList<QStringList> allFilesExtensions; // список всех возможных расширений файлов
+    QStringList filesExtensionsWord = QStringList() << ".docx" << ".doc" << ".rtf";
+    QStringList filesExtensionsExcel = QStringList() << ".xls" << ".xlsx"  << ".xlsm" << ".xlsb";
+    allFilesExtensions.append(filesExtensionsWord);
+    allFilesExtensions.append(filesExtensionsExcel);
+
+    for(auto &&list : allFilesExtensions) // проходим по всем спискам расширений
+    {
+        for(auto &&ext : list) // проходим по всем расширениям
+        {
+            if(sourceFileName.endsWith(ext)) // если совпадает
+            {
+                return sourceFileName.replace(ext, ".pdf"); // делаем замену и возвращаем
+            }
+        }
+    }
+    return sourceFileName;
 }
 
 void WordEditor::exception(int code, QString source, QString desc, QString help)
