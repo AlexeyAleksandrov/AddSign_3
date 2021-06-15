@@ -603,8 +603,10 @@ void MainWindow::setRowColor(QTableWidget *table, int row, QColor color)
                 if(!item) // если память не выделена
                 {
                     item = new QTableWidgetItem(" "); // выделяем память
+                    QApplication::processEvents();
                 }
                 item->setBackground(QBrush(color)); // задаём цвет фона
+                QApplication::processEvents();
             }
         }
     }
@@ -627,17 +629,21 @@ void MainWindow::setFileStatus(QString file_dir, int status)
     if(item)
     {
         item->setText(str_status);
+        QApplication::processEvents();
     }
     else
     {
         item = new QTableWidgetItem(str_status);
         ui->tableWidget_filestatus->setItem(row, 1, item);
+        QApplication::processEvents();
     }
     QString log_text = "Изменён статус файла " + file_dir + str_status;
     log.addToLog(log_text);
 //    ui->tableWidget_filestatus->setItem(row, 1, item);
     setRowColor(ui->tableWidget_filestatus, row, itog_color);
+    QApplication::processEvents();
     ui->tableWidget_filestatus->scrollToItem(ui->tableWidget_filestatus->item(row, 0));
+    QApplication::processEvents();
 }
 
 int MainWindow::getFileStatus(QString fileDir)
