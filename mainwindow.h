@@ -26,7 +26,7 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include "m_widget.h"
-#include <filesignprocessor.h>
+//#include <filesignprocessor.h>
 #include <imagetransformer.h>
 #include "uipreset.h"
 #include <signprocessor.h>
@@ -76,8 +76,9 @@ private:
     // =================================================================================
 //    WordEditor *word = nullptr; // редактор Word, каждый раз создаётся новый, для перемещения в поток
 //    QThread *wordThread = nullptr; // поток для обработки Word
-    QThread *signThread = nullptr; // поток для обработки подписей
-    int countFilesReady = 0;
+//    QThread *signThread = nullptr; // поток для обработки подписей
+    bool SigningInProcess = false;
+//    int countFilesReady = 0;
     QString imageDir; // директория, где лежит файл картинки, полученной из виджета
     // =================================================================================
     // ==== БЛОК СТАТУСОВ ФАЙЛОВ =====
@@ -106,7 +107,7 @@ private:
     // ==== БЛОК ОБРАБОТКИ ФАЙЛОВ ====
     // =================================================================================
     bool isClosing = false; // флаг того, что программа закрывается и нужно всё сворачивать
-    bool wordCancel = false;
+//    bool wordCancel = false;
 
     SignProcessor processor;
 
@@ -154,7 +155,7 @@ private:
     // =================================================================================
     // ==== БЛОК КРИПТЫ ====
     // =================================================================================
-    fileSignProcessor *signProscessor = nullptr;
+//    fileSignProcessor *signProscessor = nullptr;
 //    CryptoCMD cryptoObject;
     CryptoPRO_CSP CryptoPRO;
     QList<CryptoPRO_CSP::CryptoSignData> sertificatesList; // список сертификатов
@@ -200,10 +201,10 @@ private:
 
 private slots:
     void fileReady(SignProcessor::FileForSign file, int status);
-    void threadFinished();
-    void updateFileStatus(QString fileDir, int status);
-    void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
-    void signProcessFinished(); // слот завершения потока подписи
+//    void threadFinished();
+//    void updateFileStatus(QString fileDir, int status);
+//    void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
+//    void signProcessFinished(); // слот завершения потока подписи
     void cryptoSignListReady(QList<CryptoPRO_CSP::CryptoSignData> list); // слот, получающий информацию о том, что список подписей загружен
 //    void setCurrentSignByComboBox(); // устанавливает шаблон по комбо-боксу. Слот нужен для вызова из файла класса загрузки
 
@@ -219,7 +220,7 @@ private slots:
 
     void closeEvent(QCloseEvent *event)
     {
-        if(signThread)
+        if(SigningInProcess)
         {
             if (QMessageBox::question(this,"Выход","Внимание! Идёт процесс подписи, принудительное закрытие программы может привести к повреждению файлов. Используйте принудительное закрытие только в том случае, если программа зависла\nЗакрыть программу принудительно?", QMessageBox::Yes|QMessageBox::No,QMessageBox::Yes)==QMessageBox::Yes)
             {
@@ -254,7 +255,7 @@ private slots:
 //    void on_pushButton_2_clicked();
     void on_comboBox_choseImageGerb_currentIndexChanged(const QString &arg1);
 //    void on_comboBox_activated(int index);
-    void on_pushButton_moveToSigning_clicked();
+//    void on_pushButton_moveToSigning_clicked();
     void on_pushButton_backToChoseFiles_clicked();
     void on_comboBox_currentIndexChanged(int index);
     void on_comboBox_signHost_currentIndexChanged(int index);

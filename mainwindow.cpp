@@ -68,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent)
     qDebug() << dir.removeRecursively();
     qDebug() << dir.mkdir(QDir::currentPath() + TEMP_DIR);
 #else
-    dir.removeRecursively();te
+    dir.removeRecursively();
     dir.mkdir(QDir::currentPath() + TEMP_DIR);
 #endif
 
@@ -229,12 +229,12 @@ void MainWindow::on_pushButton_addsign_clicked()
 {
     // === ПРОВЕРКИ ===
 
-    if(signThread) // если поток уже запущен
+    if(SigningInProcess) // если поток уже запущен
     {
 //        signProscessor->setClosing(true); // Отправляем, что нужно прервать
         isClosing = true;
         log.addToLog("Прерывание обработки word");
-        wordCancel = true;
+//        wordCancel = true;
         return;
     }
 
@@ -380,7 +380,7 @@ void MainWindow::on_pushButton_addsign_clicked()
 
     dir.mkpath(outputDir); // создаём директорию вывода
     log.addToLog("Запуск Word");
-    countFilesReady = 0; // обнуляем счётчик обработанных файлов
+//    countFilesReady = 0; // обнуляем счётчик обработанных файлов
 
     clearAllOutputsToolTipData(); // очищаем пути вывода для всех файлов в таблице
 
@@ -427,7 +427,7 @@ void MainWindow::on_pushButton_addsign_clicked()
     processor.setCryptoPROOptions(CryptoPRO_settings);
     processor.setFilesList(listAddedFiles);
 
-    signThread = new QThread(this);
+//    signThread = new QThread(this);
 //    signProscessor->moveToThread(signThread);
 
     // логика запуска потоков
@@ -439,19 +439,32 @@ void MainWindow::on_pushButton_addsign_clicked()
 //    connect(signProscessor, &fileSignProcessor::newFileStatus, this, &MainWindow::updateFileStatus); // сигнал обновления статуса файла
 
     connect(&processor, &SignProcessor::newFileStatus, this, &MainWindow::fileReady);
-    connect(&processor, &SignProcessor::procesingFinished, this, &MainWindow::threadFinished);
+//    connect(&processor, &SignProcessor::procesingFinished, this, &MainWindow::threadFinished);
 
 
+    SigningInProcess = false;
     log.addToLog("Запущена обработка файлов");
     ui->pushButton_addsign->setText("Отмена");
 
-    log.addToLog("Запущен поток word");
-//    signThread->start();
     processor.closing = &isClosing;
     processor.runProcessing();
 
     isClosing = false;
     ui->pushButton_addsign->setText("Добавить подпись");
+
+    // заменяем статусы необработанных файлов
+    int rows = ui->tableWidget_filestatus->rowCount();
+    for (int i=0; i<rows; i++)
+    {
+        int status = f_status.getStatusNumberByName(ui->tableWidget_filestatus->item(i, 1)->text()); // получаем номер статуса
+        if(status == files_status::waiting) // Если статус "в очереди"
+        {
+            setFileStatus(getFileDirByIndex(i), files_status::added); // устанавливаем статус добавлен всем файлам, которые оказались в процессе
+        }
+    }
+    log.addToLog("Обработка файлов завершена");
+
+    ui->closeButton->setDisabled(false);
     QMessageBox::information(this, "", "Готово");
 }
 
@@ -1290,76 +1303,76 @@ void MainWindow::fileReady(SignProcessor::FileForSign file, int status)
     //    QApplication::processEvents();
 }
 
-void MainWindow::threadFinished()
-{
-    log.addToLog("Завершён поток Word'а");
-#ifdef DEBUGGING
-    qDebug() << "Завершён поток Word'а";
-#endif
+//void MainWindow::threadFinished()
+//{
+//    log.addToLog("Завершён поток Word'а");
+////#ifdef DEBUGGING
+////    qDebug() << "Завершён поток Word'а";
+////#endif
 
 
-#ifdef DEBUGGING
-    qDebug() << "Установлен parent для cryptoObject - this";
-#endif
-    delete signProscessor;
-    signProscessor = nullptr;
+////#ifdef DEBUGGING
+////    qDebug() << "Установлен parent для cryptoObject - this";
+////#endif
+////    delete signProscessor;
+////    signProscessor = nullptr;
 
-#ifdef DEBUGGING
-    qDebug() << "Удален signProscessor";
-#endif
-    delete signThread;
-    signThread = nullptr;
-#ifdef DEBUGGING
-    qDebug() << "Завершен поток подписи";
-#endif
+////#ifdef DEBUGGING
+////    qDebug() << "Удален signProscessor";
+////#endif
+////    delete signThread;
+////    signThread = nullptr;
+////#ifdef DEBUGGING
+////    qDebug() << "Завершен поток подписи";
+////#endif
 
-    log.addToLog("Завершен поток подписи");
+//    log.addToLog("Завершен поток подписи");
 
-    countFilesReady = 0;
+////    countFilesReady = 0;
 
-    // заменяем статусы необработанных файлов
-    int rows = ui->tableWidget_filestatus->rowCount();
-    for (int i=0; i<rows; i++)
-    {
-        int status = f_status.getStatusNumberByName(ui->tableWidget_filestatus->item(i, 1)->text()); // получаем номер статуса
-        if(status == files_status::waiting) // Если статус "в оченреди"
-        {
-            setFileStatus(getFileDirByIndex(i), files_status::added); // устанавливаем статус добавлен всем файлам, которые оказались в процессе
-        }
-    }
-
-    ui->pushButton_addsign->setText("Добавить подпись");
-//    if(!isClosing && !wordCancel)
+//    // заменяем статусы необработанных файлов
+//    int rows = ui->tableWidget_filestatus->rowCount();
+//    for (int i=0; i<rows; i++)
 //    {
-//        QMessageBox::information(this, "", "ExcelEditor");
+//        int status = f_status.getStatusNumberByName(ui->tableWidget_filestatus->item(i, 1)->text()); // получаем номер статуса
+//        if(status == files_status::waiting) // Если статус "в оченреди"
+//        {
+//            setFileStatus(getFileDirByIndex(i), files_status::added); // устанавливаем статус добавлен всем файлам, которые оказались в процессе
+//        }
 //    }
-    ui->closeButton->setDisabled(false);
 
-}
+//    ui->pushButton_addsign->setText("Добавить подпись");
+////    if(!isClosing && !wordCancel)
+////    {
+////        QMessageBox::information(this, "", "ExcelEditor");
+////    }
+//    ui->closeButton->setDisabled(false);
 
-void MainWindow::updateFileStatus(QString fileDir, int status)
-{
-    setFileStatus(fileDir, status);
-}
+//}
 
-void MainWindow::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
-{
-#ifdef DEBUGGING
-    qDebug() << "Процесс завершился. Код: " << exitCode << "Статус: " << exitStatus;
-#else
-    Q_UNUSED(exitCode);
-    Q_UNUSED(exitStatus);
-#endif
-    sender()->deleteLater();
-    QFile temp_file(TEMP_BAT_FILE);
-    temp_file.remove(); // удаляем временный bat-ник
-    log.addToLog("Процесс завершен. Удален временный bat файл");
-}
+//void MainWindow::updateFileStatus(QString fileDir, int status)
+//{
+//    setFileStatus(fileDir, status);
+//}
 
-void MainWindow::signProcessFinished()
-{
+//void MainWindow::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
+//{
+//#ifdef DEBUGGING
+//    qDebug() << "Процесс завершился. Код: " << exitCode << "Статус: " << exitStatus;
+//#else
+//    Q_UNUSED(exitCode);
+//    Q_UNUSED(exitStatus);
+//#endif
+//    sender()->deleteLater();
+//    QFile temp_file(TEMP_BAT_FILE);
+//    temp_file.remove(); // удаляем временный bat-ник
+//    log.addToLog("Процесс завершен. Удален временный bat файл");
+//}
 
-}
+//void MainWindow::signProcessFinished()
+//{
+
+//}
 
 void MainWindow::cryptoSignListReady(QList<CryptoPRO_CSP::CryptoSignData> list)
 {
@@ -1803,20 +1816,20 @@ QString MainWindow::fileToolTip::getToolTip()
     return "sourceFile=" + sourceFile + "|" + "signedFile=" + signedFile + "|" + "signedPdfFile=" + signedPdfFile;
 }
 
-void MainWindow::on_pushButton_moveToSigning_clicked()
-{
-    if(signThread) // если поток уже запущен
-    {
-//        signProscessor->setClosing(true); // Отправляем, что нужно прервать
-        log.addToLog("Прерывание обработки word");
-        wordCancel = true;
-        return;
-    }
-    else
-    {
-        ui->stackedWidget->setCurrentIndex(STACKED_SIGN_SETTINGS); // переходим к подписи
-    }
-}
+//void MainWindow::on_pushButton_moveToSigning_clicked()
+//{
+//    if(signThread) // если поток уже запущен
+//    {
+////        signProscessor->setClosing(true); // Отправляем, что нужно прервать
+//        log.addToLog("Прерывание обработки word");
+//        wordCancel = true;
+//        return;
+//    }
+//    else
+//    {
+//        ui->stackedWidget->setCurrentIndex(STACKED_SIGN_SETTINGS); // переходим к подписи
+//    }
+//}
 
 void MainWindow::on_pushButton_backToChoseFiles_clicked()
 {

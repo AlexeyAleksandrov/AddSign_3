@@ -16,7 +16,6 @@ SOURCES += \
     cryptopro_csp.cpp \
     exeleditor.cpp \
     files_status.cpp \
-    filesignprocessor.cpp \
     imagetransformer.cpp \
     m_widget.cpp \
     main.cpp \
@@ -35,7 +34,6 @@ HEADERS += \
     cryptopro_csp.h \
     exeleditor.h \
     files_status.h \
-    filesignprocessor.h \
     imagetransformer.h \
     m_widget.h \
     mainwindow.h \
