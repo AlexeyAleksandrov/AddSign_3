@@ -8,12 +8,14 @@ qpdf_cmd::qpdf_cmd(QObject *parent) : QObject(parent)
 bool qpdf_cmd::overlay(QString upperfile, QString underfile, QString outputfile, QString options)
 {
     // запускаем процесс
+    log.addToLog("Запускаем процесс QPDF. upperfile = " + upperfile + " underfile = " + underfile + " outputfile = " + outputfile + " options = " + options);
     QProcess qpdf_process(this);
     qpdf_process.setReadChannel(QProcess::StandardOutput);
 
     if(!upperfile.endsWith(".pdf") || (!underfile.endsWith(".pdf")) || (!outputfile.endsWith(".pdf")))
     {
         qDebug() << "Error on input files! It must *.pdf";
+        log.addToLog("Error on input files! It must *.pdf");
         return false;
     }
 
@@ -27,14 +29,17 @@ bool qpdf_cmd::overlay(QString upperfile, QString underfile, QString outputfile,
     if(!qpdf_process.waitForStarted())
     {
         qDebug() << "The process didn't start" << qpdf_process.error();
+        log.addToLog(&"The process didn't start " [ qpdf_process.error()]);
         return false;
     }
     if(!qpdf_process.waitForFinished())
     {
         qDebug() << "The process didn't finished" << qpdf_process.error();
+        log.addToLog(&"The process didn't finished " [ qpdf_process.error()]);
         return false;
     }
 
+    log.addToLog("Процесс QPDF успешно завершён");
     return true;
 }
 

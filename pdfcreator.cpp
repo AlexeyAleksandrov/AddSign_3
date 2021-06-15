@@ -15,14 +15,17 @@ PDFCreator::PDFCreator(QObject *parent) : QObject(parent)
 
 bool PDFCreator::createSignPDFbyHTML(QString fileName, int image_pos_x, int image_pos_y, QString mireaLogoFileName, QString line_sertifacate, QString line_owner, QString line_validTime, PDFCreator::orientation orientation, bool drawMireaLogo)
 {
+    log.addToLog("Создаём пустой файл подписи " + fileName);
     QFile pdfFile(fileName);
     if(!pdfFile.open(QIODevice::WriteOnly)) // если файл нельзя открыть для записи
     {
+        log.addToLog("Файл нельзя открыть для записи" + fileName);
         return false;
     }
     QPageLayout::Orientation pageOrientation = (orientation == 0) ? QPageLayout::Portrait : QPageLayout::Landscape; // получаем нужную ориентацияю страницы
-    if(pageOrientation != QPageLayout::Portrait && pageOrientation != QPageLayout::Landscape) // если укащана неверная ориентация страницы
+    if(pageOrientation != QPageLayout::Portrait && pageOrientation != QPageLayout::Landscape) // если указана неверная ориентация страницы
     {
+        log.addToLog("Указана неверная ориентация страницы");
         return false;
     }
     pdfFile.close();
@@ -98,6 +101,7 @@ bool PDFCreator::createSignPDFbyHTML(QString fileName, int image_pos_x, int imag
     {
         if(!QFile(mireaLogoFileName).exists()) // если файл лого не найден
         {
+            log.addToLog("Не найден файл лого" + mireaLogoFileName);
             return false;
         }
         QImage mirea_logo(mireaLogoFileName);
@@ -133,6 +137,7 @@ bool PDFCreator::createSignPDFbyHTML(QString fileName, int image_pos_x, int imag
     td.drawContents(&painter);
 
     painter.end();
+    log.addToLog("Файл сформирован " + fileName);
     return true;
 }
 

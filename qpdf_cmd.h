@@ -5,6 +5,8 @@
 #include <QProcess>
 #include <QDebug>
 
+#include "logclass.h"
+
 class qpdf_cmd : public QObject
 {
     Q_OBJECT
@@ -19,6 +21,8 @@ signals:
 
 private:
     QString qpdfPath; // директория исполняемого файла
+
+    logClass log;
 
 };
 

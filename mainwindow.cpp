@@ -451,6 +451,7 @@ void MainWindow::on_pushButton_addsign_clicked()
     processor.runProcessing();
 
     isClosing = false;
+    ui->pushButton_addsign->setText("Добавить подпись");
     QMessageBox::information(this, "", "Готово");
 }
 

@@ -6,7 +6,7 @@
 #define MIREA_LOGO_HTML PDFOptions.image_dir
 
 #define DISPLAY_STATUS_ON_NEW_PAGE
-#define assert(var, texterror) if(var == false) { qDebug() << "Assert: " << texterror; return; }
+#define assert(var, texterror) if(var == false) { qDebug() << "Assert: " << texterror; log.addToLog(texterror); return; }
 
 SignProcessor::SignProcessor(QObject *parent) : QObject(parent)
 {
@@ -23,6 +23,7 @@ void SignProcessor::setFilesList(const QStringList &files)
     QList<FileForSign> filesList; // создаем список файлов
     for(auto &&inputFile : files)
     {
+        log.addToLog("добавляем файл " + inputFile);
         FileForSign file; // создаем экземпляр файла
         file.sourceFile = inputFile;
 
@@ -51,6 +52,7 @@ void SignProcessor::setFilesList(const QStringList &files)
         filesList.append(file); // добавляем в список
     }
     setFilesList(filesList); // вызываем обычную функцию установки файлов
+    log.addToLog("Все файлы добавлены в список");
 }
 
 void SignProcessor::setWordOptions(const WordParams &value)
@@ -70,6 +72,7 @@ void SignProcessor::setCryptoPROOptions(const CryptoPROParams &value)
 
 void SignProcessor::runProcessing()
 {
+    log.addToLog("Запущен процесс подписи");
     CryptoPRO_CSP CryptoPRO; // создаем обработчик подписи
     CryptoPRO.csptest.setCryptoProDirectory(CryptoPROOptions.CryptoPRODirectore); // устанавливаем директорию
 
@@ -80,6 +83,7 @@ void SignProcessor::runProcessing()
     for(auto &&file : filesList) // перебераем все файлы
     {
         QApplication::processEvents(); // прогружаем интерфейс
+        log.addToLog("Обработка файла " + file.sourceFile);
         if(closing != nullptr)
         {
             if(*closing == true)
@@ -126,6 +130,7 @@ void SignProcessor::runProcessing()
                     if(!WordOptions.ignoreMovingToNextList) // если нельзя игнорировать переход на новую страницу и переход произошёл
                     {
                         qDebug() << "Произошло увеличение количества страниц. Отменяем подпись.";
+                        log.addToLog("Произошло увеличение количества страниц. Отменяем подпись.");
                         emit newFileStatus(file, files_status::error_new_page_no_added);
 //                        word.closeDocument(); // закрываем
                         continue;
@@ -139,6 +144,7 @@ void SignProcessor::runProcessing()
                     if(!word.exportToPdf(file.signPDFFile)) // экспортируем файл в PDF
                     {
                         qDebug() << "Не удалось экспортировать файл в PDF";
+                        log.addToLog("Не удалось экспортировать файл в PDF");
                         emit newFileStatus(file, files_status::error_pdf_no_export);
                         continue;
                     }
@@ -150,6 +156,7 @@ void SignProcessor::runProcessing()
                     if(!replaceOriginalFileByTemp(file.signWordFile, tempFile)) // копируем временный файл в необходимый
                     {
                         qDebug() << "Не удалось экспортировать файл Word";
+                        log.addToLog("Не удалось экспортировать файл Word");
                         emit newFileStatus(file, files_status::error_no_open);
                         continue;
                     }
@@ -166,6 +173,7 @@ void SignProcessor::runProcessing()
                 if(!word.exportToPdf(tempFile)) // экспортируем файл в PDF
                 {
                     qDebug() << "Не удалось экспортировать файл в PDF";
+                    log.addToLog("Не удалось экспортировать файл в PDF");
                     emit newFileStatus(file, files_status::error_pdf_no_export);
                     continue;
                 }
@@ -195,6 +203,7 @@ void SignProcessor::runProcessing()
                                             PDFOptions.drawLogo)) // создаем PDF из HTML
                 {
                     qDebug() << "Не удалось создать PDF файл подписи!";
+                    log.addToLog("Не удалось создать PDF файл подписи!");
                     emit newFileStatus(file, files_status::error_pdf_no_export);
                     continue;
                 }
@@ -213,6 +222,7 @@ void SignProcessor::runProcessing()
             if(tempFile == "")
             {
                 qDebug() << "Произошла ошибка создания временного файла!";
+                log.addToLog("Произошла ошибка создания временного файла!");
                 emit newFileStatus(file, files_status::error_no_open);
                 continue;
             }
@@ -227,6 +237,7 @@ void SignProcessor::runProcessing()
             if(!excel.exportToPdf(tempPdfFile)) // экспортируем файл в PDF
             {
                 qDebug() << "Не удалось экспортировать файл в PDF";
+                log.addToLog("Не удалось экспортировать файл в PDF");
                 emit newFileStatus(file, files_status::error_pdf_no_export);
                 continue;
             }
@@ -256,6 +267,7 @@ void SignProcessor::runProcessing()
                                         PDFOptions.drawLogo)) // создаем PDF из HTML
             {
                 qDebug() << "Не удалось создать PDF файл подписи!";
+                log.addToLog("Не удалось создать PDF файл подписи!");
                 emit newFileStatus(file, files_status::error_pdf_no_export);
                 continue;
             }
@@ -268,6 +280,8 @@ void SignProcessor::runProcessing()
             if(!qpdf.overlay(simpleSignFile, tempPdfFile, file.signPDFFile)) // объединяем файлы и готово
             {
                 qDebug() << "Не удалось объединить файлы" << tempPdfFile << simpleSignFile;
+                log.addToLog("Не удалось объединить файлы " + tempPdfFile + " " + simpleSignFile);
+                emit newFileStatus(file, files_status::error_pdf_no_export);
                 continue;
             }
         }
@@ -279,6 +293,7 @@ void SignProcessor::runProcessing()
             if(tempFile == "")
             {
                 qDebug() << "Произошла ошибка создания временного файла!";
+                log.addToLog("Произошла ошибка создания временного файла!");
                 emit newFileStatus(file, files_status::error_no_open);
                 continue;
             }
@@ -297,6 +312,7 @@ void SignProcessor::runProcessing()
                                         PDFOptions.drawLogo)) // создаем PDF из HTML
             {
                 qDebug() << "Не удалось создать PDF файл подписи!";
+                log.addToLog("Не удалось создать PDF файл подписи!");
                 emit newFileStatus(file, files_status::error_pdf_no_export);
                 continue;
             }
@@ -308,7 +324,8 @@ void SignProcessor::runProcessing()
         }
         else
         {
-            qDebug() << "не удалось определить расшиение файла: " << file.sourceFile;
+            qDebug() << "Не удалось определить расшиение файла: " << file.sourceFile;
+            log.addToLog("Не удалось определить расшиение файла: " + file.sourceFile);
             emit newFileStatus(file, files_status::error_file_signature_failed);
             continue;
         }
@@ -319,6 +336,7 @@ void SignProcessor::runProcessing()
             if(!CryptoPRO.csptest.createSign(file.signWordFile, CryptoPROOptions.sign))
             {
                 qDebug() << "Не удалось подписать файл " << file.signWordFile;
+                log.addToLog("Не удалось подписать файл " + file.signWordFile);
                 emit newFileStatus(file, files_status::no_signed);
                 continue;
             }
@@ -329,6 +347,7 @@ void SignProcessor::runProcessing()
             if(!CryptoPRO.csptest.createSign(file.signPDFFile, CryptoPROOptions.sign))
             {
                 qDebug() << "Не удалось подписать файл " << file.signPDFFile;
+                log.addToLog("Не удалось подписать файл " + file.signPDFFile);
                 emit newFileStatus(file, files_status::no_signed);
                 continue;
             }
@@ -346,6 +365,7 @@ void SignProcessor::runProcessing()
         QApplication::processEvents(); // прогружаем интерфейс
 
     }
+    log.addToLog("Завершена обработка файлов");
     emit procesingFinished();
     QApplication::processEvents(); // прогружаем интерфейс
 }

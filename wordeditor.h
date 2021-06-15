@@ -5,6 +5,7 @@
 #include <QAxObject>
 #include <QDebug>
 #include <QFileInfo>
+#include "logclass.h"
 
 
 class WordEditor : public QObject
@@ -86,6 +87,7 @@ private:
     QString activeFile; // текущий открытый файл
     bool opened = false;
 
+    logClass log;
 
 };
 

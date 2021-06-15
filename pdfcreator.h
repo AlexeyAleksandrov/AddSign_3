@@ -2,6 +2,7 @@
 #define PDFCREATOR_H
 
 #include <QObject>
+#include "logclass.h"
 
 class PDFCreator : public QObject
 {
@@ -24,6 +25,7 @@ private:
     QString getLine(QString symvol, int lenght);
     QString tab(int count);
 
+    logClass log;
 };
 
 #endif // PDFCREATOR_H

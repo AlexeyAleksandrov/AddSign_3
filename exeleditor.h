@@ -10,6 +10,7 @@
 #include <QProgressBar>
 #include <QApplication>
 #include <QDebug>
+#include "logclass.h"
 
 // параметры Excel
 #define xlTypePDF 0
@@ -60,6 +61,8 @@ private:
     QAxObject* sheet = nullptr;
     QAxObject *ActiveSheet = nullptr;
     QAxObject *pageSetup = nullptr;
+
+    logClass log;
 
 private slots:
     void exception(int code, QString source, QString desc, QString help); // слот получения ошибок

@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QDebug>
 
+#include "logclass.h"
+
 #include "files_status.h"
 #include "wordeditor.h"
 #include "exeleditor.h"
@@ -137,6 +139,9 @@ private:
 
 public:
     bool *closing = nullptr;
+
+private:
+    logClass log;
 
 };
 

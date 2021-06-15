@@ -50,6 +50,7 @@ int CryptoPRO_CSP::getSignIndex(QList<CryptoSignData> allSignsList, CryptoSignDa
 QString CryptoPRO_CSP::s_certmgr::getConsoleText(QStringList options)
 {
     // запускаем процесс
+    log.addToLog("запускаем процесс certmgr");
     QProcess certmgr_process;
     certmgr_process.setReadChannel(QProcess::StandardOutput);
 
@@ -59,6 +60,7 @@ QString CryptoPRO_CSP::s_certmgr::getConsoleText(QStringList options)
     if(!certmgr_process.waitForStarted())
     {
         qDebug() << "The process didn't start" << certmgr_process.error();
+        log.addToLog(&"The process didn't start " [ certmgr_process.error()]);
         return "";
     }
 
@@ -69,6 +71,7 @@ QString CryptoPRO_CSP::s_certmgr::getConsoleText(QStringList options)
         if(!certmgr_process.waitForReadyRead()) // ждём доступа на чтение
         {
             qDebug() << "Поток не открыл доступ на чтение!";
+            log.addToLog("Поток не открыл доступ на чтение!");
             return "";
         }
         while(certmgr_process.bytesAvailable())
@@ -83,14 +86,17 @@ QString CryptoPRO_CSP::s_certmgr::getConsoleText(QStringList options)
     if(!certmgr_process.waitForFinished())
     {
         qDebug() << "The process didn't finished" << certmgr_process.error();
+        log.addToLog(&"The process didn't finished " [ certmgr_process.error()]);
         return "";
     }
 
+    log.addToLog("Текст certmgr получен");
     return consoleText;
 }
 
 QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList()
 {
+    log.addToLog("Запускаем процесс получения списка подписей");
     QString cmd_out = getConsoleText(QStringList() << "-list" << "-store" << "uMy");
     if(cmd_out == "")
     {
@@ -214,6 +220,7 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
     {
         sign.index = getSignIndex(SignsList, sign); // получаем информацию об индексе
     }
+    log.addToLog("Список подписей сформирован");
     return SignsList;
 }
 
@@ -224,6 +231,7 @@ void CryptoPRO_CSP::s_certmgr::setCryptoProDirectory(const QString &value)
 
 bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSignData sign)
 {
+    log.addToLog("Запускатся процесс подписи файла " + file);
     QFile csptest_bat_file("csptest_bat.bat");
     QString bat_text = QString("echo %2 | \"") + runfile + QString("\" -sfsign -sign -detached -add -in %1 -out %1.sig -my %3"); // универсальный текст батника
 
@@ -244,6 +252,7 @@ bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSig
     if (!csptest_bat.waitForStarted())
     {
         qDebug() << "The process didnt start" << csptest_bat.error();
+        log.addToLog(&"The process didnt start " [ csptest_bat.error()]);
         csptest_bat_file.remove();
         return false;
     }
@@ -259,16 +268,19 @@ bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSig
     if (!csptest_bat.waitForFinished())
     {
         qDebug() << "The process didnt finished" << csptest_bat.error();
+        log.addToLog(&"The process didnt finished " [ csptest_bat.error()]);
         csptest_bat_file.remove();
         return false;
     }
     csptest_bat_file.remove();
     if(sigFile.exists() && cmd_out.contains("[ErrorCode: 0x00000000]")) //  && cmd_out.contains("[ErrorCode: 0x00000000]")
     {
+        log.addToLog("Подпись успешно создана " + sigFile.fileName());
         return true;
     }
     else
     {
+        log.addToLog("Не удалось создать подпись - файл не найден " + sigFile.fileName());
         return false;
     }
 }

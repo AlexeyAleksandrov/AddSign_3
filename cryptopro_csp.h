@@ -6,6 +6,8 @@
 #include <QProcess>
 #include <QDebug>
 
+#include "logclass.h"
+
 class CryptoPRO_CSP : public QObject
 {
     Q_OBJECT
@@ -45,6 +47,7 @@ private:
         void setCryptoProDirectory(const QString &value);
     private:
         QString runfile = "certmgr.exe";
+        logClass log;
 
     };
     struct s_csptest
@@ -54,12 +57,15 @@ private:
         void setCryptoProDirectory(const QString &value);
     private:
         QString runfile = "csptest.exe";
-
+        logClass log;
     };
 
 public:
     s_certmgr certmgr; // менеджер сертификатов
     s_csptest csptest; // отвечает за создание sig файла
+
+private:
+    logClass log;
 
 };
 
