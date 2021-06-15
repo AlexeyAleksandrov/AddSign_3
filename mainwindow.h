@@ -164,7 +164,7 @@ private:
     // ==== БЛОК ЗАПУСКА ФАЙЛОВ ====
     // =================================================================================
     void runFile(QString file); // запускает файл из под винды (DEMO)
-    void runWordFile(QString wordFile); // запускает Word файл
+//    void runWordFile(QString wordFile); // запускает Word файл
     // =================================================================================
     logClass log; // лог
     bool findQpdf(QString &qpdf_dir);

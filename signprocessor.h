@@ -11,7 +11,6 @@
 #include "cryptopro_csp.h"
 #include "pdfcreator.h"
 
-
 class SignProcessor : public QObject
 {
     Q_OBJECT
@@ -135,6 +134,9 @@ private:
     private:
         QString controlFile;
     };
+
+public:
+    bool *closing = nullptr;
 
 };
 

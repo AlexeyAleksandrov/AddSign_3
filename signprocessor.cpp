@@ -79,7 +79,16 @@ void SignProcessor::runProcessing()
 
     for(auto &&file : filesList) // перебераем все файлы
     {
+        QApplication::processEvents(); // прогружаем интерфейс
+        if(closing != nullptr)
+        {
+            if(*closing == true)
+            {
+                break;
+            }
+        }
         emit newFileStatus(file, files_status::in_process);
+        QApplication::processEvents(); // прогружаем интерфейс
         bool movedToNextPage = false; // флаг перехода на новую страницу
         if(isWordFile(file.sourceFile)) // если у нас вордовский файл
         {
@@ -214,6 +223,7 @@ void SignProcessor::runProcessing()
 
             QString tempPdfFile = WordOptions.getTempdir() + getFileNameInPDFFormat(QFileInfo(file.sourceFile).fileName()); // создаем временный pdf файл
             AutoDeleter tempPdfFileDirContol(tempPdfFile); // автоматическое удаление файла
+            excel.saveBook();
             if(!excel.exportToPdf(tempPdfFile)) // экспортируем файл в PDF
             {
                 qDebug() << "Не удалось экспортировать файл в PDF";
@@ -255,7 +265,11 @@ void SignProcessor::runProcessing()
             qpdf.setQpdfPath(PDFOptions.qpdf_dir); // устанавливаем путь к QPDF
             qDebug() << "Файл для наложения: " << file.signPDFFile;
             qDebug() << "Файл наложения: " << simpleSignFile;
-            qpdf.overlay(simpleSignFile, tempPdfFile, file.signPDFFile); // объединяем файлы и готово
+            if(!qpdf.overlay(simpleSignFile, tempPdfFile, file.signPDFFile)) // объединяем файлы и готово
+            {
+                qDebug() << "Не удалось объединить файлы" << tempPdfFile << simpleSignFile;
+                continue;
+            }
         }
         else if (isPDFFile(file.sourceFile)) // обрабатываем PDF файл
         {
@@ -329,9 +343,11 @@ void SignProcessor::runProcessing()
 #endif
         }
         emit newFileStatus(file, files_status::no_errors);
+        QApplication::processEvents(); // прогружаем интерфейс
 
     }
     emit procesingFinished();
+    QApplication::processEvents(); // прогружаем интерфейс
 }
 
 bool SignProcessor::isExtension(QString file, QStringList filesExtensions)

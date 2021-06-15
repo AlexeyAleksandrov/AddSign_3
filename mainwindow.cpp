@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "qstringview.h"
 
+#include <QDesktopServices>
 #include <QMenu>
 
 #define SETTINGS_PASSWORD "oozioozi21" // worker21
@@ -231,6 +232,7 @@ void MainWindow::on_pushButton_addsign_clicked()
     if(signThread) // если поток уже запущен
     {
 //        signProscessor->setClosing(true); // Отправляем, что нужно прервать
+        isClosing = true;
         log.addToLog("Прерывание обработки word");
         wordCancel = true;
         return;
@@ -327,28 +329,34 @@ void MainWindow::on_pushButton_addsign_clicked()
         }
     }
 
-    QString qpdf_dir = ui->lineEdit_qpdfexe_dir->text();
-    if(containsPDFFiles || signType == SignProcessor::insert_in_exported_pdf) // если содержатся PDF файлы, то ищем QPDF
+    QString qpdf_dir = QDir::currentPath() + "/qpdf/qpdf.exe";
+    if(!QFile::exists(qpdf_dir))
     {
-        if(qpdf_dir == "")
-        {
-            if(!findQpdf(qpdf_dir))
-            {
-                QMessageBox::warning(this, "Ошибка", "Ошибка! Не указан путь к qpdf.exe");
-                log.addToLog("Ошибка! Не указан путь к qpdf.exe");
-                return;
-            }
-        }
-        if(!QFile::exists(qpdf_dir))
-        {
-            if(!findQpdf(qpdf_dir))
-            {
-                QMessageBox::warning(this, "Ошибка", "Ошибка! Файл qpdf.exe не найден!");
-                log.addToLog("Ошибка! Файл qpdf.exe не найден!");
-                return;
-            }
-        }
+        QMessageBox::warning(this, "Ошибка", "Ошибка! Файл qpdf.exe не найден!");
+        log.addToLog("Ошибка! Файл qpdf.exe не найден!");
+        return;
     }
+//    if(containsPDFFiles || signType == SignProcessor::insert_in_exported_pdf) // если содержатся PDF файлы, то ищем QPDF
+//    {
+//        if(qpdf_dir == "")
+//        {
+//            if(!findQpdf(qpdf_dir))
+//            {
+//                QMessageBox::warning(this, "Ошибка", "Ошибка! Не указан путь к qpdf.exe");
+//                log.addToLog("Ошибка! Не указан путь к qpdf.exe");
+//                return;
+//            }
+//        }
+//        if(!QFile::exists(qpdf_dir))
+//        {
+//            if(!findQpdf(qpdf_dir))
+//            {
+//                QMessageBox::warning(this, "Ошибка", "Ошибка! Файл qpdf.exe не найден!");
+//                log.addToLog("Ошибка! Файл qpdf.exe не найден!");
+//                return;
+//            }
+//        }
+//    }
 
     // страый метод
 //    cryptoObject.setCurrentSign(currentSign); // устанавливаем актуальную подпись
@@ -412,7 +420,7 @@ void MainWindow::on_pushButton_addsign_clicked()
 //    signProscessor->processor.setCryptoPROOptions(CryptoPRO_settings);
 //    signProscessor->processor.setFilesList(listAddedFiles);
 
-    signProscessor = new fileSignProcessor;
+//    signProscessor = new fileSignProcessor;
 
     processor.setWordOptions(word_settings);
     processor.setPDFOptions(PDF_settings);
@@ -420,7 +428,7 @@ void MainWindow::on_pushButton_addsign_clicked()
     processor.setFilesList(listAddedFiles);
 
     signThread = new QThread(this);
-    signProscessor->moveToThread(signThread);
+//    signProscessor->moveToThread(signThread);
 
     // логика запуска потоков
 //    connect(signThread, &QThread::started, signProscessor, &fileSignProcessor::run); // когдазаустился Word, начинаем обработку файлов
@@ -439,7 +447,11 @@ void MainWindow::on_pushButton_addsign_clicked()
 
     log.addToLog("Запущен поток word");
 //    signThread->start();
+    processor.closing = &isClosing;
     processor.runProcessing();
+
+    isClosing = false;
+    QMessageBox::information(this, "", "Готово");
 }
 
 void MainWindow::updateCurrentHostName()
@@ -968,56 +980,56 @@ QStringList MainWindow::getSignedFiles()
 
 void MainWindow::runFile(QString file)
 {
-    QString program;
-    QStringList args;
-    if(QSysInfo::productType()=="windows")
-    {
-        program = "cmd";
-        //        file = "/C start " + file + ""; // добавляем префикс для запуска из командной строки
-    }
-    args << "/C" << "start" << file;
-    //    args = file.split(" ", Qt::SplitBehavior(Qt::SkipEmptyParts));
-    qDebug() << "command: " + program << args;
-    QProcess t_proc; // создаём процесс
-    t_proc.startDetached(program, args); // запускаем файл в отдельном независящем потоке
-    log.addToLog("Запуск командной строки");
+//    QString program;
+//    QStringList args;
+//    if(QSysInfo::productType()=="windows")
+//    {
+//        program = "cmd";
+//        //        file = "/C start " + file + ""; // добавляем префикс для запуска из командной строки
+//    }
+//    args << "/C" << "start" << file;
+//    //    args = file.split(" ", Qt::SplitBehavior(Qt::SkipEmptyParts));
+//    qDebug() << "command: " + program << args;
+//    QProcess t_proc; // создаём процесс
+//    t_proc.startDetached(program, args); // запускаем файл в отдельном независящем потоке
+    log.addToLog("Запуск файла " + file);
+    QDesktopServices::openUrl(QUrl("file:" + file));
 }
 
-void MainWindow::runWordFile(QString wordFile)
-{
-    log.addToLog("Открытие файла в Word " + wordFile);
-    QProcess *process = new QProcess(this);
-    connect(process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(processFinished(int,QProcess::ExitStatus)));
-    QString file; // путь к ворду
-    //    file = "C:/Program Files/Microsoft Office/Office16/WINWORD.EXE"; // путь к ворду
-    file = ui->lineEdit_wordDirectory->text();
-    if(file.isEmpty())
-    {
-        QMessageBox::warning(this, "Ошибка", "Не указан путь к файлу Word!");
-        log.addToLog("Ошибка! Не указан путь к файлу Word!");
-        return;
-    }
-    if(!ifFileContains(file)) // Если файл не найден в директории (ворд был перемещён или директорию удалили)
-    {
-        QMessageBox::warning(this, "Ошибка", "Word по установленной директории не найден. Выберите другую директорию");
-        log.addToLog("Ошибка! Word по установленной директории не найден. Выберите другую директорию");
-        return;
-    }
+//void MainWindow::runWordFile(QString wordFile)
+//{
+//    log.addToLog("Открытие файла в Word " + wordFile);
+//    QProcess *process = new QProcess(this);
+//    connect(process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(processFinished(int,QProcess::ExitStatus)));
+//    QString file; // путь к ворду
+//    file = ui->lineEdit_wordDirectory->text();
+//    if(file.isEmpty())
+//    {
+//        QMessageBox::warning(this, "Ошибка", "Не указан путь к файлу Word!");
+//        log.addToLog("Ошибка! Не указан путь к файлу Word!");
+//        return;
+//    }
+//    if(!ifFileContains(file)) // Если файл не найден в директории (ворд был перемещён или директорию удалили)
+//    {
+//        QMessageBox::warning(this, "Ошибка", "Word по установленной директории не найден. Выберите другую директорию");
+//        log.addToLog("Ошибка! Word по установленной директории не найден. Выберите другую директорию");
+//        return;
+//    }
 
-    file = "\"" + file + "\"";
-    wordFile = "\"" + wordFile + "\"";
+//    file = "\"" + file + "\"";
+//    wordFile = "\"" + wordFile + "\"";
 
-    QFile temp_file(QDir::currentPath() + TEMP_BAT_FILE);
-    temp_file.open(QIODevice::WriteOnly);
-    QString temp_text = "start " + file + " " + wordFile;
-    temp_file.write(QString::fromUtf8(temp_text.toUtf8()).toLocal8Bit().data());
-    temp_file.close();
+//    QFile temp_file(QDir::currentPath() + TEMP_BAT_FILE);
+//    temp_file.open(QIODevice::WriteOnly);
+//    QString temp_text = "start " + file + " " + wordFile;
+//    temp_file.write(QString::fromUtf8(temp_text.toUtf8()).toLocal8Bit().data());
+//    temp_file.close();
 
-    log.addToLog("Запускаем Word: " + wordFile);
+//    log.addToLog("Запускаем Word: " + wordFile);
 
-    process->setProgram(temp_file.fileName());
-    process->startDetached();
-}
+//    process->setProgram(temp_file.fileName());
+//    process->startDetached();
+//}
 
 bool MainWindow::findQpdf(QString &qpdf_dir)
 {
@@ -1128,7 +1140,7 @@ void MainWindow::filesTableMouseRightClick(QTableWidgetItem *item)
     QString filename;
     if(item != nullptr)
     {
-        filename = item->text();
+        filename = getFileDirByIndex(item->row());
         QAction *menuDeleteFile = menu.addAction("Удалить " + filename);
         QObject::connect(menuDeleteFile, &QAction::triggered, this, [=]() { removeFile(getFileDirByIndex(item->row())); }); // удаление файла
     }
@@ -1158,17 +1170,17 @@ void MainWindow::filesTableMouseRightClick(QTableWidgetItem *item)
         fileToolTip fileData = getFileToolTip(item->row()); // получаем tooltip файла
 
         QAction *menuOpenFileAction = menu.addAction("Открыть " + QFileInfo(fileData.sourceFile).fileName());
-        QObject::connect(menuOpenFileAction, &QAction::triggered, this, [this, fileData]() { runWordFile(fileData.sourceFile); });
+        QObject::connect(menuOpenFileAction, &QAction::triggered, this, [this, fileData]() { runFile(fileData.sourceFile); });
 
         if(fileData.signedFile != "")
         {
             QAction *menuOpenFileAction = menu.addAction("Открыть подписанный WORD файл");
-            QObject::connect(menuOpenFileAction, &QAction::triggered, this, [this, fileData]() { runWordFile(fileData.signedFile); });
+            QObject::connect(menuOpenFileAction, &QAction::triggered, this, [this, fileData]() { runFile(fileData.signedFile); });
         }
         if(fileData.signedPdfFile != "")
         {
             QAction *menuOpenFileAction = menu.addAction("Открыть подписанный PDF файл");
-            QObject::connect(menuOpenFileAction, &QAction::triggered, this, [this, fileData]() { runWordFile(fileData.signedPdfFile); });
+            QObject::connect(menuOpenFileAction, &QAction::triggered, this, [this, fileData]() { runFile(fileData.signedPdfFile); });
         }
     }
 
@@ -1310,10 +1322,10 @@ void MainWindow::threadFinished()
     }
 
     ui->pushButton_addsign->setText("Добавить подпись");
-    if(!isClosing && !wordCancel)
-    {
-        QMessageBox::information(this, "", "Готово");
-    }
+//    if(!isClosing && !wordCancel)
+//    {
+//        QMessageBox::information(this, "", "ExcelEditor");
+//    }
     ui->closeButton->setDisabled(false);
 
 }
@@ -1547,7 +1559,7 @@ void MainWindow::on_tableWidget_filestatus_itemDoubleClicked(QTableWidgetItem *i
     }
     if(!fileForRun.isEmpty())
     {
-        runWordFile(fileForRun);
+        runFile(fileForRun);
     }
     else
     {

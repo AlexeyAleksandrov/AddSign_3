@@ -29,6 +29,7 @@ bool ExcelEditor::openBook(QString fileDir)
     checkAxObject(ActiveSheet, "ActiveSheet");
     pageSetup = ActiveSheet->querySubObject("PageSetup");
     checkAxObject(pageSetup, "pageSetup");
+    qDebug() << "Открыли файл " << fileDir;
     return true;
 }
 
@@ -42,11 +43,31 @@ bool ExcelEditor::saveBook()
 bool ExcelEditor::exportToPdf(QString outputFileName)
 {
     checkNullPointer(ActiveSheet, "ActiveSheet");
-    QString tempOutputFileName = "C:/temp.pdf";
+    QString t_dir = "C:/tempAddSign";
+    QDir tempdir(t_dir);
+    if(!tempdir.exists())
+    {
+        if(!tempdir.mkdir(t_dir))
+        {
+            qDebug() << "Не удалось создать временную папку!";
+            return false;
+        }
+    }
+    QString tempOutputFileName =  t_dir + "/temp.pdf";
     ActiveSheet->dynamicCall("ExportAsFixedFormat(int, QVariant, int, bool, bool, bool)",
                                xlTypePDF, tempOutputFileName, xlQualityStandard, IgnorePrintAreas, OpenAfterPublish);
     QFile::copy(tempOutputFileName, outputFileName);
-    QFile::remove(tempOutputFileName);
+    if(QFile::exists(outputFileName))
+    {
+        QFile::remove(tempOutputFileName);
+        tempdir.rmdir(t_dir);
+    }
+    else
+    {
+        qDebug() << "Не удалось экспортировать в PDF " << outputFileName;
+        tempdir.rmdir(t_dir);
+        return false;
+    }
     qDebug() << "Экспортировано в " << outputFileName;
     return true;
 }
