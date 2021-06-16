@@ -465,7 +465,14 @@ void MainWindow::on_pushButton_addsign_clicked()
     log.addToLog("Обработка файлов завершена");
 
     ui->closeButton->setDisabled(false);
-    QMessageBox::information(this, "", "Готово");
+    if(!closeOnEnd)
+    {
+        QMessageBox::information(this, "", "Готово");
+    }
+    else
+    {
+        this->close();
+    }
 }
 
 void MainWindow::updateCurrentHostName()
@@ -1465,8 +1472,15 @@ void MainWindow::cryptoSignListReady(QList<CryptoPRO_CSP::CryptoSignData> list)
             qDebug() << "Добавили файл " << args.at(1);
             if(args.count() >= 3) // дополнительный аргумент
             {
-                if(args.at(2) == "addsign")
+                if(args.at(2) == "-addsign")
                 {
+                    if(args.count() >= 4) // дополнительный аргумент
+                    {
+                        if(args.at(3) == "-close")
+                        {
+                            closeOnEnd = true;
+                        }
+                    }
                     ui->pushButton_addsign->click(); // вызываем функцию клика
                 }
             }
@@ -1816,8 +1830,9 @@ QString MainWindow::fileToolTip::getToolTip()
     return "sourceFile=" + sourceFile + "|" + "signedFile=" + signedFile + "|" + "signedPdfFile=" + signedPdfFile;
 }
 
-//void MainWindow::on_pushButton_moveToSigning_clicked()
-//{
+void MainWindow::on_pushButton_moveToSigning_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(STACKED_SIGN_SETTINGS); // переходим к подписи
 //    if(signThread) // если поток уже запущен
 //    {
 ////        signProscessor->setClosing(true); // Отправляем, что нужно прервать
@@ -1829,7 +1844,7 @@ QString MainWindow::fileToolTip::getToolTip()
 //    {
 //        ui->stackedWidget->setCurrentIndex(STACKED_SIGN_SETTINGS); // переходим к подписи
 //    }
-//}
+}
 
 void MainWindow::on_pushButton_backToChoseFiles_clicked()
 {
@@ -2025,3 +2040,8 @@ void MainWindow::on_pushButton_acceptCurrentPreset_clicked()
     presets.applyPreset(ui->comboBox_changePreset->currentText()); // примняем выбранный шаблон
 }
 
+
+//void MainWindow::on_pushButton_moveToSigning_clicked()
+//{
+
+//}

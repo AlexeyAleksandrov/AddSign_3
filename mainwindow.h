@@ -107,6 +107,7 @@ private:
     // ==== БЛОК ОБРАБОТКИ ФАЙЛОВ ====
     // =================================================================================
     bool isClosing = false; // флаг того, что программа закрывается и нужно всё сворачивать
+    bool closeOnEnd = false;
 //    bool wordCancel = false;
 
     SignProcessor processor;
@@ -288,5 +289,6 @@ private slots:
     void on_pushButton_deletePreset_clicked();
     void on_pushButton_acceptCurrentPreset_clicked();
 //    void on_comboBox_choseImageGerb_currentIndexChanged(int index);
+    void on_pushButton_moveToSigning_clicked();
 };
 #endif // MAINWINDOW_H
