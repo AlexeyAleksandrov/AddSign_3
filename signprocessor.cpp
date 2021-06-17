@@ -332,7 +332,7 @@ void SignProcessor::runProcessing()
             // теперь с помощью QPDF объединяем файлы
             qpdf_cmd qpdf;
             qpdf.setQpdfPath(PDFOptions.qpdf_dir); // устанавливаем путь к QPDF
-            if(qpdf.overlay(simpleSignFile, tempFile, file.signPDFFile)) // объединяем файлы и готово
+            if(!qpdf.overlay(simpleSignFile, tempFile, file.signPDFFile)) // объединяем файлы и готово
             {
                 qDebug() << "Не удалось объединить файлы" << tempFile << simpleSignFile;
                 log.addToLog("Не удалось объединить файлы " + tempFile + " " + simpleSignFile);
