@@ -376,6 +376,7 @@ void MainWindow::on_pushButton_addsign_clicked()
     for (auto &&file : listAddedFiles)
     {
         setFileStatus(file, files_status::waiting); // ставим всем файлам статус ожидания
+        QApplication::processEvents(); // прогружаем интерфейс
     }
 
     dir.mkpath(outputDir); // создаём директорию вывода
@@ -383,6 +384,7 @@ void MainWindow::on_pushButton_addsign_clicked()
 //    countFilesReady = 0; // обнуляем счётчик обработанных файлов
 
     clearAllOutputsToolTipData(); // очищаем пути вывода для всех файлов в таблице
+    QApplication::processEvents(); // прогружаем интерфейс
 
     SignProcessor::WordParams word_settings;
 //    word_settings.files = listAddedFiles; // передаём файлы для обработки
@@ -393,6 +395,7 @@ void MainWindow::on_pushButton_addsign_clicked()
     word_settings.exportToWord = exportToWord; // передаём, нужно-ли подписывать документ Word
     word_settings.exportToPDF = exportToPDF; // устанавдиваем, нужно-ли экспортировать в PDF
     word_settings.insertType =(ui->radioButton_usually_insert->isChecked() ? SignProcessor::insert_standart : SignProcessor::insert_in_exported_pdf); // подставляем тип вставки картинки
+    word_settings.noInsertImage = ui->checkBox_disableInsertImageToWord->isChecked(); // вставлять или не вставлять картинку в word (при стандартной вставке)
 
     SignProcessor::signPreset pdfSignPreset;
     pdfSignPreset.alignment = ui->horizontalSlider->value();
@@ -460,6 +463,7 @@ void MainWindow::on_pushButton_addsign_clicked()
         if(status == files_status::waiting) // Если статус "в очереди"
         {
             setFileStatus(getFileDirByIndex(i), files_status::added); // устанавливаем статус добавлен всем файлам, которые оказались в процессе
+            QApplication::processEvents(); // прогружаем интерфейс
         }
     }
     log.addToLog("Обработка файлов завершена");
@@ -636,6 +640,7 @@ void MainWindow::setFileStatus(QString file_dir, int status)
 {
     int row = -1;
     row = getFileIndexByDir(file_dir); // получаем индекс файла в таблице
+    QApplication::processEvents(); // прогружаем интерфейс
 
     if(row == -1)
     {
@@ -717,6 +722,7 @@ int MainWindow::getFileIndexByDir(QString file_dir)
             //            qDebug() << "Найдено: " << i;
             break;
         }
+        QApplication::processEvents(); // прогружаем интерфейс
     }
     return row;
 }

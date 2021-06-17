@@ -232,28 +232,42 @@ void CryptoPRO_CSP::s_certmgr::setCryptoProDirectory(const QString &value)
 bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSignData sign)
 {
     log.addToLog("Запускатся процесс подписи файла " + file);
-    QFile csptest_bat_file("csptest_bat.bat");
+    QFile csptest_bat_file(QDir::currentPath() + "/csptest_bat.bat");
     QString bat_text = QString("echo %2 | \"") + runfile + QString("\" -sfsign -sign -detached -add -in %1 -out %1.sig -my %3"); // универсальный текст батника
 
     csptest_bat_file.open(QIODevice::WriteOnly);
     csptest_bat_file.write(bat_text.toUtf8()); // создаём батник
     csptest_bat_file.close();
 
+    QString filebatDir = csptest_bat_file.fileName();
+    if(!QFile::exists(filebatDir))
+    {
+        qDebug() << "Файл не найден " << filebatDir;
+        log.addToLog("Файл не найден " + filebatDir);
+        return false;
+    }
+
     QProcess csptest_bat;
     csptest_bat.setReadChannel(QProcess::StandardOutput);
 
-    QFile sigFile(file + ".sig");
-    if(sigFile.exists())
+    if(!QFile::exists(file))
     {
-        sigFile.remove(); // удаляем sig файл, если таковой уже имеется
+        qDebug() << "Файл для подписи не найден " + file;
+        log.addToLog("Файл для подписи не найден " + file);
+        return false;
     }
+//    if(sigFile.exists())
+//    {
+//        sigFile.remove(); // удаляем sig файл, если таковой уже имеется
+//    }
 
-    csptest_bat.start(csptest_bat_file.fileName(), QStringList() << file << QString::number(sign.index) << sign.email); // запускаем батник с параметрами
+    QStringList params = QStringList() << file << QString::number(sign.index) << sign.email;
+    csptest_bat.start(csptest_bat_file.fileName(), params); // запускаем батник с параметрами
     if (!csptest_bat.waitForStarted())
     {
         qDebug() << "The process didnt start" << csptest_bat.error();
         log.addToLog(&"The process didnt start " [ csptest_bat.error()]);
-        csptest_bat_file.remove();
+//        csptest_bat_file.remove();
         return false;
     }
     QString cmd_out;
@@ -272,7 +286,8 @@ bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSig
         csptest_bat_file.remove();
         return false;
     }
-    csptest_bat_file.remove();
+//    csptest_bat_file.remove();
+    QFile sigFile(file + ".sig");
     if(sigFile.exists() && cmd_out.contains("[ErrorCode: 0x00000000]")) //  && cmd_out.contains("[ErrorCode: 0x00000000]")
     {
         log.addToLog("Подпись успешно создана " + sigFile.fileName());

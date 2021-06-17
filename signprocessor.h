@@ -37,6 +37,7 @@ public:
         bool exportToPDF = false;
         int signImageRowsCount = 2;
         int insertType = insert_standart;
+        bool noInsertImage = false;
 
         QString getTempdir() const;
         QString getOutputdir() const;

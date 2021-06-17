@@ -2357,17 +2357,36 @@ background-color: rgb(32, 74, 135);
               <string>Настройки для Word</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_21">
-              <item row="2" column="0">
+              <item row="3" column="0">
                <widget class="QCheckBox" name="checkBox_signWordDocument">
                 <property name="text">
                  <string>Подписывать документ Word</string>
                 </property>
                </widget>
               </item>
-              <item row="3" column="0">
+              <item row="1" column="0">
+               <widget class="QCheckBox" name="checkBox_exportWordToPDF">
+                <property name="font">
+                 <font>
+                  <family>MS Shell Dlg 2</family>
+                  <pointsize>12</pointsize>
+                  <weight>50</weight>
+                  <italic>false</italic>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Экспортировать в PDF</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
                <widget class="QGroupBox" name="groupBox_16">
                 <property name="title">
-                 <string>Вставка подписи (черновое вариант)</string>
+                 <string>Вставка подписи</string>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_25">
                  <item row="0" column="0">
@@ -2391,25 +2410,6 @@ background-color: rgb(32, 74, 135);
                   </widget>
                  </item>
                 </layout>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QCheckBox" name="checkBox_exportWordToPDF">
-                <property name="font">
-                 <font>
-                  <family>MS Shell Dlg 2</family>
-                  <pointsize>12</pointsize>
-                  <weight>50</weight>
-                  <italic>false</italic>
-                  <bold>false</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Экспортировать в PDF</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
                </widget>
               </item>
              </layout>
@@ -2575,78 +2575,6 @@ background-color: rgb(32, 74, 135);
            <string>Системные настройки</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
-           <item row="6" column="3">
-            <widget class="QLabel" name="label_31">
-             <property name="text">
-              <string>применяется автоматически</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="2">
-            <widget class="QDoubleSpinBox" name="doubleSpinBox_scalekoefficient">
-             <property name="minimum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>4.990000000000000</double>
-             </property>
-             <property name="singleStep">
-              <double>0.250000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="3">
-            <widget class="QPushButton" name="pushButton_8">
-             <property name="text">
-              <string>Выбрать</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="1">
-            <widget class="QLabel" name="label_30">
-             <property name="text">
-              <string>Масштаб системы</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="3">
-            <widget class="QPushButton" name="pushButton_chose_qpdfexe_dir">
-             <property name="text">
-              <string>Выбрать</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QLabel" name="label_25">
-             <property name="text">
-              <string>Директория qpdf.exe</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="label_16">
-             <property name="text">
-              <string>Путь расположения Word: </string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1" colspan="2">
-            <widget class="QLineEdit" name="lineEdit_wordDirectory">
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="label_17">
-             <property name="text">
-              <string>Директория хранения временных файлов:</string>
-             </property>
-            </widget>
-           </item>
            <item row="1" column="3">
             <widget class="QPushButton" name="pushButton_7">
              <property name="text">
@@ -2654,14 +2582,7 @@ background-color: rgb(32, 74, 135);
              </property>
             </widget>
            </item>
-           <item row="3" column="1" colspan="2">
-            <widget class="QLineEdit" name="lineEdit_tempFilesDirectory">
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="1" colspan="3">
+           <item row="9" column="1" colspan="3">
             <spacer name="horizontalSpacer_6">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -2677,10 +2598,47 @@ background-color: rgb(32, 74, 135);
              </property>
             </spacer>
            </item>
-           <item row="5" column="1" colspan="2">
-            <widget class="QLineEdit" name="lineEdit_qpdfexe_dir">
-             <property name="readOnly">
-              <bool>true</bool>
+           <item row="6" column="2">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_scalekoefficient">
+             <property name="minimum">
+              <double>1.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>4.990000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.250000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QLabel" name="label_25">
+             <property name="text">
+              <string>Директория qpdf.exe</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="3">
+            <widget class="QLabel" name="label_31">
+             <property name="text">
+              <string>применяется автоматически</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QLabel" name="label_30">
+             <property name="text">
+              <string>Масштаб системы</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="label_16">
+             <property name="text">
+              <string>Путь расположения Word: </string>
              </property>
             </widget>
            </item>
@@ -2699,6 +2657,55 @@ background-color: rgb(32, 74, 135);
               </size>
              </property>
             </spacer>
+           </item>
+           <item row="5" column="1" colspan="2">
+            <widget class="QLineEdit" name="lineEdit_qpdfexe_dir">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1" colspan="2">
+            <widget class="QLineEdit" name="lineEdit_wordDirectory">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLabel" name="label_17">
+             <property name="text">
+              <string>Директория хранения временных файлов:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="3">
+            <widget class="QPushButton" name="pushButton_8">
+             <property name="text">
+              <string>Выбрать</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="3">
+            <widget class="QPushButton" name="pushButton_chose_qpdfexe_dir">
+             <property name="text">
+              <string>Выбрать</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1" colspan="2">
+            <widget class="QLineEdit" name="lineEdit_tempFilesDirectory">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="1" colspan="3">
+            <widget class="QCheckBox" name="checkBox_disableInsertImageToWord">
+             <property name="text">
+              <string>Отключить добавление картинки в Word</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>

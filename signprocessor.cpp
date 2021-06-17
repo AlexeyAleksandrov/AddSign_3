@@ -80,7 +80,7 @@ void SignProcessor::runProcessing()
 //    PDFOptions.htmlParams.lineOwner = "Владелец: " + CryptoPROOptions.sign.subname; // ЗАМЕНИТЬ!!!!!
 //    PDFOptions.htmlParams.lineDate = "Действителен с 09.09.2021 до 10.10.2021";
 
-    WordEditor word; // создаем обработчик ворда
+//    WordEditor word; // создаем обработчик ворда
 
     for(auto &&file : filesList) // перебераем все файлы
     {
@@ -98,6 +98,7 @@ void SignProcessor::runProcessing()
         bool movedToNextPage = false; // флаг перехода на новую страницу
         if(isWordFile(file.sourceFile)) // если у нас вордовский файл
         {
+            WordEditor word; // создаем обработчик ворда
             QString imagedir = WordOptions.getImageDir();
             if(imagedir == "" || (imagedir != "" && !QFile::exists(imagedir)))
             {
@@ -122,8 +123,11 @@ void SignProcessor::runProcessing()
                 int pagesCountBefore = word.getPagesCount(); // получаем количество страниц
                 assert(word.insertText("\r"), "insertText"); // добавляем перенос строки (по умолчанию добавляется в конец документа
 
-                assert(word.moveSelectionToEnd(), "moveSelectionToEnd"); // перемещаем курсор в конец (потому что обработчик смарт-объектов указывает на начало документа)
-                assert(word.addPicture(imagedir, 3.0), "addPicture"); // вставляем картинку
+                if(!WordOptions.noInsertImage) // если нет запрета на вставку картинки
+                {
+                    assert(word.moveSelectionToEnd(), "moveSelectionToEnd"); // перемещаем курсор в конец (потому что обработчик смарт-объектов указывает на начало документа)
+                    assert(word.addPicture(imagedir, 3.0), "addPicture"); // вставляем картинку
+                }
                 assert(word.setParagraphAlignment(WordEditor::paragrapfAlignment::center), "setParagraphAlignment"); // выравниваем по центру
                 int pageCountAfter = word.getPagesCount(); // получаем количество страниц после вставки
 
@@ -213,7 +217,13 @@ void SignProcessor::runProcessing()
                 // теперь с помощью QPDF объединяем файлы
                 qpdf_cmd qpdf;
                 qpdf.setQpdfPath(PDFOptions.qpdf_dir); // устанавливаем путь к QPDF
-                qpdf.overlay(simpleSignFile, tempFile, file.signPDFFile); // объединяем файлы и готово
+                if(qpdf.overlay(simpleSignFile, tempFile, file.signPDFFile)) // объединяем файлы и готово
+                {
+                    qDebug() << "Не удалось объединить файлы" << tempFile << simpleSignFile;
+                    log.addToLog("Не удалось объединить файлы " + tempFile + " " + simpleSignFile);
+                    emit newFileStatus(file, files_status::error_pdf_no_export);
+                    continue;
+                }
             }
         }
         else if (isExcelFile(file.sourceFile))  // обработчик Excel файлов
@@ -322,7 +332,13 @@ void SignProcessor::runProcessing()
             // теперь с помощью QPDF объединяем файлы
             qpdf_cmd qpdf;
             qpdf.setQpdfPath(PDFOptions.qpdf_dir); // устанавливаем путь к QPDF
-            qpdf.overlay(simpleSignFile, tempFile, file.signPDFFile); // объединяем файлы и готово
+            if(qpdf.overlay(simpleSignFile, tempFile, file.signPDFFile)) // объединяем файлы и готово
+            {
+                qDebug() << "Не удалось объединить файлы" << tempFile << simpleSignFile;
+                log.addToLog("Не удалось объединить файлы " + tempFile + " " + simpleSignFile);
+                emit newFileStatus(file, files_status::error_pdf_no_export);
+                continue;
+            }
         }
         else
         {
