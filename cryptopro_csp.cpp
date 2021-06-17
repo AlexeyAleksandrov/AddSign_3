@@ -54,7 +54,7 @@ QString CryptoPRO_CSP::s_certmgr::getConsoleText(QStringList options)
     QProcess certmgr_process;
     certmgr_process.setReadChannel(QProcess::StandardOutput);
 
-    qDebug() << "runfile = " << runfile;
+//    qDebug() << "runfile = " << runfile;
     certmgr_process.start(this->runfile, options); // запускаем процесс
     QString consoleText;
     if(!certmgr_process.waitForStarted())

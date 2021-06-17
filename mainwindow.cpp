@@ -530,7 +530,7 @@ void MainWindow::setSignsInCombobox(QList<CryptoPRO_CSP::CryptoSignData> list, i
         {
             name = "-";
         }
-        qDebug() << "name = " << name << "subname = " << subname << "nameOrSubjectState = " << nameOrSubjectState;
+//        qDebug() << "name = " << name << "subname = " << subname << "nameOrSubjectState = " << nameOrSubjectState;
         switch (nameOrSubjectState)
         {
             case 0:
@@ -1498,7 +1498,7 @@ void MainWindow::cryptoSignListReady(QList<CryptoPRO_CSP::CryptoSignData> list)
     }
     else
     {
-        qDebug() << "Недостаточно аргументов запуска!" << args;
+//        qDebug() << "Недостаточно аргументов запуска!" << args;
     }
     log.addToLog("Завершен слот cryptoSignListReady");
 }
@@ -1654,10 +1654,10 @@ void MainWindow::on_pushButton_9_clicked()
 }
 
 
-void MainWindow::on_pushButton_5_clicked()
-{
+//void MainWindow::on_pushButton_5_clicked()
+//{
 
-}
+//}
 
 
 
@@ -1682,20 +1682,20 @@ void MainWindow::on_advancedSettingsButton_clicked()
     }
 }
 
-void MainWindow::on_pushButton_chose_files_clicked()
-{
-    ui->stackedWidget->setCurrentIndex(STACKED_FILES);
-}
+//void MainWindow::on_pushButton_chose_files_clicked()
+//{
+//    ui->stackedWidget->setCurrentIndex(STACKED_FILES);
+//}
 
-void MainWindow::on_pushButton_edit_preview_clicked()
-{
-    ui->stackedWidget->setCurrentIndex(STACKED_EDIT_PREVIEW);
-}
+//void MainWindow::on_pushButton_edit_preview_clicked()
+//{
+//    ui->stackedWidget->setCurrentIndex(STACKED_EDIT_PREVIEW);
+//}
 
-void MainWindow::on_pushButton_chose_shablon_clicked()
-{
-    ui->stackedWidget->setCurrentIndex(STACKED_SHABLONI);
-}
+//void MainWindow::on_pushButton_chose_shablon_clicked()
+//{
+//    ui->stackedWidget->setCurrentIndex(STACKED_SHABLONI);
+//}
 
 void MainWindow::on_pushButton_back_to_menu_clicked()
 {
@@ -1852,10 +1852,10 @@ void MainWindow::on_pushButton_moveToSigning_clicked()
 //    }
 }
 
-void MainWindow::on_pushButton_backToChoseFiles_clicked()
-{
-    ui->stackedWidget->setCurrentIndex(STACKED_FILES); // переходим назад к выбору файлов
-}
+//void MainWindow::on_pushButton_backToChoseFiles_clicked()
+//{
+//    ui->stackedWidget->setCurrentIndex(STACKED_FILES); // переходим назад к выбору файлов
+//}
 
 void MainWindow::on_comboBox_currentIndexChanged(int index)
 {
@@ -1918,13 +1918,13 @@ void MainWindow::on_doubleSpinBox_scalekoefficient_valueChanged(double arg1)
     setScale(arg1);
 }
 
-void MainWindow::on_paramButton_clicked()
-{
-    ui->stackedWidget->setCurrentIndex(STACKED_SIGN_POSITION_PREVIEW);
-    updatePrewiew();
-    ui->previewWidget->rescale();
-    ui->verticalSlider->setMaximum(ui->previewWidget->getDrawLinesCount()); // ставим максимум в число строк на превью
-}
+//void MainWindow::on_paramButton_clicked()
+//{
+//    ui->stackedWidget->setCurrentIndex(STACKED_SIGN_POSITION_PREVIEW);
+//    updatePrewiew();
+//    ui->previewWidget->rescale();
+//    ui->verticalSlider->setMaximum(ui->previewWidget->getDrawLinesCount()); // ставим максимум в число строк на превью
+//}
 
 void MainWindow::on_verticalSlider_valueChanged(int value)
 {
@@ -1938,10 +1938,10 @@ void MainWindow::on_horizontalSlider_valueChanged(int value)
     ui->previewWidget->update();
 }
 
-void MainWindow::on_pushButton_backToExportParams_clicked()
-{
-    ui->stackedWidget->setCurrentIndex(STACKED_SIGN_SETTINGS);
-}
+//void MainWindow::on_pushButton_backToExportParams_clicked()
+//{
+//    ui->stackedWidget->setCurrentIndex(STACKED_SIGN_SETTINGS);
+//}
 
 
 void MainWindow::on_radioButton_usually_insert_clicked(bool checked)

@@ -237,12 +237,12 @@ private slots:
     }
 //    void on_pushButton_clicked();
 //    void on_pushButton_4_clicked();
-    void on_pushButton_5_clicked();
+//    void on_pushButton_5_clicked();
 //    void on_pushButton_6_clicked();
     void on_advancedSettingsButton_clicked();
-    void on_pushButton_chose_files_clicked();
-    void on_pushButton_edit_preview_clicked();
-    void on_pushButton_chose_shablon_clicked();
+//    void on_pushButton_chose_files_clicked();
+//    void on_pushButton_edit_preview_clicked();
+//    void on_pushButton_chose_shablon_clicked();
 //    void on_pushButton_add_new_shablon_clicked();
     void on_pushButton_back_to_menu_clicked();
     void on_closeButton_clicked();
@@ -257,7 +257,7 @@ private slots:
     void on_comboBox_choseImageGerb_currentIndexChanged(const QString &arg1);
 //    void on_comboBox_activated(int index);
 //    void on_pushButton_moveToSigning_clicked();
-    void on_pushButton_backToChoseFiles_clicked();
+//    void on_pushButton_backToChoseFiles_clicked();
     void on_comboBox_currentIndexChanged(int index);
     void on_comboBox_signHost_currentIndexChanged(int index);
 //    void on_comboBox_viewPresetInfo_currentIndexChanged(int index);
@@ -266,13 +266,13 @@ private slots:
     void on_addFolderPushButton_clicked();
 //    void on_pushButton_apply_scale_clicked();
     void on_doubleSpinBox_scalekoefficient_valueChanged(double arg1);
-    void on_paramButton_clicked();
+//    void on_paramButton_clicked();
     void on_verticalSlider_valueChanged(int value);
     void on_horizontalSlider_valueChanged(int value);
 //    void on_horizontalSlider_sliderMoved(int position);
 //    void on_comboBox_2_activated(const QString &arg1);
 //    void on_comboBox_linesInterval_currentIndexChanged(const QString &arg1);
-    void on_pushButton_backToExportParams_clicked();
+//    void on_pushButton_backToExportParams_clicked();
 //    void on_verticalSlider_sliderMoved(int position);
     void on_radioButton_usually_insert_clicked(bool checked);
     void on_radioButton_insert_in_exported_pdf_clicked(bool checked);
