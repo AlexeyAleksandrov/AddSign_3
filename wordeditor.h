@@ -5,7 +5,6 @@
 #include <QAxObject>
 #include <QDebug>
 #include <QFileInfo>
-#include "logclass.h"
 
 
 class WordEditor : public QObject
@@ -28,6 +27,47 @@ public:
     {
         wdOrientPortrait = 0,
         wdOrientLandscape = 1
+    };
+
+    struct WordTables
+    {
+    public:
+        WordTables(QAxObject *tables);
+        int count(); // возвращает количество таблиц в документе
+    private:
+        QAxObject *tables = nullptr;
+
+    };
+
+    struct TableCell
+    {
+        TableCell(QAxObject *cell, int row, int col);
+        QString text();
+        bool setText(QString text);
+        int row();
+        int column();
+        bool setImage(QString imageDir);
+        bool clear();
+
+        private:
+        QAxObject *cell = nullptr;
+        int tableRow = -1;
+        int tableColumn = -1;
+    };
+
+    struct WordTable
+    {
+    public:
+        WordTable(QAxObject *table, int index);
+        bool tableToText(); // перевести таблицу в текст (внутри документа)
+        int columnsCount(); // получить количество столбцов в таблице
+        int rowsCount(); // возвращает количество строк
+        int taleIndex() const;
+        TableCell cell(int row, int col); // возвращает ячейку таблицы
+
+        private:
+        QAxObject *table = nullptr;
+        int index = -1;
     };
 
 public:
@@ -54,6 +94,7 @@ public:
     bool updateSelection(); // обновляет выбранную область
     bool selectionSetRange(int start, int end); // установить область выделения
     bool selectionCollapse(int postion); // переместить курсор в начало или колнец документа
+    bool deleteSelection(); // удалить выбранную убласть
 
     // работа со страницами
     int getPagesCount(); // получить количество страниц в документе
@@ -62,21 +103,28 @@ public:
 
     // работа с картинками
     bool moveSelectionToEnd(); // перемещаем курсор в конец файла
-    bool updateShapes(); // обновляет указатель на smart объекты
-    bool addPicture(QString imagedir, const float size_santimetr = 3.0); // добавить картинку
+    bool updateShapes(QAxObject *selection = nullptr); // обновляет указатель на smart объекты
+    bool addPicture(QString imagedir, const float size_santimetr = 3.0, QAxObject *selection = nullptr); // добавить картинку
 
     // перемещение по документу
     bool typeBackspace(); // вызов клавиши backspace
 
-signals:
+    // таблицы
+    WordTables tables(); // возвращает объект tables
+    WordTable table(int tableIndex); // возвращает объект tables
 
-private slots:
+//    WordTable tables = WordTable(nullptr);
+
+    QAxObject *getWord() const;
+
+    signals:
+
+    private slots:
     void exception(int code, QString source, QString desc, QString help); // слот получения ошибок
 
 private:
     bool wordInit(); // инициализация ворда
     bool wordQuit(); // завершение ворда
-    QString getFileNameInPDFFormat(QString sourceFileName); // изменяет расширение файла на .pdf и возвращает его
     QAxObject *word = nullptr; // объект ворда
     QAxObject *documents = nullptr; //получаем коллекцию документов
     QAxObject *document = nullptr; // открытый документ
@@ -88,7 +136,7 @@ private:
     QString activeFile; // текущий открытый файл
     bool opened = false;
 
-    logClass log;
+
 
 };
 

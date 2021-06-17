@@ -1,15 +1,11 @@
 #include "wordeditor.h"
 
-#define checkAxObject(pointer, object_name)  if(pointer==nullptr) { qDebug() << "Нет данных " + QString(object_name); log.addToLog("Нет данных " + QString(object_name)); throw QString("AxObject Error: ") + object_name;  return false; } else { connect(pointer, SIGNAL(exception(int,QString,QString,QString)), this, SLOT(exception(int,QString,QString,QString))); pointer->setObjectName(object_name); }
-#define checkNullPointer(pointer, texterror) if(pointer == nullptr) { qDebug() << texterror << " is nullptr"; log.addToLog(texterror + QString(" is nullptr")); throw QString("NullPointer Error: ") + texterror;  return false; }
+#define checkAxObject(pointer, object_name)  if(pointer==nullptr) { qDebug() << "Нет данных " + QString(object_name); throw QString("AxObject Error: ") + object_name;  return false; } else { QObject::connect(pointer, SIGNAL(exception(int,QString,QString,QString)), this, SLOT(exception(int,QString,QString,QString))); pointer->setObjectName(object_name); }
+#define checkNullPointer(pointer, texterror) if(pointer == nullptr) { qDebug() << texterror << " is nullptr"; throw QString("NullPointer Error: ") + texterror;  return false; }
 
 WordEditor::WordEditor(QObject *parent) : QObject(parent)
 {
-//   Q_ASSERT(wordInit()); // инициализируем ворд, и если ошибюка, то qt на сообщит об этом
-    if(!(wordInit())) // инициализируем ворд, и если ошибюка, то qt на сообщит об этом
-    {
-        qDebug() << "Не удалось инициализирвоать WORD";
-    }
+   Q_ASSERT(wordInit()); // инициализируем ворд, и если ошибюка, то qt на сообщит об этом
 }
 
 WordEditor::~WordEditor()
@@ -26,10 +22,10 @@ bool WordEditor::openDocument(QString fileDir)
     QString f_dir;
     QString f_name;
 
-//    if(opened) // если уже открыт документ
-//    {
-//        closeDocument(); // закрываем открытый
-//    }
+    if(opened) // если уже открыт документ
+    {
+        closeDocument(); // закрываем открытый
+    }
 
     f_dir = QFileInfo(fileDir).absolutePath() + "/";
     f_name = QFileInfo(fileDir).fileName();
@@ -105,6 +101,7 @@ bool WordEditor::updateSelection()
 
 bool WordEditor::selectionSetRange(int start, int end)
 {
+    checkNullPointer(selection, "selection");
     checkNullPointer(word, "word");
     updateSelection();
     checkNullPointer(Range, "Range");
@@ -128,9 +125,21 @@ bool WordEditor::selectionCollapse(int postion)
     return true;
 }
 
-bool WordEditor::updateShapes()
+bool WordEditor::deleteSelection()
 {
-    checkNullPointer(word, "word");
+    checkNullPointer(selection, "selection");
+    updateSelection();
+    selection->dynamicCall("Delete()");
+    return true;
+}
+
+bool WordEditor::updateShapes(QAxObject *selection)
+{
+    if(selection == nullptr)
+    {
+        selection = this->selection;
+    }
+    checkNullPointer(selection, "selection");
     if(selection == nullptr)
     {
         if(!updateSelection())
@@ -144,10 +153,14 @@ bool WordEditor::updateShapes()
     return true;
 }
 
-bool WordEditor::addPicture(QString imagedir, const float size_santimetr)
+bool WordEditor::addPicture(QString imagedir, const float size_santimetr, QAxObject *selection)
 {
     checkNullPointer(word, "word");
-    if(!updateShapes())
+    if(selection == nullptr)
+    {
+        selection = this->selection;
+    }
+    if(!updateShapes(selection))
     {
         qDebug() << "не удалось получить updateShapes";
         throw "не удалось получить updateShapes";
@@ -169,6 +182,85 @@ bool WordEditor::addPicture(QString imagedir, const float size_santimetr)
     inlineShape->dynamicCall( "ScaleHeight", height );
     inlineShape->dynamicCall( "ScaleWidth", width );
     return true;
+}
+
+WordEditor::WordTables WordEditor::tables()
+{
+    if(!word || !ActiveDocument)
+    {
+        qDebug() << "Ошибка getTables";
+        return WordTables(nullptr);
+    }
+    return WordTables(ActiveDocument->querySubObject("Tables()"));
+}
+
+WordEditor::WordTable WordEditor::table(int tableIndex)
+{
+    if(!word || !ActiveDocument)
+    {
+        qDebug() << "Ошибка getTables";
+        return WordTable(nullptr, -1);
+    }
+    return WordTable(ActiveDocument->querySubObject("Tables(int)", tableIndex), tableIndex);
+}
+
+WordEditor::WordTable::WordTable(QAxObject *table, int index)
+{
+    this->table = table;
+    this->index = index;
+}
+
+bool WordEditor::WordTable::tableToText()
+{
+    checkNullPointer(table, "table");
+    table->dynamicCall("ConvertToText()");
+    return true;
+}
+
+//int WordEditor::WordTable::getTablesCount()
+//{
+//    checkNullPointer(word, "word");
+//    checkNullPointer(ActiveDocument, "ActiveDocument");
+//    return ActiveDocument->querySubObject("Tables()")->dynamicCall("Count()").toInt();
+//}
+
+int WordEditor::WordTable::columnsCount()
+{
+    checkNullPointer(table, "table");
+    return table->querySubObject("Columns()")->dynamicCall("Count()").toInt();
+}
+
+int WordEditor::WordTable::rowsCount()
+{
+    checkNullPointer(table, "table");
+    return table->querySubObject("Rows()")->dynamicCall("Count()").toInt();
+}
+
+int WordEditor::WordTable::taleIndex() const
+{
+    return index;
+}
+
+WordEditor::TableCell WordEditor::WordTable::cell(int row, int col)
+{
+    if(table == nullptr)
+    {
+        qDebug() << "Не указана таблица. Получить ячейку невозможно.";
+        return TableCell(nullptr, -1, -1);
+    }
+    int rows = rowsCount();
+    int cols = columnsCount();
+    if(row < 1 && row > rows)
+    {
+        qDebug() << "Некорректный номер строки" << row << rows;
+        return TableCell(nullptr, -1, -1);
+    }
+    if(col < 1 && col > cols)
+    {
+        qDebug() << "Некорректный номер столбца" << col << cols;
+        return TableCell(nullptr, -1, -1);
+    }
+    return TableCell(table->querySubObject("Cell(int,int)", row, col), row, col); // возвращаем ячейку
 }
 
 bool WordEditor::setParagraphAlignment(int alignment)
@@ -206,11 +298,10 @@ bool WordEditor::exportToPdf(QString outputFileName)
     }
     qDebug() << "Сохряняем файл в PDF: " << exportFilename;
     QString change_dir = QFileInfo(exportFilename).absolutePath() + "/";
-    QString exportName = getFileNameInPDFFormat(outputFileName.remove(change_dir)); // получаем имя файла в формате PDF
 
     word->dynamicCall("ChangeFileOpenDirectory(String)", change_dir); // устанавливаем рабочую директорию
     ActiveDocument->dynamicCall("ExportAsFixedFormat(String, WdExportFormat, Boolean, WdExportOptimizeFor, WdExportRange, Long, Long, WdExportItem, Boolean, Boolean, WdExportCreateBookmarks, Boolean, Boolean, Boolean)",
-                                                          exportName, "wdExportFormatPDF", false);
+                                                          QFileInfo(exportFilename).baseName() + ".pdf", "wdExportFormatPDF", false);
     word->dynamicCall("ChangeFileOpenDirectory(String)", change_dir); // устанавливаем рабочую директорию
     return true;
 }
@@ -304,31 +395,100 @@ bool WordEditor::wordQuit()
     return true;
 }
 
-QString WordEditor::getFileNameInPDFFormat(QString sourceFileName)
+QAxObject *WordEditor::getWord() const
 {
-    // теоритически - это не очень рационально,
-    // но практически, если нам нужно будет добавить новое расширение файла,
-    // то это будет сделать очень удобно
-    QList<QStringList> allFilesExtensions; // список всех возможных расширений файлов
-    QStringList filesExtensionsWord = QStringList() << ".docx" << ".doc" << ".rtf";
-    QStringList filesExtensionsExcel = QStringList() << ".xls" << ".xlsx"  << ".xlsm" << ".xlsb";
-    allFilesExtensions.append(filesExtensionsWord);
-    allFilesExtensions.append(filesExtensionsExcel);
-
-    for(auto &&list : allFilesExtensions) // проходим по всем спискам расширений
-    {
-        for(auto &&ext : list) // проходим по всем расширениям
-        {
-            if(sourceFileName.endsWith(ext)) // если совпадает
-            {
-                return sourceFileName.replace(ext, ".pdf"); // делаем замену и возвращаем
-            }
-        }
-    }
-    return sourceFileName;
+    return word;
 }
 
 void WordEditor::exception(int code, QString source, QString desc, QString help)
 {
     qDebug() << "EXCEPTION: " << "Sender: " + sender()->objectName() << "code: " << code << "Source: " + source << "Desc: " +  desc << "Help: " + help;
+}
+
+WordEditor::WordTables::WordTables(QAxObject *tables)
+{
+    this->tables = tables;
+}
+
+int WordEditor::WordTables::count()
+{
+    checkNullPointer(this->tables, "tables");
+    return tables->dynamicCall("Count()").toInt();
+}
+
+WordEditor::TableCell::TableCell(QAxObject *cell, int row, int col)
+{
+    this->cell = cell;
+    this->tableRow = row;
+    this->tableColumn = col;
+}
+
+QString WordEditor::TableCell::text()
+{
+    if(cell == nullptr)
+    {
+        qDebug() <<  "Не удалось получить текст ячейки " + QString::number(tableRow) + " " + QString::number(tableColumn) + ". Не задана ячейка.";
+        return "";
+    }
+    return cell->querySubObject("Range()")->dynamicCall("Text()").toString();
+}
+
+bool WordEditor::TableCell::setText(QString text)
+{
+    if(cell == nullptr)
+    {
+        qDebug() << "Не удалось установить текст ячейки " + QString::number(tableRow) + " " + QString::number(tableColumn) + ". Не задана ячейка.";
+        return false;
+    }
+    cell->querySubObject("Range()")->dynamicCall("Delete()");
+    return true;
+}
+
+int WordEditor::TableCell::row()
+{
+    return tableRow;
+}
+
+int WordEditor::TableCell::column()
+{
+    return tableColumn;
+}
+
+bool WordEditor::TableCell::setImage(QString imageDir)
+{
+    QAxObject *range = cell->querySubObject("Range()");
+    if(range == nullptr)
+    {
+        qDebug() << "Ошибка range. Картинка не вставлена.";
+        return false;
+    }
+//    checkNullPointer(word, "word");
+//    QAxObject* inlineShape = word->querySubObject("Selection()")->querySubObject("InlineShapes()");
+    QAxObject* inlineShape = range->querySubObject("InlineShapes()");
+    const float size_santimetr = 3.0;
+    checkNullPointer(inlineShape, "inlineShape");
+    QAxObject *image = inlineShape->querySubObject("AddPicture(const QString&,bool,bool,QVariant)", imageDir, false, true );   // метод добавления картинки
+//    checkAxObject(inlineShape,"inlineShape");
+
+//    const float size_santimetr = 3.0; // желаемая высота картинки в сантиметрах
+    const float size_koefficient = 0.05081632653; // постоянный коэффициент для преобразования сантиметров в размер (высчитан опытным путём)
+    const float size_for_word = size_santimetr/size_koefficient; // считаем коээфицент для масштабирвоания в ворде
+    const int output_size = static_cast<int>(size_for_word); // переводим в целое число, потому что ворду нужны целые числа
+
+    const int height = output_size; // задаём коэффицент масштабирвоания по высоте
+    const int width = output_size; // задаём коэффицент масштабирования по ширине
+    image->dynamicCall( "ScaleHeight", height );
+    image->dynamicCall( "ScaleWidth", width );
+    return true;
+}
+
+bool WordEditor::TableCell::clear()
+{
+    if(cell == nullptr)
+    {
+        qDebug() << "Не удалось очистить данные ячейки " + QString::number(tableRow) + " " + QString::number(tableColumn) + ". Не задана ячейка.";
+        return false;
+    }
+    cell->querySubObject("Range()")->dynamicCall("Delete()");
+    return true;
 }
