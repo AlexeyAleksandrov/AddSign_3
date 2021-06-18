@@ -267,7 +267,7 @@ bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSig
     {
         qDebug() << "The process didnt start" << csptest_bat.error();
         log.addToLog(&"The process didnt start " [ csptest_bat.error()]);
-//        csptest_bat_file.remove();
+        csptest_bat_file.remove();
         return false;
     }
     QString cmd_out;
@@ -286,7 +286,7 @@ bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSig
         csptest_bat_file.remove();
         return false;
     }
-//    csptest_bat_file.remove();
+    csptest_bat_file.remove();
     QFile sigFile(file + ".sig");
     if(sigFile.exists() && cmd_out.contains("[ErrorCode: 0x00000000]")) //  && cmd_out.contains("[ErrorCode: 0x00000000]")
     {

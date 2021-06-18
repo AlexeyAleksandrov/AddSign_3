@@ -225,6 +225,88 @@ void SignProcessor::runProcessing()
                     continue;
                 }
             }
+            else if(WordOptions.insertType == insert_by_tag_in_table) // если выбран вариант вставки по тэгу
+            {
+                assert(word.openDocument(tempFile), "openDocument"); // открываем документ
+                int pagesCountBefore = word.getPagesCount(); // получаем количество страниц
+
+                int tableCount = word.tables().count();
+                if(tableCount <= 0)
+                {
+                    qDebug() << "В файле отсутвуют таблицы " + file.sourceFile;
+                    log.addToLog("В файле отсутвуют таблицы " + file.sourceFile);
+                    emit newFileStatus(file, files_status::error_no_tabels);
+                    continue;
+                }
+                if(WordOptions.signTag == "")
+                {
+                    qDebug() << "Задан пустой тэг для поиска " + file.sourceFile;
+                    log.addToLog("Задан пустой тэг для поиска " + file.sourceFile);
+                    emit newFileStatus(file, files_status::error_no_tabels);
+                    continue;
+                }
+                for (int i=1; i<=tableCount; i++)
+                {
+                    WordEditor::WordTable table = word.table(i); // получаем таблицу
+
+                    int rowsCount = table.rowsCount();
+                    int colsCount = table.columnsCount();
+
+                    for (int row=1; row<=rowsCount; row++)
+                    {
+                        for (int col=1; col<=colsCount; col++)
+                        {
+                            WordEditor::TableCell cell = table.cell(row, col); // получем ячейку
+                            QString currentText = cell.text(); // получаем текст ячейки
+
+                            if(currentText.contains(WordOptions.signTag)) // если ячейка содержит тэг
+                            {
+                                cell.clear(); // очищаем ячейку
+                                cell.setImage(WordOptions.getImageDir()); // ставим картинку в ячейку
+                            }
+                        }
+                    }
+                }
+
+                int pageCountAfter = word.getPagesCount(); // получаем количество страниц после вставки
+
+                if(pageCountAfter > pagesCountBefore)
+                {
+                    if(!WordOptions.ignoreMovingToNextList) // если нельзя игнорировать переход на новую страницу и переход произошёл
+                    {
+                        qDebug() << "Произошло увеличение количества страниц. Отменяем подпись.";
+                        log.addToLog("Произошло увеличение количества страниц. Отменяем подпись.");
+                        emit newFileStatus(file, files_status::error_new_page_no_added);
+//                        word.closeDocument(); // закрываем
+                        continue;
+                    }
+                    movedToNextPage = true; // иначе ставим флаг, что произошёл переход
+                }
+
+//                assert(word.saveDocument(), "saveDocument"); // сохраняем
+                if(WordOptions.exportToPDF)
+                {
+                    if(!word.exportToPdf(file.signPDFFile)) // экспортируем файл в PDF
+                    {
+                        qDebug() << "Не удалось экспортировать файл в PDF";
+                        log.addToLog("Не удалось экспортировать файл в PDF");
+                        emit newFileStatus(file, files_status::error_pdf_no_export);
+                        continue;
+                    }
+                }
+                assert(word.saveDocument(), "saveDocument"); // сохраняем
+                word.closeDocument(); // закрываем
+                if(WordOptions.exportToWord)
+                {
+                    if(!replaceOriginalFileByTemp(file.signWordFile, tempFile)) // копируем временный файл в необходимый
+                    {
+                        qDebug() << "Не удалось экспортировать файл Word";
+                        log.addToLog("Не удалось экспортировать файл Word");
+                        emit newFileStatus(file, files_status::error_no_open);
+                        continue;
+                    }
+                }
+            }
         }
         else if (isExcelFile(file.sourceFile))  // обработчик Excel файлов
         {

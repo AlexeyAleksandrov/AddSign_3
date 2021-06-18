@@ -31,6 +31,7 @@ public:
         error_file_signature_failed,
         error_password_failed,
         error_qpdf_no_image_added,
+        error_no_tabels,
         in_process,
         waiting,
         added,

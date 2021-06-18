@@ -386,6 +386,27 @@ void MainWindow::on_pushButton_addsign_clicked()
     clearAllOutputsToolTipData(); // очищаем пути вывода для всех файлов в таблице
     QApplication::processEvents(); // прогружаем интерфейс
 
+    int insertType = 0;
+    if(ui->radioButton_usually_insert->isChecked())
+    {
+        insertType = SignProcessor::insert_standart;
+    }
+    else if (ui->radioButton_insert_in_exported_pdf->isChecked())
+    {
+        insertType = SignProcessor::insert_in_exported_pdf;
+    }
+    else if (ui->radioButton_signByTag->isChecked())
+    {
+        insertType = SignProcessor::insert_by_tag_in_table;
+    }
+
+    QString signtag = ui->lineEdit_signTag->text();
+    if(signtag == "" && insertType == SignProcessor::insert_by_tag_in_table)
+    {
+        QMessageBox::warning(this, "Ошибка", "Не выбраны действия тег для поиска");
+        return;
+    }
+
     SignProcessor::WordParams word_settings;
 //    word_settings.files = listAddedFiles; // передаём файлы для обработки
     word_settings.tempdir = tempFilesDir + "/"; // директория для хранения временных файлов
@@ -394,8 +415,10 @@ void MainWindow::on_pushButton_addsign_clicked()
     word_settings.ignoreMovingToNextList = ui->checkBox_signingOut->isChecked(); // устанавливаем, игнорировать переходы на новую стриницу или нет
     word_settings.exportToWord = exportToWord; // передаём, нужно-ли подписывать документ Word
     word_settings.exportToPDF = exportToPDF; // устанавдиваем, нужно-ли экспортировать в PDF
-    word_settings.insertType =(ui->radioButton_usually_insert->isChecked() ? SignProcessor::insert_standart : SignProcessor::insert_in_exported_pdf); // подставляем тип вставки картинки
+    word_settings.insertType = insertType; // подставляем тип вставки картинки
     word_settings.noInsertImage = ui->checkBox_disableInsertImageToWord->isChecked(); // вставлять или не вставлять картинку в word (при стандартной вставке)
+    word_settings.signTag = signtag;
+
 
     SignProcessor::signPreset pdfSignPreset;
     pdfSignPreset.alignment = ui->horizontalSlider->value();

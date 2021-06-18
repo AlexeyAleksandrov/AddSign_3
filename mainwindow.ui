@@ -2357,13 +2357,6 @@ background-color: rgb(32, 74, 135);
               <string>Настройки для Word</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_21">
-              <item row="3" column="0">
-               <widget class="QCheckBox" name="checkBox_signWordDocument">
-                <property name="text">
-                 <string>Подписывать документ Word</string>
-                </property>
-               </widget>
-              </item>
               <item row="1" column="0">
                <widget class="QCheckBox" name="checkBox_exportWordToPDF">
                 <property name="font">
@@ -2383,12 +2376,19 @@ background-color: rgb(32, 74, 135);
                 </property>
                </widget>
               </item>
-              <item row="2" column="0">
+              <item row="3" column="0">
                <widget class="QGroupBox" name="groupBox_16">
                 <property name="title">
                  <string>Вставка подписи</string>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_25">
+                 <item row="3" column="0">
+                  <widget class="QRadioButton" name="radioButton_signByTag">
+                   <property name="text">
+                    <string>По тэгу в таблице</string>
+                   </property>
+                  </widget>
+                 </item>
                  <item row="0" column="0">
                   <widget class="QRadioButton" name="radioButton_usually_insert">
                    <property name="text">
@@ -2399,7 +2399,7 @@ background-color: rgb(32, 74, 135);
                    </property>
                   </widget>
                  </item>
-                 <item row="1" column="0">
+                 <item row="2" column="0">
                   <widget class="QRadioButton" name="radioButton_insert_in_exported_pdf">
                    <property name="text">
                     <string>Подпись экспортируемого PDF файла</string>
@@ -2409,7 +2409,21 @@ background-color: rgb(32, 74, 135);
                    </property>
                   </widget>
                  </item>
+                 <item row="4" column="0">
+                  <widget class="QLineEdit" name="lineEdit_signTag">
+                   <property name="text">
+                    <string>&lt;место_для_подписи&gt;</string>
+                   </property>
+                  </widget>
+                 </item>
                 </layout>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QCheckBox" name="checkBox_signWordDocument">
+                <property name="text">
+                 <string>Подписывать документ Word</string>
+                </property>
                </widget>
               </item>
              </layout>

@@ -38,6 +38,7 @@ public:
         int signImageRowsCount = 2;
         int insertType = insert_standart;
         bool noInsertImage = false;
+        QString signTag = "<место_для_подписи>";
 
         QString getTempdir() const;
         QString getOutputdir() const;
@@ -83,7 +84,8 @@ public:
     enum signInsertType
     {
         insert_standart,
-        insert_in_exported_pdf
+        insert_in_exported_pdf,
+        insert_by_tag_in_table
     };
 
 
