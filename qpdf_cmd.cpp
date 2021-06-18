@@ -14,8 +14,21 @@ bool qpdf_cmd::overlay(QString upperfile, QString underfile, QString outputfile,
 
     if(!upperfile.endsWith(".pdf") || (!underfile.endsWith(".pdf")) || (!outputfile.endsWith(".pdf")))
     {
-        qDebug() << "Error on input files! It must *.pdf";
-        log.addToLog("Error on input files! It must *.pdf");
+        if(!upperfile.endsWith(".pdf"))
+        {
+            qDebug() << "Ошибка! Файл upperfile должен бать формата PDF " + upperfile;
+            log.addToLog("Ошибка! Файл upperfile должен бать формата PDF " + upperfile);
+        }
+        if(!underfile.endsWith(".pdf"))
+        {
+            qDebug() << "Ошибка! Файл underfile должен бать формата PDF " + underfile;
+            log.addToLog("Ошибка! Файл underfile должен бать формата PDF " + underfile);
+        }
+        if(!outputfile.endsWith(".pdf"))
+        {
+            qDebug() << "Ошибка! Файл outputfile должен бать формата PDF " + outputfile;
+            log.addToLog("Ошибка! Файл outputfile должен бать формата PDF " + outputfile);
+        }
         return false;
     }
 

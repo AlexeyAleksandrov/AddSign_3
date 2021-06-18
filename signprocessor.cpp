@@ -33,7 +33,7 @@ void SignProcessor::setFilesList(const QStringList &files)
             {
                 file.signWordFile = inputFile;
             }
-            if(WordOptions.exportToPDF) // если нужно экспортировать в PDF
+            if(((WordOptions.insertType == insert_standart || WordOptions.insertType == insert_by_tag_in_table) && WordOptions.exportToPDF) || WordOptions.insertType == insert_in_exported_pdf) // если нужно экспортировать в PDF
             {
                 file.signPDFFile = getFileNameInPDFFormat(inputFile); // просто меняем расщирение файла, а пуь оставляем тот же самый
             }
@@ -44,7 +44,7 @@ void SignProcessor::setFilesList(const QStringList &files)
             {
                 file.signWordFile = WordOptions.getOutputdir() + getFileName(file.sourceFile); // формируем путь к ворду, который экспортируем
             }
-            if(WordOptions.exportToPDF) // если нужно экспортировать в PDF
+            if(((WordOptions.insertType == insert_standart || WordOptions.insertType == insert_by_tag_in_table) && WordOptions.exportToPDF) || WordOptions.insertType == insert_in_exported_pdf) // если нужно экспортировать в PDF
             {
                 file.signPDFFile = getFileNameInPDFFormat(WordOptions.getOutputdir() + getFileName(file.sourceFile)); // тоже самое, но меняем расширение файла
             }
