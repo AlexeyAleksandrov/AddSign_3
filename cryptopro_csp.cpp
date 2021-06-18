@@ -136,11 +136,13 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
                             }
                             if(pairList.at(0) == "G")
                             {
-                                host_name_and_patronymic = pairList.at(1);
+                                host_name_and_patronymic = pairList.at(1); // имя + отчество
+                                SignCMD.name_and_patronymic = pairList.at(1);
                             }
                             if(pairList.at(0) == "SN")
                             {
-                                host_surname = pairList.at(1);
+                                host_surname = pairList.at(1); // фамилия
+                                SignCMD.surname = pairList.at(1);
                             }
                         }
                     }

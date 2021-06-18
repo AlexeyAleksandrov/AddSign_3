@@ -24,6 +24,8 @@ public:
         QString email = "";
         QString serial = "";
         QString subname = "";
+        QString surname = "";
+        QString name_and_patronymic = "";
         QDate startDate;
         QDate finishDate;
 

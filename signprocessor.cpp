@@ -8,6 +8,12 @@
 #define DISPLAY_STATUS_ON_NEW_PAGE
 #define assert(var, texterror) if(var == false) { qDebug() << "Assert: " << texterror; log.addToLog(texterror); return; }
 
+#if QT_VERSION >= 0x050f00 // версия Qt 5.15.0
+#define SPLITTER Qt::SplitBehavior(Qt::SkipEmptyParts)
+#else
+#define SPLITTER QString::SkipEmptyParts
+#endif
+
 SignProcessor::SignProcessor(QObject *parent) : QObject(parent)
 {
 
@@ -238,34 +244,99 @@ void SignProcessor::runProcessing()
                     emit newFileStatus(file, files_status::error_no_tabels);
                     continue;
                 }
-                if(WordOptions.signTag == "")
-                {
-                    qDebug() << "Задан пустой тэг для поиска " + file.sourceFile;
-                    log.addToLog("Задан пустой тэг для поиска " + file.sourceFile);
-                    emit newFileStatus(file, files_status::error_no_tabels);
-                    continue;
-                }
-                for (int i=1; i<=tableCount; i++)
-                {
-                    WordEditor::WordTable table = word.table(i); // получаем таблицу
 
-                    int rowsCount = table.rowsCount();
-                    int colsCount = table.columnsCount();
-
-                    for (int row=1; row<=rowsCount; row++)
+                // проверка тэга картинки
+                bool hasSignImageTag = false;
+                if(WordOptions.signImageTag != "")
+                {
+                    for (int i=1; i<=tableCount; i++)
                     {
-                        for (int col=1; col<=colsCount; col++)
-                        {
-                            WordEditor::TableCell cell = table.cell(row, col); // получем ячейку
-                            QString currentText = cell.text(); // получаем текст ячейки
+                        WordEditor::WordTable table = word.table(i); // получаем таблицу
 
-                            if(currentText.contains(WordOptions.signTag)) // если ячейка содержит тэг
+                        int rowsCount = table.rowsCount();
+                        int colsCount = table.columnsCount();
+
+                        for (int row=1; row<=rowsCount; row++)
+                        {
+                            for (int col=1; col<=colsCount; col++)
                             {
-                                cell.clear(); // очищаем ячейку
-                                cell.setImage(WordOptions.getImageDir()); // ставим картинку в ячейку
+                                WordEditor::TableCell cell = table.cell(row, col); // получем ячейку
+                                QString currentText = cell.text(); // получаем текст ячейки
+
+                                if(currentText.contains(WordOptions.signImageTag)) // если ячейка содержит тэг
+                                {
+                                    cell.clear(); // очищаем ячейку
+                                    QString imagdir = WordOptions.getImageDir();
+                                    cell.setImage(imagdir); // ставим картинку в ячейку
+                                    hasSignImageTag = true;
+                                }
                             }
                         }
                     }
+                }
+
+                // проверка тэга фио
+                bool hasSignFioTag = true;
+                bool needContinue = false;
+                if(WordOptions.signFioTag != "")
+                {
+                    for (int i=1; i<=tableCount; i++)
+                    {
+                        WordEditor::WordTable table = word.table(i); // получаем таблицу
+
+                        int rowsCount = table.rowsCount();
+                        int colsCount = table.columnsCount();
+
+                        for (int row=1; row<=rowsCount; row++)
+                        {
+                            for (int col=1; col<=colsCount; col++)
+                            {
+                                WordEditor::TableCell cell = table.cell(row, col); // получем ячейку
+                                QString currentText = cell.text(); // получаем текст ячейки
+
+                                if(currentText.contains(WordOptions.signFioTag)) // если ячейка содержит тэг
+                                {
+                                    QString surname = CryptoPROOptions.sign.surname; // получаем фамилию по сертификату
+                                    QString name;
+                                    QString patronymic;
+                                    QStringList nameList = CryptoPROOptions.sign.name_and_patronymic.split(" ", SPLITTER); // разбиваем имя и фотчество через пробел
+                                    if(nameList.size() != 2) // если не содержится имя + отчество
+                                    {
+                                        QString sertname = CryptoPROOptions.sign.name; // получаем название сертификата
+                                        nameList = sertname.split(" ", SPLITTER);
+                                        if(nameList.size() != 3) // если в названии не содержится Фамилия Имя Отчество
+                                        {
+                                            qDebug() << "Некорректное значение имени и отчества " << nameList;
+                                            log.addToLog("Некорректное значение имени и отчества ");
+                                            emit newFileStatus(file, files_status::error_no_tabels);
+                                            needContinue = true;
+                                            continue;
+                                        }
+                                        surname = nameList.at(0); // 0 - фамилия
+                                        name = nameList.at(1).at(0); // первая буква имени
+                                        patronymic = nameList.at(2).at(0); // первая буква отчества
+                                    }
+                                    name = nameList.at(0).at(0); // берем первый элемент списка и из него 1ю букву
+                                    patronymic = nameList.at(1).at(0); // берем второй элемент списка и из него 1ю букву
+                                    QString text = surname + " " + name + "." + patronymic + "."; // формируем строку фио
+                                    cell.setText(text); // ставим картинку в ячейку
+                                    hasSignFioTag = true;
+                                }
+                            }
+                        }
+                    }
+                }
+                if(needContinue)
+                {
+                    continue;
+                }
+
+                if(!hasSignImageTag && !hasSignFioTag)
+                {
+                    qDebug() << "Не найдены тэги в документе " + file.sourceFile;
+                    log.addToLog("Не найдены тэги в документе " + file.sourceFile);
+                    emit newFileStatus(file, files_status::error_no_tabels);
+                    continue;
                 }
 
                 int pageCountAfter = word.getPagesCount(); // получаем количество страниц после вставки

@@ -435,12 +435,21 @@ QString WordEditor::TableCell::text()
 
 bool WordEditor::TableCell::setText(QString text)
 {
+    if(!clear())
+        return false;
+    if(!insertText(text))
+        return false;
+    return true;
+}
+
+bool WordEditor::TableCell::insertText(QString text)
+{
     if(cell == nullptr)
     {
         qDebug() << "Не удалось установить текст ячейки " + QString::number(tableRow) + " " + QString::number(tableColumn) + ". Не задана ячейка.";
         return false;
     }
-    cell->querySubObject("Range()")->dynamicCall("Delete()");
+    cell->querySubObject("Range()")->dynamicCall("InsertAfter(String)", text);
     return true;
 }
 

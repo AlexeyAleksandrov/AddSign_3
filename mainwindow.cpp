@@ -5,8 +5,12 @@
 #include <QDesktopServices>
 #include <QMenu>
 
+#define SIGN_IMAGE_TAG "<место_для_подписи>"
+#define SIGN_FIO_TAG "<имя_владельца_подписи>"
+
 #define SETTINGS_PASSWORD "oozioozi21" // worker21
 #define PROGRAM_INFORMATION "Версия программы: 2.9.1 Beta\n\nРазработчики:\nАлександров А.С.\nБабуркина С.С.\n\nОтдел обеспечения защиты информации и управления информатизации\nРТУ МИРЭА - Российский Технологический Университет\nДата релиза: 27.05.2021"
+
 
 #define SHOW_MSG_DEBUG // РАЗКОММЕНТИРВОАТЬ ДЛЯ ДЕБАГА
 //#define CHECK_POBEL_IN_DIRECTORY_BY_ADD_FILE // проверять наличие пробелов в пути к файлу, при добалении через кнопку добавить
@@ -400,12 +404,12 @@ void MainWindow::on_pushButton_addsign_clicked()
         insertType = SignProcessor::insert_by_tag_in_table;
     }
 
-    QString signtag = ui->lineEdit_signTag->text();
-    if(signtag == "" && insertType == SignProcessor::insert_by_tag_in_table)
-    {
-        QMessageBox::warning(this, "Ошибка", "Не выбраны действия тег для поиска");
-        return;
-    }
+//    QString signtag = SIGN_IMAGE_TAG;
+//    if(signtag == "" && insertType == SignProcessor::insert_by_tag_in_table)
+//    {
+//        QMessageBox::warning(this, "Ошибка", "Не выбраны действия тег для поиска");
+//        return;
+//    }
 
     SignProcessor::WordParams word_settings;
 //    word_settings.files = listAddedFiles; // передаём файлы для обработки
@@ -417,7 +421,8 @@ void MainWindow::on_pushButton_addsign_clicked()
     word_settings.exportToPDF = exportToPDF; // устанавдиваем, нужно-ли экспортировать в PDF
     word_settings.insertType = insertType; // подставляем тип вставки картинки
     word_settings.noInsertImage = ui->checkBox_disableInsertImageToWord->isChecked(); // вставлять или не вставлять картинку в word (при стандартной вставке)
-    word_settings.signTag = signtag;
+    word_settings.signImageTag = SIGN_IMAGE_TAG;
+    word_settings.signFioTag = SIGN_FIO_TAG;
 
 
     SignProcessor::signPreset pdfSignPreset;

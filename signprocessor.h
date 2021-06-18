@@ -38,7 +38,8 @@ public:
         int signImageRowsCount = 2;
         int insertType = insert_standart;
         bool noInsertImage = false;
-        QString signTag = "<место_для_подписи>";
+        QString signImageTag;
+        QString signFioTag;
 
         QString getTempdir() const;
         QString getOutputdir() const;

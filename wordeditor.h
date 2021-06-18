@@ -44,6 +44,7 @@ public:
         TableCell(QAxObject *cell, int row, int col);
         QString text();
         bool setText(QString text);
+        bool insertText(QString text);
         int row();
         int column();
         bool setImage(QString imageDir);
