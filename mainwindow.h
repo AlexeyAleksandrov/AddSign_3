@@ -290,5 +290,7 @@ private slots:
     void on_pushButton_acceptCurrentPreset_clicked();
 //    void on_comboBox_choseImageGerb_currentIndexChanged(int index);
     void on_pushButton_moveToSigning_clicked();
+//    void on_radioButton_signByTag_clicked();
+    void on_radioButton_signByTag_clicked(bool checked);
 };
 #endif // MAINWINDOW_H

@@ -47,7 +47,7 @@ public:
     void add(QDoubleSpinBox *doubleSpinBox); // добавляет checkBox в список
     void add(QSlider *slider);
     void add(QMainWindow *mainWindow);
-    void add(QRadioButton *radioButton);
+    void addRb(QRadioButton *radioButton);
 
 //    preset *getPres() const;
 //    void setPres(preset *value);

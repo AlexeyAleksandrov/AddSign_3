@@ -171,7 +171,7 @@ void UiDataSaver::add(QMainWindow *mainWindow)
     appendToList(mainWindow, mainWindowList);
 }
 
-void UiDataSaver::add(QRadioButton *radioButton)
+void UiDataSaver::addRb(QRadioButton *radioButton)
 {
     appendToList(radioButton, radioButtonList);
 }
@@ -324,6 +324,7 @@ void UiDataSaver::setRadioButtonState(QRadioButton *radioButton, QString state)
 {
     bool click_state = state.toInt();
     radioButton->setChecked(click_state);
+//    radioButton->setDown(click_state);
     emit radioButton->clicked(click_state);
 }
 

@@ -215,10 +215,12 @@ void MainWindow::customConstructor()
     presets.add(ui->verticalSlider);
     presets.add(ui->horizontalSlider);
 
-    presets.add(ui->checkBox_exportWordToPDF);
-    presets.add(ui->checkBox_signWordDocument);
-    presets.add(ui->radioButton_usually_insert);
-    presets.add(ui->radioButton_insert_in_exported_pdf);
+    uisaver.add(ui->checkBox_exportWordToPDF);
+    uisaver.add(ui->checkBox_signWordDocument);
+
+    uisaver.addRb(ui->radioButton_usually_insert);
+    uisaver.addRb(ui->radioButton_insert_in_exported_pdf);
+    uisaver.addRb(ui->radioButton_signByTag);
 
     ui->radioButton_runSourceFile->setChecked(true);  // по умолчанию ставим, чтобы запускался исходный файл
     reshowSidebar(); // прячем бокове меню
@@ -1974,22 +1976,29 @@ void MainWindow::on_horizontalSlider_valueChanged(int value)
 
 void MainWindow::on_radioButton_usually_insert_clicked(bool checked)
 {
-    ui->checkBox_exportWordToPDF->setEnabled(checked);
-    ui->checkBox_signWordDocument->setEnabled(checked);
-    ui->checkBox_exportWordToPDF->setChecked(checkBox_exportWordToPDF_oldState);
-    ui->checkBox_signWordDocument->setChecked(checkBox_signWordDocument_oldState);
+//    ui->checkBox_exportWordToPDF->setEnabled(checked);
+//    ui->checkBox_signWordDocument->setEnabled(checked);
+//    ui->checkBox_exportWordToPDF->setChecked(checkBox_exportWordToPDF_oldState);
+//    ui->checkBox_signWordDocument->setChecked(checkBox_signWordDocument_oldState);
 }
 
 void MainWindow::on_radioButton_insert_in_exported_pdf_clicked(bool checked)
 {
-    ui->checkBox_exportWordToPDF->setEnabled(!checked);
-    ui->checkBox_signWordDocument->setEnabled(!checked);
-    checkBox_exportWordToPDF_oldState = ui->checkBox_exportWordToPDF->isChecked();
-    checkBox_signWordDocument_oldState = ui->checkBox_signWordDocument->isChecked();
-    ui->checkBox_exportWordToPDF->setChecked(!checked);
-    ui->checkBox_signWordDocument->setChecked(!checked);
+//    ui->checkBox_exportWordToPDF->setEnabled(!checked);
+//    ui->checkBox_signWordDocument->setEnabled(!checked);
+//    checkBox_exportWordToPDF_oldState = ui->checkBox_exportWordToPDF->isChecked();
+//    checkBox_signWordDocument_oldState = ui->checkBox_signWordDocument->isChecked();
+//    ui->checkBox_exportWordToPDF->setChecked(!checked);
+//    ui->checkBox_signWordDocument->setChecked(!checked);
 }
 
+void MainWindow::on_radioButton_signByTag_clicked(bool checked)
+{
+//    ui->checkBox_exportWordToPDF->setEnabled(checked);
+//    ui->checkBox_signWordDocument->setEnabled(checked);
+//    ui->checkBox_exportWordToPDF->setChecked(checkBox_exportWordToPDF_oldState);
+//    ui->checkBox_signWordDocument->setChecked(checkBox_signWordDocument_oldState);
+}
 
 
 void MainWindow::on_pushButton_settings_shower_clicked()
@@ -2075,7 +2084,3 @@ void MainWindow::on_pushButton_acceptCurrentPreset_clicked()
 }
 
 
-//void MainWindow::on_pushButton_moveToSigning_clicked()
-//{
-
-//}
