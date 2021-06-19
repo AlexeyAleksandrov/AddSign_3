@@ -87,6 +87,7 @@ private:
     void setRowColor(QTableWidget *table, int row, QColor color); // устанавливает цвет строки в таблице
     void setFileStatus(QString file_dir, int status); // устанавливает статус
     int getFileStatus(QString fileDir); // получает статус файла
+    QString getDesktopDirectory(); // получить директорию рабочего стола
     // =================================================================================
     // ==== БЛОК ИНТЕРФЕЙСА =====
     // =================================================================================

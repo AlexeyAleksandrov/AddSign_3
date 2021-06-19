@@ -53,6 +53,7 @@
 
 #ifdef PDF_FILES_EXTENSIONS
 #define FILES_EXTENSIONS "Files for sign (*.docx *.doc *.rtf *.pdf *.xlsx *.xls);"    // поддерживаемые расширения файлов
+#define SEARCH_EXTENSIONS "*.docx", "*.doc", "*.rtf", "*.pdf", "*.xlsx", "*.xls"
 #else
 #define FILES_EXTENSIONS "Word Files (*.docx *.doc *.rtf);"    // поддерживаемые расширения файлов
 #endif
@@ -714,6 +715,16 @@ int MainWindow::getFileStatus(QString fileDir)
 
     QString statusText = ui->tableWidget_filestatus->item(row, 1)->text();
     return f_status.getStatusNumberByName(statusText);
+}
+
+QString MainWindow::getDesktopDirectory()
+{
+    QString name = qgetenv("USER");
+    if (name.isEmpty())
+    {
+        name = qgetenv("USERNAME");
+    }
+    return "C:/Users/" + name + "/Desktop/";
 }
 
 void MainWindow::setTableWidgetFiles(QStringList listParamFiles, int status)
@@ -1536,7 +1547,7 @@ void MainWindow::cryptoSignListReady(QList<CryptoPRO_CSP::CryptoSignData> list)
 void MainWindow::on_pushButton_addFile_clicked()
 {
     // директория, где находится файл
-    QStringList fileDiretory = QFileDialog::getOpenFileNames(this,tr("OpenFile"),tr("downloads"),tr(FILES_EXTENSIONS)); // делаем выборку сразу нескольких файлов
+    QStringList fileDiretory = QFileDialog::getOpenFileNames(this,tr("OpenFile"), getDesktopDirectory(),tr(FILES_EXTENSIONS)); // делаем выборку сразу нескольких файлов
     if(fileDiretory.size() == 0) // если не было выбрано ни одного файла
     {
         //        QMessageBox::information(this, "Внимание", "Вы не выбрали файл");
@@ -1779,8 +1790,9 @@ void MainWindow::on_checkBox_createSubFolder_stateChanged(int arg1)
 void MainWindow::on_pushButton_selectOutputPath_clicked()
 {
     // открываем диалог выбора файла
+    QString openDir = getDesktopDirectory(); // поулчаем директорию рабочего стола
     QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-                                                    "/",
+                                                    openDir,
                                                     QFileDialog::ShowDirsOnly
                                                     | QFileDialog::DontResolveSymlinks);
     if(!dir.isEmpty())
@@ -1920,9 +1932,9 @@ void MainWindow::on_pushButton_chose_qpdfexe_dir_clicked()
 
 void MainWindow::on_addFolderPushButton_clicked()
 {
-    QString folder = QFileDialog::getExistingDirectory(this,"Выберите папку","C:/",QFileDialog::ShowDirsOnly);
+    QString folder = QFileDialog::getExistingDirectory(this,"Выберите папку", getDesktopDirectory(),QFileDialog::ShowDirsOnly);
     if(folder == ""){return;}
-    QDirIterator foldIter(folder,{"*.rtf","*.doc","*.docx","*.pdf"},QDir::Files);
+    QDirIterator foldIter(folder,{ SEARCH_EXTENSIONS },QDir::Files);
     QStringList addedFiles = getAddedFiles();
     while (foldIter.hasNext())
     {
