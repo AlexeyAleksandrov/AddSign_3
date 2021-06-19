@@ -9,6 +9,7 @@
 #define SIGN_FIO_TAG "<имя_владельца_подписи>"
 
 #define SETTINGS_PASSWORD "oozioozi21" // worker21
+#define SETTINGS_PASSWORD_RU "щщяшщщяш21" // worker21
 #define PROGRAM_INFORMATION "Версия программы: 2.9.1 Beta\n\nРазработчики:\nАлександров А.С.\nБабуркина С.С.\n\nОтдел обеспечения защиты информации и управления информатизации\nРТУ МИРЭА - Российский Технологический Университет\nДата релиза: 27.05.2021"
 
 
@@ -1705,21 +1706,26 @@ void MainWindow::on_pushButton_9_clicked()
 void MainWindow::on_advancedSettingsButton_clicked()
 {
     log.addToLog("Попытка доступа в файл настроек");
-    QString password = QInputDialog::getText(this,"Введите пароль", "", QLineEdit::Password);
-
-    if (password == SETTINGS_PASSWORD)
+//    QString password = QInputDialog::getText(this,"Введите пароль", "", QLineEdit::Password);
+    while(true)
     {
-        ui->stackedWidget->setCurrentIndex(STACKED_SYSTEM_SETTINGS);
-        ui->advancedSettingsButton->hide();
-    }
-    else if (password == "")
-    {
-        log.addToLog("Введён пустой пароль");
-    }
-    else
-    {
-        QMessageBox::information(this,"Ошибка","Неверный пароль");
-        log.addToLog("Неверный пароль");
+        QString password = QInputDialog::getText(this,"Введите пароль", "", QLineEdit::Password);
+        if (password == SETTINGS_PASSWORD || password == SETTINGS_PASSWORD_RU)
+        {
+            ui->stackedWidget->setCurrentIndex(STACKED_SYSTEM_SETTINGS);
+            ui->advancedSettingsButton->hide();
+            break;
+        }
+        else if (password == "")
+        {
+            log.addToLog("Введён пустой пароль");
+            break;
+        }
+        else
+        {
+            QMessageBox::critical(this,"Ошибка","Неверный пароль");
+            log.addToLog("Неверный пароль");
+        }
     }
 }
 
