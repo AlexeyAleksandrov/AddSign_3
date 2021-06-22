@@ -438,7 +438,7 @@ void MainWindow::on_pushButton_addsign_clicked()
     pdfSignPreset.paragraphOffset = ui->verticalSlider->value();
 
     SignProcessor::PDFParams PDF_settings;
-    PDF_settings.image_dir = ":/images/MIREA_logo_resize.png";
+    PDF_settings.image_dir = ":/images/MIREA_logo.png";
     PDF_settings.qpdf_dir = qpdf_dir;
     PDF_settings.drawLogo = isDrawGerb();
     PDF_settings.pdf_preset = pdfSignPreset;

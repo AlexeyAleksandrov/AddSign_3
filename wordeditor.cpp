@@ -5,7 +5,10 @@
 
 WordEditor::WordEditor(QObject *parent) : QObject(parent)
 {
-   Q_ASSERT(wordInit()); // инициализируем ворд, и если ошибюка, то qt на сообщит об этом
+   if(!(wordInit())) // инициализируем ворд, и если ошибюка, то qt на сообщит об этом
+   {
+      qDebug() << "Не удалось инициализировать word!";
+   }
 }
 
 WordEditor::~WordEditor()

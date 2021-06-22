@@ -5,7 +5,10 @@
 
 ExcelEditor::ExcelEditor(QObject *parent) : QObject(parent)
 {
-    Q_ASSERT(ExcelInit());
+    if(!(ExcelInit()))
+    {
+        qDebug() << "Excel no init!";
+    }
 }
 
 ExcelEditor::~ExcelEditor()

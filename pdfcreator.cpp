@@ -1,19 +1,11 @@
 #include "pdfcreator.h"
 
-#include "QFile"
-#include "QTextStream"
-#include <QDebug>
-#include <QPainter>
-#include <QPdfWriter>
-#include <QPrinter>
-#include <QTextDocument>
-
 #define TAB "&nbsp;"
 
 PDFCreator::PDFCreator(QObject *parent) : QObject(parent)
 {}
 
-bool PDFCreator::createSignPDFbyHTML(QString fileName, int image_pos_x, int image_pos_y, QString mireaLogoFileName, QString line_sertifacate, QString line_owner, QString line_validTime, PDFCreator::orientation orientation, bool drawMireaLogo)
+bool PDFCreator::drawSign(QString fileName, int image_pos_x, int image_pos_y, QString line_sertifacate, QString line_owner, QString line_validTime, PDFCreator::orientation orientation)
 {
     log.addToLog("Создаём пустой файл подписи " + fileName);
     QFile pdfFile(fileName);
@@ -60,6 +52,7 @@ bool PDFCreator::createSignPDFbyHTML(QString fileName, int image_pos_x, int imag
     const double signRectHeight = 150.39;
     double signPosX = 0.0;
     double signPosY = 0.0;
+
     const int rowsCount = 30;
 
     // рассчёт позиции по X
@@ -97,21 +90,135 @@ bool PDFCreator::createSignPDFbyHTML(QString fileName, int image_pos_x, int imag
     int radius = 10;
     painter.drawRoundedRect(bodyRect, radius, radius);
 
-    if(drawMireaLogo)
-    {
-        if(!QFile(mireaLogoFileName).exists()) // если файл лого не найден
-        {
-            log.addToLog("Не найден файл лого" + mireaLogoFileName);
-            return false;
-        }
-        QImage mirea_logo(mireaLogoFileName);
-        painter.drawImage(bodyRect.topLeft().x()+2, bodyRect.topLeft().y()+5, mirea_logo);
-    }
+//    if(drawMireaLogo)
+//    {
+//        if(!QFile(mireaLogoFileName).exists()) // если файл лого не найден
+//        {
+//            log.addToLog("Не найден файл лого" + mireaLogoFileName);
+//            return false;
+//        }
+//        QImage mirea_logo(mireaLogoFileName);
+//        painter.drawImage(bodyRect.topLeft().x()+2, bodyRect.topLeft().y()+5, mirea_logo);
+//    }
 
-    QTextDocument td;
     auto coord = bodyRect.topLeft();
     coord.setY(coord.y()+7);
     painter.translate(coord);
+
+    QString html = getHtmlBySign(line_sertifacate, line_owner, line_validTime); // создаем html с данными о подписи
+    drawHtml(painter, html);
+
+    painter.end();
+    log.addToLog("Файл сформирован " + fileName);
+    return true;
+}
+
+bool PDFCreator::drawImage(QString fileName, QString imageDir, int image_pos_x, int image_pos_y, orientation orientation)
+{
+    log.addToLog("Создаём пустой файл подписи " + fileName);
+    QFile pdfFile(fileName);
+    if(!pdfFile.open(QIODevice::WriteOnly)) // если файл нельзя открыть для записи
+    {
+        log.addToLog("Файл нельзя открыть для записи" + fileName);
+        return false;
+    }
+    QPageLayout::Orientation pageOrientation = (orientation == 0) ? QPageLayout::Portrait : QPageLayout::Landscape; // получаем нужную ориентацияю страницы
+    if(pageOrientation != QPageLayout::Portrait && pageOrientation != QPageLayout::Landscape) // если указана неверная ориентация страницы
+    {
+        log.addToLog("Указана неверная ориентация страницы");
+        return false;
+    }
+    pdfFile.close();
+    QPdfWriter pdfWriter(fileName);
+    QPainter painter;
+    pdfWriter.setResolution(2200);
+    QPageSize pageSize(QPageSize::A4);
+    QMarginsF margins(10, 10, 10, 10);
+    QPageLayout pageLayout(pageSize, pageOrientation, margins, QPageLayout::Millimeter);
+    QRectF fullrect = pageSize.rectPixels(pdfWriter.resolution()); // получаем полный прямоугольник
+    pdfWriter.setPageLayout(pageLayout);
+
+    painter.begin(&pdfWriter);
+
+    QPen pen;
+    pen.setColor(Qt::black);
+    pen.setWidth(3);
+    painter.setPen(pen);
+
+    // прямоугольник для листа
+    const double scaleFactor = 2200.00 / 150.00;
+    int weight = fullrect.width()-100 * scaleFactor;
+    int height = fullrect.height()-100 * scaleFactor;
+    if(pageOrientation == QPageLayout::Landscape) // если ориентация горизонтальная, то высоту и ширину меняем местами
+    {
+        std::swap(weight, height); // меняем местами
+    }
+//    painter.drawRect(0, 0, weight, height);
+    qDebug() << "Высота: " << height << "Ширина: " << weight;
+
+    // прямоугольник для подписи
+    const double signRectWeight = 352.38 * scaleFactor;
+    const double signRectHeight = 150.39 * scaleFactor;
+    double signPosX = 0.0;
+    double signPosY = 0.0;
+
+    const int rowsCount = 30;
+
+    // рассчёт позиции по X
+    switch (image_pos_x)
+    {
+        case 0:
+            signPosX = 0.0;
+            break;
+        case 2:
+            signPosX = weight - signRectWeight;
+            break;
+        default:
+            signPosX = (weight - signRectWeight)/2.0;
+            break;
+    }
+
+    // рассчёт позиции по Y
+    switch (image_pos_y)
+    {
+        case 0:
+            signPosY = height - signRectHeight;
+            break;
+        case rowsCount:
+            signPosY = 0.0;
+            break;
+        default:
+            signPosY = ((height - signRectHeight)/rowsCount)*(rowsCount - image_pos_y);
+            break;
+    }
+
+
+    //    QRectF bodyRect(image_pos_x, image_pos_y, signRectWeight, signRectHeight);
+    QRectF bodyRect(signPosX, signPosY, signRectWeight, signRectHeight);
+
+
+    if(!QFile(imageDir).exists()) // если файл лого не найден
+    {
+        log.addToLog("Не найден файл лого" + imageDir);
+        return false;
+    }
+    QImage mirea_logo(imageDir);
+    painter.drawImage(bodyRect.topLeft().x()+2, bodyRect.topLeft().y()+5, mirea_logo);
+
+    painter.end();
+    log.addToLog("Файл сформирован " + fileName);
+    return true;
+}
+
+void PDFCreator::drawHtml(QPainter &painter, QString &html)
+{
+    QTextDocument td;
+    td.setHtml(html);
+    td.drawContents(&painter);
+}
+
+QString PDFCreator::getHtmlBySign(QString line_sertifacate, QString line_owner, QString line_validTime)
+{
     QString html;
 
     QString styleBig = QString::number(5);
@@ -133,12 +240,8 @@ bool PDFCreator::createSignPDFbyHTML(QString fileName, int image_pos_x, int imag
 
     html.append("</font><font size=" + styleBig +"><br></font><font size=" + stylewSmall +">");
     html.append("</font>");
-    td.setHtml(html);
-    td.drawContents(&painter);
 
-    painter.end();
-    log.addToLog("Файл сформирован " + fileName);
-    return true;
+    return html;
 }
 
 QString PDFCreator::getLine(QString symvol, int lenght)
