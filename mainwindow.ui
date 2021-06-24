@@ -1071,8 +1071,14 @@ background-color: transparent;</string>
                 <layout class="QGridLayout" name="gridLayout_25">
                  <item row="3" column="0">
                   <widget class="QRadioButton" name="radioButton_signByTag">
+                   <property name="toolTip">
+                    <string/>
+                   </property>
+                   <property name="whatsThis">
+                    <string/>
+                   </property>
                    <property name="text">
-                    <string>По тэгу в таблице</string>
+                    <string>По тэгу в таблице (только для WORD файлов)</string>
                    </property>
                   </widget>
                  </item>
@@ -1089,7 +1095,7 @@ background-color: transparent;</string>
                  <item row="2" column="0">
                   <widget class="QRadioButton" name="radioButton_insert_in_exported_pdf">
                    <property name="text">
-                    <string>Подпись экспортируемого PDF файла</string>
+                    <string>По координатам, на последнюю страницу</string>
                    </property>
                    <property name="checked">
                     <bool>false</bool>

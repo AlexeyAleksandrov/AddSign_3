@@ -10,7 +10,7 @@
 
 #define SETTINGS_PASSWORD "oozioozi21" // worker21
 #define SETTINGS_PASSWORD_RU "щщяшщщяш21" // worker21
-#define PROGRAM_INFORMATION "Версия программы: 3.4" \
+#define PROGRAM_INFORMATION "Версия программы: 3.5" \
 "\n\nРазработчики:\nАлександров А.С.\nБабуркина С.С.\n\n" \
 "Отдел обеспечения защиты информации и управления информатизации\n" \
 "РТУ МИРЭА - Российский Технологический Университет\n\n" \

@@ -19,6 +19,7 @@ files_status::files_status() // инициализация в конструкт
     status_name.insert(status::error_password_failed, "Пароль неверный");
     status_name.insert(status::error_qpdf_no_image_added, "Ошибка QPDF");
     status_name.insert(status::error_no_tabels, "Отсутствуют таблицы");
+    status_name.insert(status::no_supported, "Не поддерживается");
 
 
     status_color.insert(status::no_errors, COLOR_GREEN);
@@ -36,6 +37,8 @@ files_status::files_status() // инициализация в конструкт
     status_color.insert(status::error_password_failed, COLOR_RED);
     status_color.insert(status::error_qpdf_no_image_added, COLOR_RED);
     status_color.insert(status::error_no_tabels, COLOR_RED);
+    status_color.insert(status::no_supported, COLOR_RED);
+
 }
 
 QString files_status::getStatusName(int st)

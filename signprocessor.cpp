@@ -695,7 +695,7 @@ void SignProcessor::runProcessing()
             {
                 qDebug() << "Для данного типа файла невозможно выполнить действие " << file.sourceFile;
                 log.addToLog("Для данного типа файла невозможно выполнить действие " + file.sourceFile);
-                emit newFileStatus(file, files_status::error_file_signature_failed);
+                emit newFileStatus(file, files_status::no_supported);
                 continue;
             }
         }
@@ -1033,7 +1033,7 @@ void SignProcessor::runProcessing()
             {
                 qDebug() << "Для данного типа файла невозможно выполнить действие " << file.sourceFile;
                 log.addToLog("Для данного типа файла невозможно выполнить действие " + file.sourceFile);
-                emit newFileStatus(file, files_status::error_file_signature_failed);
+                emit newFileStatus(file, files_status::no_supported);
                 continue;
             }
         }
@@ -1041,7 +1041,7 @@ void SignProcessor::runProcessing()
         {
             qDebug() << "Не удалось определить расшиение файла: " << file.sourceFile;
             log.addToLog("Не удалось определить расшиение файла: " + file.sourceFile);
-            emit newFileStatus(file, files_status::error_file_signature_failed);
+            emit newFileStatus(file, files_status::no_supported);
             continue;
         }
 

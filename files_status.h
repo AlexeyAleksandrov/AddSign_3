@@ -37,6 +37,7 @@ public:
         added,
         image_added,
         no_signed,
+        no_supported,
         no_status
     };
 
