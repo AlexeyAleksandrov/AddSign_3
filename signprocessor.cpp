@@ -712,161 +712,330 @@ void SignProcessor::runProcessing()
                 continue;
             }
 
-            PDFToPNGConverter pdfConverter;
-
-            bool ok = false;
-            auto info = pdfConverter.getLastLineInfo(file.sourceFile, &ok);
-            if(!ok)
+            if(WordOptions.insertType == insert_standart)
             {
-                qDebug() << "Произошла ошибка получения информации о PDF файле!";
-                log.addToLog("Произошла ошибка получения информации о PDF файле!");
-                emit newFileStatus(file, files_status::error_no_open);
-                continue;
-            }
+                PDFToPNGConverter pdfConverter;
 
-            PDFCreator::orientation orientation;
-            if(info.height > info.width) // если высота больше ширины
-            {
-                orientation = PDFCreator::Portrait;
-            }
-            else
-            {
-                orientation = PDFCreator::Landscape;
-            }
-
-            qDebug() << "Данные об PDF: " << "Высота: " << info.height << "Ширина: " << info.width << "Номер строки (пикселя): " << info.lastLine << " Строка для вставки: " << info.offsetLine;
-
-            // создаем PDF из HTML
-            PDFCreator pdf;
-            QString simpleSignFile = WordOptions.getTempdir() + "simpleSign.pdf";
-            AutoDeleter simpleSignFileDirContol(simpleSignFile); // автоматическое удаление файла
-//            if(!pdf.drawSign(simpleSignFile,
-//                                        PDFOptions.pdf_preset.alignment,
-//                                        PDFOptions.pdf_preset.paragraphOffset,
-//                                        PDFOptions.htmlParams.lineSertificate,
-//                                        PDFOptions.htmlParams.lineOwner,
-//                                        PDFOptions.htmlParams.lineDate,
-//                                        PDFCreator::Portrait)) // создаем PDF из HTML
-            bool onNextPage = false;
-            if(!pdf.drawSign(simpleSignFile,
-                             QPoint(-1, info.lastLine),
-                                        PDFOptions.htmlParams.lineSertificate,
-                                        PDFOptions.htmlParams.lineOwner,
-                                        PDFOptions.htmlParams.lineDate,
-                                        orientation,
-                             &onNextPage)) // создаем PDF из HTML
-
-            {
-                qDebug() << "Не удалось создать PDF файл подписи!";
-                log.addToLog("Не удалось создать PDF файл подписи!");
-                emit newFileStatus(file, files_status::error_pdf_no_export);
-                continue;
-            }
-
-            QString tempSignFile = simpleSignFile; // временный файл подписи
-
-            if(PDFOptions.drawLogo) // если нужно нарисовать герб
-            {
-                // отрисовываем герб в отдельный файл
-                QString simpleGerbFile = WordOptions.getTempdir() + "simpleGerb.pdf";
-                AutoDeleter simpleGerbFileDirContol(simpleGerbFile); // автоматическое удаление файла
-                if(!pdf.drawImage(simpleGerbFile,
-                                  MIREA_LOGO_HTML,
-                                  QPoint(-1, info.lastLine),
-                                  orientation))
+                bool ok = false;
+                auto info = pdfConverter.getLastLineInfo(file.sourceFile, &ok);
+                if(!ok)
                 {
-                    qDebug() << "Не удалось создать герб PDF файл подписи!";
-                    log.addToLog("Не удалось создать герб PDF файл подписи!");
+                    qDebug() << "Произошла ошибка получения информации о PDF файле!";
+                    log.addToLog("Произошла ошибка получения информации о PDF файле!");
+                    emit newFileStatus(file, files_status::error_no_open);
+                    continue;
+                }
+
+                PDFCreator::orientation orientation;
+                if(info.height > info.width) // если высота больше ширины
+                {
+                    orientation = PDFCreator::Portrait;
+                }
+                else
+                {
+                    orientation = PDFCreator::Landscape;
+                }
+
+                qDebug() << "Данные об PDF: " << "Высота: " << info.height << "Ширина: " << info.width << "Номер строки (пикселя): " << info.lastLine << " Строка для вставки: " << info.offsetLine;
+
+                // создаем PDF из HTML
+                PDFCreator pdf;
+                QString simpleSignFile = WordOptions.getTempdir() + "simpleSign.pdf";
+                AutoDeleter simpleSignFileDirContol(simpleSignFile); // автоматическое удаление файла
+    //            if(!pdf.drawSign(simpleSignFile,
+    //                                        PDFOptions.pdf_preset.alignment,
+    //                                        PDFOptions.pdf_preset.paragraphOffset,
+    //                                        PDFOptions.htmlParams.lineSertificate,
+    //                                        PDFOptions.htmlParams.lineOwner,
+    //                                        PDFOptions.htmlParams.lineDate,
+    //                                        PDFCreator::Portrait)) // создаем PDF из HTML
+                bool onNextPage = false;
+                if(!pdf.drawSign(simpleSignFile,
+                                 QPoint(-1, info.lastLine),
+                                            PDFOptions.htmlParams.lineSertificate,
+                                            PDFOptions.htmlParams.lineOwner,
+                                            PDFOptions.htmlParams.lineDate,
+                                            orientation,
+                                 &onNextPage)) // создаем PDF из HTML
+
+                {
+                    qDebug() << "Не удалось создать PDF файл подписи!";
+                    log.addToLog("Не удалось создать PDF файл подписи!");
                     emit newFileStatus(file, files_status::error_pdf_no_export);
                     continue;
                 }
 
-                // временный файл с подпиьсю + гербом
-                tempSignFile = WordOptions.getTempdir() + "tempSignFile.pdf";
-//                AutoDeleter tempSignDirContol(simpleGerbFile); // автоматическое удаление файла
+                QString tempSignFile = simpleSignFile; // временный файл подписи
+
+                if(PDFOptions.drawLogo) // если нужно нарисовать герб
+                {
+                    // отрисовываем герб в отдельный файл
+                    QString simpleGerbFile = WordOptions.getTempdir() + "simpleGerb.pdf";
+                    AutoDeleter simpleGerbFileDirContol(simpleGerbFile); // автоматическое удаление файла
+                    if(!pdf.drawImage(simpleGerbFile,
+                                      MIREA_LOGO_HTML,
+                                      QPoint(-1, info.lastLine),
+                                      orientation))
+                    {
+                        qDebug() << "Не удалось создать герб PDF файл подписи!";
+                        log.addToLog("Не удалось создать герб PDF файл подписи!");
+                        emit newFileStatus(file, files_status::error_pdf_no_export);
+                        continue;
+                    }
+
+                    // временный файл с подпиьсю + гербом
+                    tempSignFile = WordOptions.getTempdir() + "tempSignFile.pdf";
+    //                AutoDeleter tempSignDirContol(simpleGerbFile); // автоматическое удаление файла
+
+                    // теперь с помощью QPDF объединяем файлы
+                    qpdf_cmd qpdf;
+                    qpdf.setQpdfPath(PDFOptions.qpdf_dir); // устанавливаем путь к QPDF
+                    if(!qpdf.overlay(simpleSignFile, simpleGerbFile, tempSignFile)) // объединяем подпись и герб
+                    {
+                        qDebug() << "Не удалось объединить файлы" << tempPdfFile << simpleSignFile;
+                        log.addToLog("Не удалось объединить файлы " + tempPdfFile + " " + simpleSignFile);
+                        emit newFileStatus(file, files_status::error_pdf_no_export);
+                        continue;
+                    }
+    //                if(!qpdf.overlay(tempSignFile, tempFile, file.signPDFFile)) // объединяем файл с подписью и гербом с оригинальным файлом
+    //                {
+    //                    qDebug() << "Не удалось объединить файлы" << tempFile << simpleSignFile;
+    //                    log.addToLog("Не удалось объединить файлы " + tempFile + " " + simpleSignFile);
+    //                    emit newFileStatus(file, files_status::error_pdf_no_export);
+    //                    continue;
+    //                }
+                }
+    //            else // если не надо рисовать герб
+    //            {
+    //                // теперь с помощью QPDF объединяем файлы
+    //                qpdf_cmd qpdf;
+    //                qpdf.setQpdfPath(PDFOptions.qpdf_dir); // устанавливаем путь к QPDF
+    //                qDebug() << "Файл для наложения: " << file.signPDFFile;
+    //                qDebug() << "Файл наложения: " << simpleSignFile;
+    //                if(!qpdf.overlay(simpleSignFile, tempFile, file.signPDFFile)) // объединяем файл подписи и оригинальный файл
+    //                {
+    //                    qDebug() << "Не удалось объединить файлы" << tempFile << simpleSignFile;
+    //                    log.addToLog("Не удалось объединить файлы " + tempFile + " " + simpleSignFile);
+    //                    emit newFileStatus(file, files_status::error_pdf_no_export);
+    //                    continue;
+    //                }
+    //            }
 
                 // теперь с помощью QPDF объединяем файлы
+                AutoDeleter tempSignDirContol(tempSignFile); // автоматическое удаление файла
                 qpdf_cmd qpdf;
                 qpdf.setQpdfPath(PDFOptions.qpdf_dir); // устанавливаем путь к QPDF
-                if(!qpdf.overlay(simpleSignFile, simpleGerbFile, tempSignFile)) // объединяем подпись и герб
+                qDebug() << "Файл для наложения: " << file.signPDFFile;
+                qDebug() << "Файл наложения: " << tempSignFile;
+                if(onNextPage) // если подпись переходит на последнюю страницу
                 {
-                    qDebug() << "Не удалось объединить файлы" << tempPdfFile << simpleSignFile;
-                    log.addToLog("Не удалось объединить файлы " + tempPdfFile + " " + simpleSignFile);
-                    emit newFileStatus(file, files_status::error_pdf_no_export);
-                    continue;
-                }
-//                if(!qpdf.overlay(tempSignFile, tempFile, file.signPDFFile)) // объединяем файл с подписью и гербом с оригинальным файлом
-//                {
-//                    qDebug() << "Не удалось объединить файлы" << tempFile << simpleSignFile;
-//                    log.addToLog("Не удалось объединить файлы " + tempFile + " " + simpleSignFile);
-//                    emit newFileStatus(file, files_status::error_pdf_no_export);
-//                    continue;
-//                }
-            }
-//            else // если не надо рисовать герб
-//            {
-//                // теперь с помощью QPDF объединяем файлы
-//                qpdf_cmd qpdf;
-//                qpdf.setQpdfPath(PDFOptions.qpdf_dir); // устанавливаем путь к QPDF
-//                qDebug() << "Файл для наложения: " << file.signPDFFile;
-//                qDebug() << "Файл наложения: " << simpleSignFile;
-//                if(!qpdf.overlay(simpleSignFile, tempFile, file.signPDFFile)) // объединяем файл подписи и оригинальный файл
-//                {
-//                    qDebug() << "Не удалось объединить файлы" << tempFile << simpleSignFile;
-//                    log.addToLog("Не удалось объединить файлы " + tempFile + " " + simpleSignFile);
-//                    emit newFileStatus(file, files_status::error_pdf_no_export);
-//                    continue;
-//                }
-//            }
-
-            // теперь с помощью QPDF объединяем файлы
-            AutoDeleter tempSignDirContol(tempSignFile); // автоматическое удаление файла
-            qpdf_cmd qpdf;
-            qpdf.setQpdfPath(PDFOptions.qpdf_dir); // устанавливаем путь к QPDF
-            qDebug() << "Файл для наложения: " << file.signPDFFile;
-            qDebug() << "Файл наложения: " << tempSignFile;
-            if(onNextPage) // если подпись переходит на последнюю страницу
-            {
-                if(WordOptions.ignoreMovingToNextList) // если можно переходить на новую страницу
-                {
-                    if(!qpdf.merge(tempPdfFile, tempSignFile, file.signPDFFile))
+                    if(WordOptions.ignoreMovingToNextList) // если можно переходить на новую страницу
                     {
-                        qDebug() << "Не удалось объединить (merge) файлы" << tempPdfFile << tempSignFile;
-                        log.addToLog("Не удалось объединить (merge) файлы " + tempPdfFile + " " + tempSignFile);
+                        if(!qpdf.merge(tempPdfFile, tempSignFile, file.signPDFFile))
+                        {
+                            qDebug() << "Не удалось объединить (merge) файлы" << tempPdfFile << tempSignFile;
+                            log.addToLog("Не удалось объединить (merge) файлы " + tempPdfFile + " " + tempSignFile);
+                            emit newFileStatus(file, files_status::error_pdf_no_export);
+                            continue;
+                        }
+                    }
+                    else // если нельзя игнорировать переход
+                    {
+                        qDebug() << "Произошло увеличение количества страниц. Отменяем подпись.";
+                        log.addToLog("Произошло увеличение количества страниц. Отменяем подпись.");
+                        emit newFileStatus(file, files_status::error_new_page_no_added);
+                        continue;
+                    }
+                }
+                else // если рисуем на последней странице
+                {
+                    if(!qpdf.overlay(tempSignFile, tempPdfFile, file.signPDFFile)) // объединяем файл подписи и оригинальный файл
+                    {
+                        qDebug() << "Не удалось объединить (overlay) файлы" << tempPdfFile << tempSignFile;
+                        log.addToLog("Не удалось объединить (overlay) файлы " + tempPdfFile + " " + tempSignFile);
                         emit newFileStatus(file, files_status::error_pdf_no_export);
                         continue;
                     }
                 }
-                else // если нельзя игнорировать переход
+
+
+    //            // теперь с помощью QPDF объединяем файлы
+    //            qpdf_cmd qpdf;
+    //            qpdf.setQpdfPath(PDFOptions.qpdf_dir); // устанавливаем путь к QPDF
+    //            if(!qpdf.overlay(simpleSignFile, tempFile, file.signPDFFile)) // объединяем файлы и готово
+    //            {
+    //                qDebug() << "Не удалось объединить файлы" << tempFile << simpleSignFile;
+    //                log.addToLog("Не удалось объединить файлы " + tempFile + " " + simpleSignFile);
+    //                emit newFileStatus(file, files_status::error_pdf_no_export);
+    //                continue;
+    //            }
+            }
+            else if (WordOptions.insertType == insert_in_exported_pdf)
+            {
+                PDFToPNGConverter pdfConverter;
+
+                bool ok = false;
+                auto info = pdfConverter.getLastLineInfo(file.sourceFile, &ok);
+                if(!ok)
                 {
-                    qDebug() << "Произошло увеличение количества страниц. Отменяем подпись.";
-                    log.addToLog("Произошло увеличение количества страниц. Отменяем подпись.");
-                    emit newFileStatus(file, files_status::error_new_page_no_added);
+                    qDebug() << "Произошла ошибка получения информации о PDF файле!";
+                    log.addToLog("Произошла ошибка получения информации о PDF файле!");
+                    emit newFileStatus(file, files_status::error_no_open);
                     continue;
                 }
-            }
-            else // если рисуем на последней странице
-            {
-                if(!qpdf.overlay(tempSignFile, tempPdfFile, file.signPDFFile)) // объединяем файл подписи и оригинальный файл
+
+                PDFCreator::orientation orientation;
+                if(info.height > info.width) // если высота больше ширины
                 {
-                    qDebug() << "Не удалось объединить (overlay) файлы" << tempPdfFile << tempSignFile;
-                    log.addToLog("Не удалось объединить (overlay) файлы " + tempPdfFile + " " + tempSignFile);
+                    orientation = PDFCreator::Portrait;
+                }
+                else
+                {
+                    orientation = PDFCreator::Landscape;
+                }
+
+                qDebug() << "Данные об PDF: " << "Высота: " << info.height << "Ширина: " << info.width << "Номер строки (пикселя): " << info.lastLine << " Строка для вставки: " << info.offsetLine;
+
+                // создаем PDF из HTML
+                PDFCreator pdf;
+                QString simpleSignFile = WordOptions.getTempdir() + "simpleSign.pdf";
+                AutoDeleter simpleSignFileDirContol(simpleSignFile); // автоматическое удаление файла
+                if(!pdf.drawSign(simpleSignFile,
+                                            PDFOptions.pdf_preset.alignment,
+                                            PDFOptions.pdf_preset.paragraphOffset,
+                                            PDFOptions.htmlParams.lineSertificate,
+                                            PDFOptions.htmlParams.lineOwner,
+                                            PDFOptions.htmlParams.lineDate,
+                                            orientation)) // создаем PDF из HTML
+//                bool onNextPage = false;
+//                if(!pdf.drawSign(simpleSignFile,
+//                                 QPoint(-1, info.lastLine),
+//                                            PDFOptions.htmlParams.lineSertificate,
+//                                            PDFOptions.htmlParams.lineOwner,
+//                                            PDFOptions.htmlParams.lineDate,
+//                                            orientation,
+//                                 &onNextPage)) // создаем PDF из HTML
+
+                {
+                    qDebug() << "Не удалось создать PDF файл подписи!";
+                    log.addToLog("Не удалось создать PDF файл подписи!");
                     emit newFileStatus(file, files_status::error_pdf_no_export);
                     continue;
                 }
+
+                QString tempSignFile = simpleSignFile; // временный файл подписи
+
+                if(PDFOptions.drawLogo) // если нужно нарисовать герб
+                {
+                    // отрисовываем герб в отдельный файл
+                    QString simpleGerbFile = WordOptions.getTempdir() + "simpleGerb.pdf";
+                    AutoDeleter simpleGerbFileDirContol(simpleGerbFile); // автоматическое удаление файла
+//                    if(!pdf.drawImage(simpleGerbFile,
+//                                      MIREA_LOGO_HTML,
+//                                      QPoint(-1, info.lastLine),
+//                                      orientation))
+                    if(!pdf.drawImage(simpleGerbFile, MIREA_LOGO_HTML, PDFOptions.pdf_preset.alignment, PDFOptions.pdf_preset.paragraphOffset, orientation))
+                    {
+                        qDebug() << "Не удалось создать герб PDF файл подписи!";
+                        log.addToLog("Не удалось создать герб PDF файл подписи!");
+                        emit newFileStatus(file, files_status::error_pdf_no_export);
+                        continue;
+                    }
+
+                    // временный файл с подпиьсю + гербом
+                    tempSignFile = WordOptions.getTempdir() + "tempSignFile.pdf";
+    //                AutoDeleter tempSignDirContol(simpleGerbFile); // автоматическое удаление файла
+
+                    // теперь с помощью QPDF объединяем файлы
+                    qpdf_cmd qpdf;
+                    qpdf.setQpdfPath(PDFOptions.qpdf_dir); // устанавливаем путь к QPDF
+                    if(!qpdf.overlay(simpleSignFile, simpleGerbFile, tempSignFile)) // объединяем подпись и герб
+                    {
+                        qDebug() << "Не удалось объединить файлы" << tempPdfFile << simpleSignFile;
+                        log.addToLog("Не удалось объединить файлы " + tempPdfFile + " " + simpleSignFile);
+                        emit newFileStatus(file, files_status::error_pdf_no_export);
+                        continue;
+                    }
+    //                if(!qpdf.overlay(tempSignFile, tempFile, file.signPDFFile)) // объединяем файл с подписью и гербом с оригинальным файлом
+    //                {
+    //                    qDebug() << "Не удалось объединить файлы" << tempFile << simpleSignFile;
+    //                    log.addToLog("Не удалось объединить файлы " + tempFile + " " + simpleSignFile);
+    //                    emit newFileStatus(file, files_status::error_pdf_no_export);
+    //                    continue;
+    //                }
+                }
+    //            else // если не надо рисовать герб
+    //            {
+    //                // теперь с помощью QPDF объединяем файлы
+    //                qpdf_cmd qpdf;
+    //                qpdf.setQpdfPath(PDFOptions.qpdf_dir); // устанавливаем путь к QPDF
+    //                qDebug() << "Файл для наложения: " << file.signPDFFile;
+    //                qDebug() << "Файл наложения: " << simpleSignFile;
+    //                if(!qpdf.overlay(simpleSignFile, tempFile, file.signPDFFile)) // объединяем файл подписи и оригинальный файл
+    //                {
+    //                    qDebug() << "Не удалось объединить файлы" << tempFile << simpleSignFile;
+    //                    log.addToLog("Не удалось объединить файлы " + tempFile + " " + simpleSignFile);
+    //                    emit newFileStatus(file, files_status::error_pdf_no_export);
+    //                    continue;
+    //                }
+    //            }
+
+                // теперь с помощью QPDF объединяем файлы
+                AutoDeleter tempSignDirContol(tempSignFile); // автоматическое удаление файла
+                qpdf_cmd qpdf;
+                qpdf.setQpdfPath(PDFOptions.qpdf_dir); // устанавливаем путь к QPDF
+                qDebug() << "Файл для наложения: " << file.signPDFFile;
+                qDebug() << "Файл наложения: " << tempSignFile;
+//                if(onNextPage) // если подпись переходит на последнюю страницу
+//                {
+//                    if(WordOptions.ignoreMovingToNextList) // если можно переходить на новую страницу
+//                    {
+//                        if(!qpdf.merge(tempPdfFile, tempSignFile, file.signPDFFile))
+//                        {
+//                            qDebug() << "Не удалось объединить (merge) файлы" << tempPdfFile << tempSignFile;
+//                            log.addToLog("Не удалось объединить (merge) файлы " + tempPdfFile + " " + tempSignFile);
+//                            emit newFileStatus(file, files_status::error_pdf_no_export);
+//                            continue;
+//                        }
+//                    }
+//                    else // если нельзя игнорировать переход
+//                    {
+//                        qDebug() << "Произошло увеличение количества страниц. Отменяем подпись.";
+//                        log.addToLog("Произошло увеличение количества страниц. Отменяем подпись.");
+//                        emit newFileStatus(file, files_status::error_new_page_no_added);
+//                        continue;
+//                    }
+//                }
+//                else // если рисуем на последней странице
+//                {
+                    if(!qpdf.overlay(tempSignFile, tempPdfFile, file.signPDFFile)) // объединяем файл подписи и оригинальный файл
+                    {
+                        qDebug() << "Не удалось объединить (overlay) файлы" << tempPdfFile << tempSignFile;
+                        log.addToLog("Не удалось объединить (overlay) файлы " + tempPdfFile + " " + tempSignFile);
+                        emit newFileStatus(file, files_status::error_pdf_no_export);
+                        continue;
+                    }
+//                }
+
+
+    //            // теперь с помощью QPDF объединяем файлы
+    //            qpdf_cmd qpdf;
+    //            qpdf.setQpdfPath(PDFOptions.qpdf_dir); // устанавливаем путь к QPDF
+    //            if(!qpdf.overlay(simpleSignFile, tempFile, file.signPDFFile)) // объединяем файлы и готово
+    //            {
+    //                qDebug() << "Не удалось объединить файлы" << tempFile << simpleSignFile;
+    //                log.addToLog("Не удалось объединить файлы " + tempFile + " " + simpleSignFile);
+    //                emit newFileStatus(file, files_status::error_pdf_no_export);
+    //                continue;
+    //            }
             }
-
-
-//            // теперь с помощью QPDF объединяем файлы
-//            qpdf_cmd qpdf;
-//            qpdf.setQpdfPath(PDFOptions.qpdf_dir); // устанавливаем путь к QPDF
-//            if(!qpdf.overlay(simpleSignFile, tempFile, file.signPDFFile)) // объединяем файлы и готово
-//            {
-//                qDebug() << "Не удалось объединить файлы" << tempFile << simpleSignFile;
-//                log.addToLog("Не удалось объединить файлы " + tempFile + " " + simpleSignFile);
-//                emit newFileStatus(file, files_status::error_pdf_no_export);
-//                continue;
-//            }
+            else
+            {
+                qDebug() << "Для данного типа файла невозможно выполнить действие " << file.sourceFile;
+                log.addToLog("Для данного типа файла невозможно выполнить действие " + file.sourceFile);
+                emit newFileStatus(file, files_status::error_file_signature_failed);
+                continue;
+            }
         }
         else
         {
