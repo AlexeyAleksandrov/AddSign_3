@@ -22,6 +22,7 @@ SOURCES += \
     mainwindow.cpp \
     my_tablewidget.cpp \
     pdfcreator.cpp \
+    pdftopngconverter.cpp \
     qpdf_cmd.cpp \
     signprewiew.cpp \
     signprocessor.cpp \
@@ -39,6 +40,7 @@ HEADERS += \
     mainwindow.h \
     my_tablewidget.h \
     pdfcreator.h \
+    pdftopngconverter.h \
     qpdf_cmd.h \
     signprewiew.h \
     signprocessor.h \

@@ -12,6 +12,7 @@
 #include "qpdf_cmd.h"
 #include "cryptopro_csp.h"
 #include "pdfcreator.h"
+#include "pdftopngconverter.h"
 
 class SignProcessor : public QObject
 {
@@ -123,6 +124,8 @@ private:
 
     inline QString getFileName(QString file); // возвращает имя файла без директории
     static QString getDir(QString dir); // добавляет в конец директории /, если таковой необходим
+
+    void processPDFFile(QString sourceFile, QString outputFile);
 
 signals:
     void newFileStatus(FileForSign, int status);

@@ -14,6 +14,7 @@ public:
     explicit qpdf_cmd(QObject *parent = nullptr);
 
     bool overlay(QString upperfile, QString underfile, QString outputfile, QString options = "--to=z"); // оверлей файла
+    bool merge(QString followingFile, QString secondFile, QString outputfile); // объединить 2 файла в один
 
     void setQpdfPath(const QString &value);
 
