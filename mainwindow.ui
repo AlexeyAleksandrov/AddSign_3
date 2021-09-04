@@ -507,7 +507,7 @@ QHeaderView::section{background-color: rgb(114, 159, 207)}
        <string notr="true"/>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_preview">
        <property name="styleSheet">
@@ -1072,7 +1072,10 @@ background-color: transparent;</string>
                  <item row="3" column="0">
                   <widget class="QRadioButton" name="radioButton_signByTag">
                    <property name="toolTip">
-                    <string/>
+                    <string>Тэги: &lt;место_для_подписи&gt;, &lt;имя_владельца_подписи&gt;</string>
+                   </property>
+                   <property name="toolTipDuration">
+                    <number>-1</number>
                    </property>
                    <property name="whatsThis">
                     <string/>
@@ -2478,7 +2481,7 @@ background-color: rgb(32, 74, 135);
            <item row="1" column="2">
             <widget class="QSlider" name="horizontalSlider">
              <property name="maximum">
-              <number>2</number>
+              <number>6</number>
              </property>
              <property name="value">
               <number>1</number>

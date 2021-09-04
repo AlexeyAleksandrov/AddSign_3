@@ -16,9 +16,11 @@ UiDataSaver::~UiDataSaver()
 
 void UiDataSaver::saveProgramData()
 {
-#ifdef DEBUGGING
-    qDebug() << "SAVE вызвана функция сохранения данных в файл";
-#endif
+    if(!loaded)
+    {
+        qDebug() << "Сохранение не выполнено! Программа не загружена";
+        return;
+    }
 //    qDebug() << "SAVE вызвана функция сохранения данных в файл";
     // получаем данные о виджетах, для сохранения
     QStringList savingList; // список информации о виджетах. 1 строка = информации об 1 типе виджетов
@@ -134,36 +136,43 @@ void UiDataSaver::loadProgramData()
 #endif
         log.addToLog("Параметры установлены");
     }
+    loaded = true;
 }
 
 void UiDataSaver::add(QCheckBox *checkBox) // добавление checkBox в список
 {
     appendToList(checkBox, checkBoxesList);
+    connect(checkBox, &QCheckBox::pressed, this, &UiDataSaver::saveProgramData);
 }
 
 void UiDataSaver::add(QLineEdit *lineEdit) // добавление lineEdit в список
 {
     appendToList(lineEdit, lineEditList);
+    connect(lineEdit, &QLineEdit::editingFinished, this, &UiDataSaver::saveProgramData);
 }
 
 void UiDataSaver::add(QComboBox *comboBox)
 {
     appendToList(comboBox, comboBoxList);
+//    connect(comboBox, SIGNAL(currentIndexChanged(int index)), this, SLOT(saveActivated(int i)));
 }
 
 void UiDataSaver::add(QSpinBox *spinBox)
 {
     appendToList(spinBox, spinBoxList);
+//    connect(spinBox, SIGNAL(valueChanged(int)), this, SLOT(saveActivated(int)));
 }
 
 void UiDataSaver::add(QDoubleSpinBox *doubleSpinBox)
 {
     appendToList(doubleSpinBox, doubleSpinBoxList);
+//    connect(doubleSpinBox, SIGNAL(valueChanged(int)), this, SLOT(saveActivated(int)));
 }
 
 void UiDataSaver::add(QSlider *slider)
 {
     appendToList(slider, sliderList);
+//    connect(slider, SIGNAL(valueChanged(int)), this, SLOT(saveActivated(int)));
 }
 
 void UiDataSaver::add(QMainWindow *mainWindow)
@@ -174,6 +183,7 @@ void UiDataSaver::add(QMainWindow *mainWindow)
 void UiDataSaver::addRb(QRadioButton *radioButton)
 {
     appendToList(radioButton, radioButtonList);
+    connect(radioButton, &QRadioButton::clicked, this, &UiDataSaver::saveProgramData);
 }
 
 void UiDataSaver::setDefaultCert(const QString &value)
@@ -199,6 +209,12 @@ QString UiDataSaver::getLastCert() const
 void UiDataSaver::setSaveFile(const QString &value)
 {
     saveFile = value;
+}
+
+void UiDataSaver::saveActivated(int i)
+{
+    Q_UNUSED(i);
+    saveProgramData();
 }
 
 //preset *UiDataSaver::getPres() const

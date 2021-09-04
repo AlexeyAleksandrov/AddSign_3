@@ -1,6 +1,5 @@
-QT       += core gui printsupport
+QT       += core gui printsupport network
 win32: QT += axcontainer
-#!linux: QT += axcontainer
 
 #DEFINES += QT_NO_DEBUG_OUTPUT
 
@@ -26,6 +25,7 @@ SOURCES += \
     qpdf_cmd.cpp \
     signprewiew.cpp \
     signprocessor.cpp \
+    systemwin32.cpp \
     uidatasaver.cpp \
     uipreset.cpp \
     wordeditor.cpp \
@@ -44,6 +44,7 @@ HEADERS += \
     qpdf_cmd.h \
     signprewiew.h \
     signprocessor.h \
+    systemwin32.h \
     uidatasaver.h \
     uipreset.h \
     wordeditor.h \

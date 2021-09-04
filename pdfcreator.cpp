@@ -2,6 +2,9 @@
 
 #define TAB "&nbsp;"
 
+#define ROWS_COUNT 30
+#define COLUMNS_COUNT 6
+
 PDFCreator::PDFCreator(QObject *parent) : QObject(parent)
 {}
 
@@ -53,7 +56,24 @@ bool PDFCreator::drawSign(QString fileName, int image_pos_x, int image_pos_y, QS
     double signPosX = 0.0;
     double signPosY = 0.0;
 
-    const int rowsCount = 30;
+//    const int rowsCount = 30;
+
+//    // рассчёт позиции по X
+//    switch (image_pos_x)
+//    {
+//        case 0:
+//            signPosX = 0.0;
+//            break;
+//        case 2:
+//            signPosX = weight - signRectWeight;
+//            break;
+//        default:
+//            signPosX = (weight - signRectWeight)/2.0;
+//            break;
+//    }
+
+    const int rowsCount = ROWS_COUNT;
+    const int columnsCount = COLUMNS_COUNT; // количество возможных вертикальных положений
 
     // рассчёт позиции по X
     switch (image_pos_x)
@@ -61,11 +81,11 @@ bool PDFCreator::drawSign(QString fileName, int image_pos_x, int image_pos_y, QS
         case 0:
             signPosX = 0.0;
             break;
-        case 2:
+        case columnsCount:
             signPosX = weight - signRectWeight;
             break;
         default:
-            signPosX = (weight - signRectWeight)/2.0;
+            signPosX = ((weight - signRectWeight)/columnsCount) * image_pos_x;
             break;
     }
 
@@ -248,7 +268,8 @@ bool PDFCreator::drawImage(QString fileName, QString imageDir, int image_pos_x, 
     double signPosX = 0.0;
     double signPosY = 0.0;
 
-    const int rowsCount = 30;
+    const int rowsCount = ROWS_COUNT;
+    const int columnsCount = COLUMNS_COUNT; // количество возможных вертикальных положений
 
     // рассчёт позиции по X
     switch (image_pos_x)
@@ -256,11 +277,11 @@ bool PDFCreator::drawImage(QString fileName, QString imageDir, int image_pos_x, 
         case 0:
             signPosX = 0.0;
             break;
-        case 2:
+        case columnsCount:
             signPosX = weight - signRectWeight;
             break;
         default:
-            signPosX = (weight - signRectWeight)/2.0;
+            signPosX = ((weight - signRectWeight)/columnsCount) * image_pos_x;
             break;
     }
 

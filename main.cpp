@@ -3,23 +3,21 @@
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QTextCodec>
+#include "systemwin32.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-//    QCommandLineParser parser;
-
-//    QCommandLineOption name_param(QStringList() << "s" << "signfile", "File", "file for sign");
-//    QCommandLineOption port_param(QStringList() << "a" << "addsign", "sign", "create sign");
-//    parser.addOption(name_param);
-//    parser.addOption(port_param);
-//    parser.process(a);
-
-//    if(parser.isSet(name_param))
-//        qDebug()<<"name is " << parser.value(name_param);
-//    if(parser.isSet(port_param))
-//        qDebug()<<"port is " << parser.value(port_param);
+    #ifdef WIN32
+    systemWin32 processesInWin;
+    if(processesInWin.getProcessCount("AddSign.exe") > 1)
+    {
+        QMessageBox::warning(0, "Ошибка!", "Программа AddSign уже запущена!\n"
+                                           "Запуск второй копии невозможен!");
+        return 0;
+    }
+    #endif
 
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("IBM 866"));
 

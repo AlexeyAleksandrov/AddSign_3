@@ -37,6 +37,8 @@ public:
     bool forsedDefaultFlag; // Флаг, указывающий, установил ли пользователь значение по умолчанию
     bool defaultFlag;
 
+    bool loaded = false;
+
     void saveProgramData(); // сохранить данные о настройках программы
     void loadProgramData(); // загрузить данные о настройках программы
 
@@ -59,6 +61,8 @@ public:
     QString getLastCert() const;
 
     void setSaveFile(const QString &value);
+
+    void saveActivated(int i); // просто оболочка над saveProgramData, чтобы сделать коннект
 
 signals:
     //    void acceptCurrentIndexSignComboBox(); // сигнал о том, что форме надо применить подпись по текущему выбранному состоянию из comboBox

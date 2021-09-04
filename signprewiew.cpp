@@ -4,6 +4,7 @@
 #define getYPos(line) signUpIndent + textInterval * line
 #define getStartImageYpos(line) getYPos(line) + ((getYPos(line+1) - getYPos(line))/2)
 
+
 signPrewiew::signPrewiew(QWidget *parent) : QWidget(parent)
 {
     //    const double scale = (double)parent->height() / (double)this->height() /*+ 2.5 - 2.5*/;
@@ -49,8 +50,13 @@ void signPrewiew::drawSmallRect(int xMode, int yMode)
     const int pageDownIndent = 20; // 2 см
 
     //====================================
+    // параметры координат подписи
+    const int linesCount = 30; // количество строк на странице (если интервал 1.0)
+    const int columnsCount = 7; // количество вертикальных позиций на странице
+
+    //====================================
     // параметры отсовываемого виджета в пикселях
-    const int backgroundWidth = img.width(); // ширина виджета
+    const int backgroundWidth = (double)img.width()/1.2f; // ширина виджета
     const int backgroundHeight = img.height(); // высота виджета
 
     // считаем смещение картинки подписи на виджете
@@ -70,7 +76,7 @@ void signPrewiew::drawSmallRect(int xMode, int yMode)
     //====================================
 
     // считаем шаг картинки
-    const int horizontalStep = workingWidht/3; // у нас 3 шага, значит делим на 3
+    const int horizontalStep = workingWidht/columnsCount; // у нас 3 шага, значит делим на 3
 
     // реальный размер картинки
     const int signRealWidht = 60; // реальная ширина 6 см (по требованию заказчика)
@@ -89,7 +95,6 @@ void signPrewiew::drawSmallRect(int xMode, int yMode)
         linesInterval = 1.0;
     }
 #endif
-    const int linesCount = 30; // количество строк на странице (если интервал 1.0)
     const int linesCountWithInterval = (double)linesCount/linesInterval; // получаем высоту прямоугольника, которую надо выделить для текста
     const int textInterval = workingHeight/linesCountWithInterval; // делим высоту рабочей области на количество строк (количество строк считает как количество с интервалом 1.0 делённое на интервал, т.к. интервал сжирает часть высоты строки)
 
