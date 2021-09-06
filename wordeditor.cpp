@@ -277,7 +277,7 @@ bool WordEditor::setParagraphAlignment(int alignment)
     return true;
 }
 
-bool WordEditor::exportToPdf(QString outputFileName)
+bool WordEditor::exportToPdf(QString &outputFileName)
 {
     if((!outputFileName.endsWith(".pdf")) && (outputFileName != ""))
     {
@@ -316,12 +316,26 @@ bool WordEditor::exportToPdf(QString outputFileName)
     {
         exportFilename = outputFileName; // директория файла + новое название
     }
+
+    // проверяем, нет-ли в директории уже созданного такого файла
+    int index = 1;  // индекс копии файла
+    QString tempFilename = exportFilename;  // временное название для поиска копий файла
+    while (QFile::exists(tempFilename))
+    {
+        tempFilename = exportFilename.remove(".pdf");
+        index++;
+        tempFilename.append("_" + QString::number(index) + ".pdf");
+    }
+    exportFilename = tempFilename;  // когда было сформировано название, сохраняем его
+    outputFileName = exportFilename;    // сохраняем новое расположение файла
+
     qDebug() << "Сохряняем файл в PDF: " << exportFilename;
     QString change_dir = QFileInfo(exportFilename).absolutePath() + "/";
+    QString export_file_baseName = exportFilename.remove(change_dir);  // получаем чистое имя файла с расширением
 
     word->dynamicCall("ChangeFileOpenDirectory(String)", change_dir); // устанавливаем рабочую директорию
     ActiveDocument->dynamicCall("ExportAsFixedFormat(String, WdExportFormat, Boolean, WdExportOptimizeFor, WdExportRange, Long, Long, WdExportItem, Boolean, Boolean, WdExportCreateBookmarks, Boolean, Boolean, Boolean)",
-                                                          f_name, "wdExportFormatPDF", false);
+                                                          export_file_baseName, "wdExportFormatPDF", false);
     word->dynamicCall("ChangeFileOpenDirectory(String)", change_dir); // устанавливаем рабочую директорию
     return true;
 }

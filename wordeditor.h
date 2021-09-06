@@ -78,7 +78,7 @@ public:
     // работа с документом
     bool openDocument(QString fileDir); // открыть документ
     bool saveDocument(); // просто сохранить документ
-    bool exportToPdf(QString outputFileName = QString()); // экспортировать в PDF
+    bool exportToPdf(QString &outputFileName); // экспортировать в PDF
     bool closeDocument(); // закрыть документ
     bool printDocument(QString printer = ""); // распечатать документ
 

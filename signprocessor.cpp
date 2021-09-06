@@ -103,6 +103,22 @@ void SignProcessor::runProcessing()
         emit newFileStatus(file, files_status::in_process);
         QApplication::processEvents(); // прогружаем интерфейс
         bool movedToNextPage = false; // флаг перехода на новую страницу
+
+        // проверяем, нет-ли в директории уже созданного такого файла
+        if(file.signPDFFile != "")
+        {
+            int index = 1;  // индекс копии файла
+            QString tempFilename = file.signPDFFile;  // временное название для поиска копий файла
+            while (QFile::exists(tempFilename))
+            {
+                tempFilename = file.signPDFFile.remove(".pdf");
+                index++;
+                tempFilename.append("_" + QString::number(index) + ".pdf");
+            }
+            file.signPDFFile = tempFilename;
+        }
+
+        // обрабатывем файл
         if(isWordFile(file.sourceFile)) // если у нас вордовский файл
         {
             WordEditor word; // создаем обработчик ворда
