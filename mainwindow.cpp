@@ -344,8 +344,8 @@ void MainWindow::on_pushButton_addsign_clicked()
     QString qpdf_dir = QDir::currentPath() + "/qpdf/qpdf.exe";
     if(!QFile::exists(qpdf_dir))
     {
-        QMessageBox::warning(this, "Ошибка", "Ошибка! Файл qpdf.exe не найден!");
-        log.addToLog("Ошибка! Файл qpdf.exe не найден!");
+        QMessageBox::warning(this, "Ошибка", "Ошибка! Файл qpdf.exe не найден! + " + qpdf_dir);
+        log.addToLog("Ошибка! Файл qpdf.exe не найден! + " + qpdf_dir);
         return;
     }
 //    if(containsPDFFiles || signType == SignProcessor::insert_in_exported_pdf) // если содержатся PDF файлы, то ищем QPDF

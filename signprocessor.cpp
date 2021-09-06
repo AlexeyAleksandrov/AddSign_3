@@ -53,6 +53,7 @@ void SignProcessor::setFilesList(const QStringList &files)
             if(((WordOptions.insertType == insert_standart || WordOptions.insertType == insert_by_tag_in_table) && WordOptions.exportToPDF) || WordOptions.insertType == insert_in_exported_pdf) // если нужно экспортировать в PDF
             {
                 file.signPDFFile = getFileNameInPDFFormat(WordOptions.getOutputdir() + getFileName(file.sourceFile)); // тоже самое, но меняем расширение файла
+                qDebug() << "PDF filename: " << file.signPDFFile;
             }
         }
         filesList.append(file); // добавляем в список

@@ -289,7 +289,24 @@ bool WordEditor::exportToPdf(QString outputFileName)
     QString exportFilename = outputFileName; // имя экспортируемого файла
 
     QString f_dir = QFileInfo(activeFile).absolutePath() + "/"; // формируем путь к файлу
-    QString f_name = QFileInfo(activeFile).baseName() + ".pdf"; // формируем название файла
+    QString f_name = activeFile.remove(f_dir); // формируем название файла
+    if(f_name.endsWith(".docx"))
+    {
+       f_name = f_name.replace(".docx", ".pdf");
+    }
+    else if(f_name.endsWith(".doc"))
+    {
+       f_name = f_name.replace(".doc", ".pdf");
+    }
+    else if(f_name.endsWith(".rtf"))
+    {
+       f_name = f_name.replace(".rtf", ".pdf");
+    }
+
+    qDebug() << "f_name = " + f_name;
+
+
+//    QString f_name = QFileInfo(activeFile).baseName() + ".pdf"; // формируем название файла
 
     if(exportFilename == "")
     {
@@ -304,7 +321,7 @@ bool WordEditor::exportToPdf(QString outputFileName)
 
     word->dynamicCall("ChangeFileOpenDirectory(String)", change_dir); // устанавливаем рабочую директорию
     ActiveDocument->dynamicCall("ExportAsFixedFormat(String, WdExportFormat, Boolean, WdExportOptimizeFor, WdExportRange, Long, Long, WdExportItem, Boolean, Boolean, WdExportCreateBookmarks, Boolean, Boolean, Boolean)",
-                                                          QFileInfo(exportFilename).baseName() + ".pdf", "wdExportFormatPDF", false);
+                                                          f_name, "wdExportFormatPDF", false);
     word->dynamicCall("ChangeFileOpenDirectory(String)", change_dir); // устанавливаем рабочую директорию
     return true;
 }
