@@ -22,12 +22,12 @@
 #define OPEN_WORD_BY_DOUBLECLICK // открывать вордовские файлы по даблклику
 
 #define STACKED_PREVIEW 0
-#define STACKED_EDIT_PREVIEW 5
-#define STACKED_SHABLONI 4
-#define STACKED_FILES 3
+//#define STACKED_EDIT_PREVIEW 5
+//#define STACKED_SHABLONI 4
+//#define STACKED_FILES 3
 #define STACKED_SYSTEM_SETTINGS 2
 #define STACKED_SIGN_SETTINGS 1
-#define STACKED_SIGN_POSITION_PREVIEW 6
+//#define STACKED_SIGN_POSITION_PREVIEW 6
 
 #define LABEL_CERTIFICATE 3
 #define LABEL_SIGN_HOSTER 4
@@ -148,6 +148,21 @@ void MainWindow::customConstructor()
     ui->stackedWidget->setCurrentIndex(STACKED_PREVIEW);
 
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("IBM 866"));
+
+    automationTest_sourceFiles.resize(automationTest_types::size);
+    automationTest_sourceFiles[automationTest_types::simple_insert_in_word] = QStringList() << "word_example_medium_text_x.docx";
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_next_page] = QStringList();
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_export_pdf] = QStringList();
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_export_pdf_next_page] = QStringList();
+    automationTest_sourceFiles[automationTest_types::standart_insert_in_pdf] = QStringList();
+    automationTest_sourceFiles[automationTest_types::standart_insert_in_pdf_with_next_page] = QStringList();
+    automationTest_sourceFiles[automationTest_types::standart_insert_in_excel] = QStringList();
+    automationTest_sourceFiles[automationTest_types::standart_insert_in_excel_with_next_page] = QStringList();
+    automationTest_sourceFiles[automationTest_types::insert_in_coords_word] = QStringList();
+    automationTest_sourceFiles[automationTest_types::insert_in_coords_excel] = QStringList();
+    automationTest_sourceFiles[automationTest_types::insert_in_coords_pdf] = QStringList();
+    automationTest_sourceFiles[automationTest_types::insert_by_tag] = QStringList();
+
 
     labelList.append(ui->label); // документ подписан
     labelList.append(ui->label_2); // электронной подписбю
@@ -2030,7 +2045,8 @@ void MainWindow::on_pushButton_settings_shower_clicked()
 
 void MainWindow::on_stackedWidget_currentChanged(int arg1)
 {
-    if(arg1 == STACKED_SIGN_POSITION_PREVIEW || arg1 == STACKED_SIGN_SETTINGS)
+//    if(arg1 == STACKED_SIGN_POSITION_PREVIEW || arg1 == STACKED_SIGN_SETTINGS)
+    if(arg1 == STACKED_SIGN_SETTINGS)
     {
         updatePrewiew();
         ui->previewWidget->rescale();
@@ -2106,3 +2122,19 @@ void MainWindow::on_pushButton_acceptCurrentPreset_clicked()
 }
 
 
+
+void MainWindow::on_pushButton_automationTest_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(STACKED_PREVIEW);
+    QString current_dir = QDir::currentPath() + "/";
+    QStringList files;
+    for (auto &&file : automationTest_sourceFiles[automationTest_types::simple_insert_in_word])
+    {
+        files.append(current_dir + file);   // добавляем файл из списка
+    }
+//    addFile(current_dir + "word_example_medium_text_x.docx");
+    addFiles(files);
+
+    ui->pushButton_addsign->click();
+
+}

@@ -199,6 +199,31 @@ private:
     QStringList args; // список аргументов запуска
 
     // =================================================================================
+    // ==== БЛОК АВТОМАТИЧЕСКОГО ТЕСТИРОВАНИЯ ====
+    // =================================================================================
+    enum automationTest_types
+    {
+        simple_insert_in_word,
+        insert_in_word_with_next_page,
+        insert_in_word_with_export_pdf,
+        insert_in_word_with_export_pdf_next_page,
+        standart_insert_in_pdf,
+        standart_insert_in_pdf_with_next_page,
+        standart_insert_in_excel,
+        standart_insert_in_excel_with_next_page,
+        insert_in_coords_word,
+        insert_in_coords_excel,
+        insert_in_coords_pdf,
+        insert_by_tag,
+        size
+    };
+    QVector<QStringList> automationTest_sourceFiles;
+
+    bool isAutomationTesting = false; // происходит-ли сейчас автоматическое тестирование программы
+    int current_automationTest_type = -1;
+    void automationTest_step_finished();    // этап автоматического тестирования завершён
+
+    // =================================================================================
 
 
 private slots:
@@ -293,5 +318,6 @@ private slots:
     void on_pushButton_moveToSigning_clicked();
 //    void on_radioButton_signByTag_clicked();
     void on_radioButton_signByTag_clicked(bool checked);
+    void on_pushButton_automationTest_clicked();
 };
 #endif // MAINWINDOW_H
