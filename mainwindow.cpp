@@ -150,18 +150,124 @@ void MainWindow::customConstructor()
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("IBM 866"));
 
     automationTest_sourceFiles.resize(automationTest_types::size);
+
     automationTest_sourceFiles[automationTest_types::simple_insert_in_word] = QStringList() << "word_example_medium_text_x.docx";
     automationTest_sourceFiles[automationTest_types::insert_in_word_with_next_page] = QStringList();
     automationTest_sourceFiles[automationTest_types::insert_in_word_with_export_pdf] = QStringList();
     automationTest_sourceFiles[automationTest_types::insert_in_word_with_export_pdf_next_page] = QStringList();
+
     automationTest_sourceFiles[automationTest_types::standart_insert_in_pdf] = QStringList();
     automationTest_sourceFiles[automationTest_types::standart_insert_in_pdf_with_next_page] = QStringList();
+
     automationTest_sourceFiles[automationTest_types::standart_insert_in_excel] = QStringList();
     automationTest_sourceFiles[automationTest_types::standart_insert_in_excel_with_next_page] = QStringList();
+
     automationTest_sourceFiles[automationTest_types::insert_in_coords_word] = QStringList();
     automationTest_sourceFiles[automationTest_types::insert_in_coords_excel] = QStringList();
     automationTest_sourceFiles[automationTest_types::insert_in_coords_pdf] = QStringList();
+
     automationTest_sourceFiles[automationTest_types::insert_by_tag] = QStringList();
+
+    QString current_dir = QDir::currentPath() + "/";
+
+    automationTesting_exapmleFiles.doc.standart = current_dir + "standart.doc";
+    automationTesting_exapmleFiles.doc.full = current_dir + "full.doc";
+    automationTesting_exapmleFiles.doc.with_tag = current_dir + "tag.doc";
+
+    automationTesting_exapmleFiles.docx.standart = current_dir + "standart.docx";
+    automationTesting_exapmleFiles.docx.full = current_dir + "full.docx";
+    automationTesting_exapmleFiles.docx.with_tag = current_dir + "docx_tag.docx";
+
+    automationTesting_exapmleFiles.rtf.standart = current_dir + "standart.rtf";
+    automationTesting_exapmleFiles.rtf.full = current_dir + "full.rtf";
+    automationTesting_exapmleFiles.rtf.with_tag = current_dir + "tag.rtf";
+
+    automationTesting_exapmleFiles.pdf.standart = current_dir + "standart.pdf";
+    automationTesting_exapmleFiles.pdf.full = current_dir + "full.pdf";
+
+    automationTesting_exapmleFiles.xls.standart = current_dir + "standart.xls";
+    automationTesting_exapmleFiles.xls.full = current_dir + "full.xls";
+
+    automationTesting_exapmleFiles.xlsc.standart = current_dir + "standart.xls";
+    automationTesting_exapmleFiles.xlsc.full = current_dir + "full.xls";
+
+    // WORD
+    // простая проверка вордовских файлов
+    automationTest_sourceFiles[automationTest_types::simple_insert_in_word].append(automationTesting_exapmleFiles.doc.standart);
+    automationTest_sourceFiles[automationTest_types::simple_insert_in_word].append(automationTesting_exapmleFiles.doc.full);
+    automationTest_sourceFiles[automationTest_types::simple_insert_in_word].append(automationTesting_exapmleFiles.docx.standart);
+    automationTest_sourceFiles[automationTest_types::simple_insert_in_word].append(automationTesting_exapmleFiles.docx.full);
+    automationTest_sourceFiles[automationTest_types::simple_insert_in_word].append(automationTesting_exapmleFiles.rtf.standart);
+    automationTest_sourceFiles[automationTest_types::simple_insert_in_word].append(automationTesting_exapmleFiles.rtf.full);
+
+    // проверка вордовских файлов с разрешением перехода на новую страницу
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_next_page].append(automationTesting_exapmleFiles.doc.standart);
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_next_page].append(automationTesting_exapmleFiles.doc.full);
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_next_page].append(automationTesting_exapmleFiles.docx.standart);
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_next_page].append(automationTesting_exapmleFiles.docx.full);
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_next_page].append(automationTesting_exapmleFiles.rtf.standart);
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_next_page].append(automationTesting_exapmleFiles.rtf.full);
+
+    // проверка экспорта в PDF
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_export_pdf].append(automationTesting_exapmleFiles.doc.standart);
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_export_pdf].append(automationTesting_exapmleFiles.doc.full);
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_export_pdf].append(automationTesting_exapmleFiles.docx.standart);
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_export_pdf].append(automationTesting_exapmleFiles.docx.full);
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_export_pdf].append(automationTesting_exapmleFiles.rtf.standart);
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_export_pdf].append(automationTesting_exapmleFiles.rtf.full);
+
+    // проверка экспорта в PDF с переходом на новую страницу
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_export_pdf_next_page].append(automationTesting_exapmleFiles.doc.standart);
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_export_pdf_next_page].append(automationTesting_exapmleFiles.doc.full);
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_export_pdf_next_page].append(automationTesting_exapmleFiles.docx.standart);
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_export_pdf_next_page].append(automationTesting_exapmleFiles.docx.full);
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_export_pdf_next_page].append(automationTesting_exapmleFiles.rtf.standart);
+    automationTest_sourceFiles[automationTest_types::insert_in_word_with_export_pdf_next_page].append(automationTesting_exapmleFiles.rtf.full);
+
+    // вставка по координатам
+    automationTest_sourceFiles[automationTest_types::insert_in_coords_word].append(automationTesting_exapmleFiles.doc.standart);
+    automationTest_sourceFiles[automationTest_types::insert_in_coords_word].append(automationTesting_exapmleFiles.doc.full);
+    automationTest_sourceFiles[automationTest_types::insert_in_coords_word].append(automationTesting_exapmleFiles.docx.standart);
+    automationTest_sourceFiles[automationTest_types::insert_in_coords_word].append(automationTesting_exapmleFiles.docx.full);
+    automationTest_sourceFiles[automationTest_types::insert_in_coords_word].append(automationTesting_exapmleFiles.rtf.standart);
+    automationTest_sourceFiles[automationTest_types::insert_in_coords_word].append(automationTesting_exapmleFiles.rtf.full);
+
+    // проверка вставки по тэгу
+    automationTest_sourceFiles[automationTest_types::insert_by_tag].append(automationTesting_exapmleFiles.docx.with_tag);
+    automationTest_sourceFiles[automationTest_types::insert_by_tag].append(automationTesting_exapmleFiles.doc.with_tag);
+    automationTest_sourceFiles[automationTest_types::insert_by_tag].append(automationTesting_exapmleFiles.rtf.with_tag);
+
+    // PDF
+    // простая вставка
+    automationTest_sourceFiles[automationTest_types::standart_insert_in_pdf].append(automationTesting_exapmleFiles.pdf.standart);
+    automationTest_sourceFiles[automationTest_types::standart_insert_in_pdf].append(automationTesting_exapmleFiles.pdf.full);
+
+    // вставка с переходом на новую страницу
+    automationTest_sourceFiles[automationTest_types::standart_insert_in_pdf_with_next_page].append(automationTesting_exapmleFiles.pdf.standart);
+    automationTest_sourceFiles[automationTest_types::standart_insert_in_pdf_with_next_page].append(automationTesting_exapmleFiles.pdf.full);
+
+    // вставка по координатам
+    automationTest_sourceFiles[automationTest_types::insert_in_coords_pdf].append(automationTesting_exapmleFiles.pdf.standart);
+    automationTest_sourceFiles[automationTest_types::insert_in_coords_pdf].append(automationTesting_exapmleFiles.pdf.full);
+
+    // EXCEL
+    // простая вставка
+    automationTest_sourceFiles[automationTest_types::standart_insert_in_excel].append(automationTesting_exapmleFiles.xls.standart);
+    automationTest_sourceFiles[automationTest_types::standart_insert_in_excel].append(automationTesting_exapmleFiles.xls.full);
+    automationTest_sourceFiles[automationTest_types::standart_insert_in_excel].append(automationTesting_exapmleFiles.xlsc.standart);
+    automationTest_sourceFiles[automationTest_types::standart_insert_in_excel].append(automationTesting_exapmleFiles.xlsc.full);
+
+    // вставка с переходом на новую страницу
+    automationTest_sourceFiles[automationTest_types::standart_insert_in_excel_with_next_page].append(automationTesting_exapmleFiles.xls.standart);
+    automationTest_sourceFiles[automationTest_types::standart_insert_in_excel_with_next_page].append(automationTesting_exapmleFiles.xls.full);
+    automationTest_sourceFiles[automationTest_types::standart_insert_in_excel_with_next_page].append(automationTesting_exapmleFiles.xlsc.standart);
+    automationTest_sourceFiles[automationTest_types::standart_insert_in_excel_with_next_page].append(automationTesting_exapmleFiles.xlsc.full);
+
+    // вставка по координатам
+    automationTest_sourceFiles[automationTest_types::insert_in_coords_excel].append(automationTesting_exapmleFiles.xls.standart);
+    automationTest_sourceFiles[automationTest_types::insert_in_coords_excel].append(automationTesting_exapmleFiles.xls.full);
+    automationTest_sourceFiles[automationTest_types::insert_in_coords_excel].append(automationTesting_exapmleFiles.xlsc.standart);
+    automationTest_sourceFiles[automationTest_types::insert_in_coords_excel].append(automationTesting_exapmleFiles.xlsc.full);
 
 
     labelList.append(ui->label); // документ подписан

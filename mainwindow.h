@@ -235,7 +235,8 @@ private:
         word rtf;
 
         file pdf;
-        file excel;
+        file xls;
+        file xlsc;
     };
     automationTest_example_files automationTesting_exapmleFiles;    // добавить инициализацию файлов
 
