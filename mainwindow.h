@@ -217,11 +217,36 @@ private:
         insert_by_tag,
         size
     };
+    struct automationTest_example_files
+    {
+        struct file
+        {
+            QString standart;
+            QString full;
+        };
+
+        struct word : public file
+        {
+            QString with_tag;
+        };
+
+        word docx;
+        word doc;
+        word rtf;
+
+        file pdf;
+        file excel;
+    };
+    automationTest_example_files automationTesting_exapmleFiles;    // добавить инициализацию файлов
+
     QVector<QStringList> automationTest_sourceFiles;
+    QVector<int> automationTest_chosedTests;
 
     bool isAutomationTesting = false; // происходит-ли сейчас автоматическое тестирование программы
     int current_automationTest_type = -1;
+    void automationTest_runTest_step(int step);    // запуск этапа автоматического тестирования
     void automationTest_step_finished();    // этап автоматического тестирования завершён
+    void on_pushButton_automationTest_clicked();    // слот обработки кнопки автотеста
 
     // =================================================================================
 
@@ -318,6 +343,5 @@ private slots:
     void on_pushButton_moveToSigning_clicked();
 //    void on_radioButton_signByTag_clicked();
     void on_radioButton_signByTag_clicked(bool checked);
-    void on_pushButton_automationTest_clicked();
 };
 #endif // MAINWINDOW_H

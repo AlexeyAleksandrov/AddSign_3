@@ -254,6 +254,7 @@ void MainWindow::customConstructor()
 
 void MainWindow::on_pushButton_addsign_clicked()
 {
+
     // === ПРОВЕРКИ ===
 
     if(SigningInProcess) // если поток уже запущен
@@ -522,7 +523,14 @@ void MainWindow::on_pushButton_addsign_clicked()
     ui->closeButton->setDisabled(false);
     if(!closeOnEnd)
     {
-        QMessageBox::information(this, "", "Готово");
+        if(isAutomationTesting)
+        {
+            automationTest_step_finished(); // завершаем этам тестирования
+        }
+        else
+        {
+            QMessageBox::information(this, "", "Готово");
+        }
     }
     else
     {
@@ -1295,6 +1303,54 @@ void MainWindow::setPresetsToComboBox(QComboBox *combobox)
     {
         combobox->clear();
         combobox->addItems(presets.getPresetsFilesList()); // записываем все пресеты
+    }
+}
+
+void MainWindow::automationTest_runTest_step(int step)
+{
+    auto files = getAddedFiles();
+    removeFiles(files); // удаляем все добавленные файлы
+    files.clear();
+
+    addFiles(automationTest_sourceFiles.at(step));  // добавляем файлы в список
+    ui->pushButton_addsign->click();    // запускаем обработку
+}
+
+void MainWindow::automationTest_step_finished()
+{
+    auto addedfiles = getAddedFiles();  // получаем все файлы из таблицы
+    if(addedfiles.size() == 0)
+    {
+        QMessageBox::warning(this, "Ошибка", "Не было добавлено ни одного файла!");
+        return;
+    }
+
+    bool test_win = true;  // флаг успешности прохождения теста
+    for (auto &&file : addedfiles)
+    {
+        auto status = getFileStatus(file);  // получаем статус файла
+        if(status != files_status::no_errors)   // если статус файла сигнализирует об ошибке
+        {
+            test_win = false;   // то ставим, что тест провален
+            break;
+        }
+    }
+
+    if(!test_win)
+    {
+        QMessageBox::critical(this, "Ошибка", "Тест не пройден!");
+        return;
+    }
+
+    int test_count = automationTest_chosedTests.size();
+    if(test_count == 0)
+    {
+        QMessageBox::information(this, "Успех!", "Тест успешно пройден!");
+        return;
+    }
+    else
+    {
+        automationTest_runTest_step(automationTest_chosedTests.takeFirst());
     }
 }
 
@@ -2128,13 +2184,21 @@ void MainWindow::on_pushButton_automationTest_clicked()
     ui->stackedWidget->setCurrentIndex(STACKED_PREVIEW);
     QString current_dir = QDir::currentPath() + "/";
     QStringList files;
+    isAutomationTesting = true;
     for (auto &&file : automationTest_sourceFiles[automationTest_types::simple_insert_in_word])
     {
         files.append(current_dir + file);   // добавляем файл из списка
     }
-//    addFile(current_dir + "word_example_medium_text_x.docx");
-    addFiles(files);
 
-    ui->pushButton_addsign->click();
+    for (int i=0; i<automationTest_types::size; i++)
+    {
+        automationTest_chosedTests.append(i);   // просто заносим все тесты в список активных, потом переделать, чтобы выбирать конкретные
+    }
+
+    automationTest_runTest_step(automationTest_chosedTests.takeFirst());  // запускам первый тест
+//    addFile(current_dir + "word_example_medium_text_x.docx");
+//    addFiles(files);
+
+//    ui->pushButton_addsign->click();
 
 }
