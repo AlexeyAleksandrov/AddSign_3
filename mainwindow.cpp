@@ -2395,6 +2395,7 @@ void MainWindow::on_pushButton_acceptCurrentPreset_clicked()
 void MainWindow::on_pushButton_automationTest_clicked()
 {
     ui->stackedWidget->setCurrentIndex(STACKED_PREVIEW);
+    on_pushButton_settings_shower_clicked();    // вызываем нажатие кнопки, чтобы скрыть боковую панель
 //    QString current_dir = QDir::currentPath() + "/";
 //    QStringList files;
 //    isAutomationTesting = true;
@@ -2407,6 +2408,8 @@ void MainWindow::on_pushButton_automationTest_clicked()
     {
         automationTest_chosedTests.append(i);   // просто заносим все тесты в список активных, потом переделать, чтобы выбирать конкретные
     }
+
+    isAutomationTesting = true; // ставим флаг, что запущено автоматическое тестирование
 
     automationTest_runTest_step(automationTest_chosedTests.takeFirst());  // запускам первый тест
 //    addFile(current_dir + "word_example_medium_text_x.docx");
