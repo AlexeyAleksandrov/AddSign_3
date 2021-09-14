@@ -252,6 +252,8 @@ private:
     QVector<QStringList> automationTest_sourceFiles;    // массив списка файлов, которые необходимо использовать для каждого из типа тестирования
     QVector<int> automationTest_chosedTests;    // массив выбранных пользователем типов тестирования
     QVector<automationTest_ui_settings> automationTest_settings;    // список настроек для каждого из видов тестирования
+    QVector<QString> automationTest_typesNames; // массив названий типов тестирования
+    QVector<QCheckBox*> automationTest_checkBoxes;  // массив чекбоксов для выбора тестов
 
     bool isAutomationTesting = false; // происходит-ли сейчас автоматическое тестирование программы
     int current_automationTest_type = -1;
@@ -357,5 +359,6 @@ private slots:
     void on_pushButton_moveToSigning_clicked();
 //    void on_radioButton_signByTag_clicked();
     void on_radioButton_signByTag_clicked(bool checked);
+    void on_checkBox_automationTest_useAll_stateChanged(int arg1);
 };
 #endif // MAINWINDOW_H

@@ -150,6 +150,38 @@ void MainWindow::customConstructor()
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("IBM 866"));
 
     // =======================================================
+    // === НАЗВАНИЯ ТИПОВ АВТОМАТИЧЕСКОГО ТЕСТИРОВАНИЯ ====
+    // =======================================================
+
+    automationTest_typesNames.resize(automationTest_types::size);   // создаем массив для хранения названий
+
+    automationTest_typesNames[automationTest_types::simple_insert_in_word] = "Простая подпись документа WORD, подпись строго на последней странице";
+    automationTest_typesNames[automationTest_types::insert_in_word_with_next_page] = "Подпись документа WORD с разрешением перехода на новую страницу";
+    automationTest_typesNames[automationTest_types::insert_in_word_with_export_pdf] = "Подпись документа WORD с экспортом в PDF файл";
+    automationTest_typesNames[automationTest_types::insert_in_word_with_export_pdf_next_page] = "Подпись документа WORD с экспортом в PDF файл и рарешением перехода на новую страницу";
+    automationTest_typesNames[automationTest_types::standart_insert_in_pdf] = "Простая подпись документа PDF, без перехона на новую страницу";
+    automationTest_typesNames[automationTest_types::standart_insert_in_pdf_with_next_page] = "Подпись документа PDF, с переходом на новую страницу";
+    automationTest_typesNames[automationTest_types::standart_insert_in_excel] = "Простая подпись документа EXCEL";
+    automationTest_typesNames[automationTest_types::standart_insert_in_excel_with_next_page] = "Подпись документа EXCEL с переходом на новую страницу";
+    automationTest_typesNames[automationTest_types::insert_in_coords_word] = "Вставка подписи по координатам в документ WORD";
+    automationTest_typesNames[automationTest_types::insert_in_coords_excel] = "Вставка подписи по координатам в документ EXCEL";
+    automationTest_typesNames[automationTest_types::insert_in_coords_pdf] = "Вставка подписи по координатам в документ PDF";
+    automationTest_typesNames[automationTest_types::insert_by_tag] = "Подпись WORD документа с вставкой подписи и инициалов по ТЭГу в таблице";
+
+    // =======================================================
+    // === ПУТИ К ФАЙЛАМ ДЛЯ АВТОМАТИЧЕСКОГО ТЕСТИРОВАНИЯ ====
+    // =======================================================
+
+    automationTest_checkBoxes.resize(automationTest_types::size);   // создаем массив для хранения CheckBox с типами тестов
+
+    for (int i=0; i<automationTest_typesNames.size(); i++)  // для каждого типа тестирования
+    {
+        QCheckBox *checkBox = new QCheckBox(automationTest_typesNames[i], this);   // создаём чекбокс с его названием
+        automationTest_checkBoxes[i] = checkBox;    // добавляем указатель в массив для хранения
+        ui->verticalLayout_automationTesting->addWidget(checkBox);  // добавляем чекбокс на форму
+    }
+
+    // =======================================================
     // === ПУТИ К ФАЙЛАМ ДЛЯ АВТОМАТИЧЕСКОГО ТЕСТИРОВАНИЯ ====
     // =======================================================
     QString current_dir = QDir::currentPath() + "/";
@@ -338,7 +370,7 @@ void MainWindow::customConstructor()
     at_settings.ignoreMovingToNextPage = true;
     automationTest_settings[automationTest_types::insert_in_coords_excel] = at_settings;
 
-    // ========================================================================================
+    // ========================================================================================0
 
     labelList.append(ui->label); // документ подписан
     labelList.append(ui->label_2); // электронной подписбю
@@ -2394,30 +2426,37 @@ void MainWindow::on_pushButton_acceptCurrentPreset_clicked()
 
 void MainWindow::on_pushButton_automationTest_clicked()
 {
-//    ui->stackedWidget->setCurrentIndex(STACKED_PREVIEW);
-    on_pushButton_back_to_menu_clicked();   // возвращаемся на главную страницу
-    on_pushButton_settings_shower_clicked();    // вызываем нажатие кнопки, чтобы скрыть боковую панель
-//    QString current_dir = QDir::currentPath() + "/";
-//    QStringList files;
-//    isAutomationTesting = true;
-//    for (auto &&file : automationTest_sourceFiles[automationTest_types::simple_insert_in_word])
-//    {
-//        files.append(current_dir + file);   // добавляем файл из списка
-//    }
+    automationTest_chosedTests.clear();
 
-    for (int i=0; i<automationTest_types::size; i++)
+    for (int i=0; i<automationTest_checkBoxes.size(); i++)  // проходим по всем чекбоксам с тестами
     {
-        automationTest_chosedTests.append(i);   // просто заносим все тесты в список активных, потом переделать, чтобы выбирать конкретные
+        if(automationTest_checkBoxes.at(i)->isChecked())    // если данный вид тестирования выбран
+        {
+            automationTest_chosedTests.append(i);   // заносим тест в список активных
+        }
     }
 
-//    automationTest_chosedTests.append(automationTest_types::insert_by_tag);
+    if(automationTest_chosedTests.size() == 0)  // если не был овыбрано ни одного теста
+    {
+        QMessageBox::warning(this, "Ошибка", "Не было выбрано ни одного теста!");
+        return;
+    }
+
+    on_pushButton_back_to_menu_clicked();   // возвращаемся на главную страницу
+    on_pushButton_settings_shower_clicked();    // вызываем нажатие кнопки, чтобы скрыть боковую панель
 
     isAutomationTesting = true; // ставим флаг, что запущено автоматическое тестирование
 
     automationTest_runTest_step(automationTest_chosedTests.takeFirst());  // запускам первый тест
-//    addFile(current_dir + "word_example_medium_text_x.docx");
-//    addFiles(files);
 
-//    ui->pushButton_addsign->click();
 
 }
+
+void MainWindow::on_checkBox_automationTest_useAll_stateChanged(int arg1)
+{
+    for (auto &&checkBox : automationTest_checkBoxes)
+    {
+        checkBox->setChecked(arg1); // применяем всем чекбоксам такое же состояние, как и у Выбрать всё
+    }
+}
+
