@@ -149,25 +149,9 @@ void MainWindow::customConstructor()
 
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("IBM 866"));
 
-    automationTest_sourceFiles.resize(automationTest_types::size);
-
-    automationTest_sourceFiles[automationTest_types::simple_insert_in_word] = QStringList() << "word_example_medium_text_x.docx";
-    automationTest_sourceFiles[automationTest_types::insert_in_word_with_next_page] = QStringList();
-    automationTest_sourceFiles[automationTest_types::insert_in_word_with_export_pdf] = QStringList();
-    automationTest_sourceFiles[automationTest_types::insert_in_word_with_export_pdf_next_page] = QStringList();
-
-    automationTest_sourceFiles[automationTest_types::standart_insert_in_pdf] = QStringList();
-    automationTest_sourceFiles[automationTest_types::standart_insert_in_pdf_with_next_page] = QStringList();
-
-    automationTest_sourceFiles[automationTest_types::standart_insert_in_excel] = QStringList();
-    automationTest_sourceFiles[automationTest_types::standart_insert_in_excel_with_next_page] = QStringList();
-
-    automationTest_sourceFiles[automationTest_types::insert_in_coords_word] = QStringList();
-    automationTest_sourceFiles[automationTest_types::insert_in_coords_excel] = QStringList();
-    automationTest_sourceFiles[automationTest_types::insert_in_coords_pdf] = QStringList();
-
-    automationTest_sourceFiles[automationTest_types::insert_by_tag] = QStringList();
-
+    // =======================================================
+    // === ПУТИ К ФАЙЛАМ ДЛЯ АВТОМАТИЧЕСКОГО ТЕСТИРОВАНИЯ ====
+    // =======================================================
     QString current_dir = QDir::currentPath() + "/";
 
     automationTesting_exapmleFiles.doc.standart = current_dir + "standart.doc";
@@ -188,8 +172,13 @@ void MainWindow::customConstructor()
     automationTesting_exapmleFiles.xls.standart = current_dir + "standart.xls";
     automationTesting_exapmleFiles.xls.full = current_dir + "full.xls";
 
-    automationTesting_exapmleFiles.xlsc.standart = current_dir + "standart.xls";
-    automationTesting_exapmleFiles.xlsc.full = current_dir + "full.xls";
+    automationTesting_exapmleFiles.xlsc.standart = current_dir + "standart.xlsx";
+    automationTesting_exapmleFiles.xlsc.full = current_dir + "full.xlsx";
+
+    // ====================================================
+    // === СПИСКИ ФАЙЛОВ ДЛЯ КАЖДОГО ТИПА ТЕСТИРОВАНИЯ ====
+    // ====================================================
+    automationTest_sourceFiles.resize(automationTest_types::size);
 
     // WORD
     // простая проверка вордовских файлов
@@ -269,6 +258,87 @@ void MainWindow::customConstructor()
     automationTest_sourceFiles[automationTest_types::insert_in_coords_excel].append(automationTesting_exapmleFiles.xlsc.standart);
     automationTest_sourceFiles[automationTest_types::insert_in_coords_excel].append(automationTesting_exapmleFiles.xlsc.full);
 
+    // ====================================================================
+    // настройки UI для каждого из видов тестирования
+    // ====================================================================
+    automationTest_ui_settings at_settings; // настройки, создаём один раз, измеяем столько сколько надо
+    automationTest_settings.resize(automationTest_types::size); // сразу выделяем память
+    // WORD
+    // стандартная подпись
+    at_settings.insert_type = SignProcessor::insert_standart;
+    at_settings.signWordFile = true;
+    at_settings.exportToPdf = false;
+    at_settings.ignoreMovingToNextPage = false;
+    automationTest_settings[automationTest_types::simple_insert_in_word] = at_settings;
+
+    // стандартная подпись с переходом на новую страницу
+    at_settings.insert_type = SignProcessor::insert_standart;
+    at_settings.signWordFile = true;
+    at_settings.exportToPdf = false;
+    at_settings.ignoreMovingToNextPage = true;
+    automationTest_settings[automationTest_types::insert_in_word_with_next_page] = at_settings;
+
+    // стандартная подпись с экспортом в PDF
+    at_settings.insert_type = SignProcessor::insert_standart;
+    at_settings.signWordFile = true;
+    at_settings.exportToPdf = true;
+    at_settings.ignoreMovingToNextPage = false;
+    automationTest_settings[automationTest_types::insert_in_word_with_export_pdf] = at_settings;
+
+    // стандартная подпись с экспортом в PDF и переходом на новую страницу
+    at_settings.insert_type = SignProcessor::insert_standart;
+    at_settings.signWordFile = true;
+    at_settings.exportToPdf = true;
+    at_settings.ignoreMovingToNextPage = true;
+    automationTest_settings[automationTest_types::insert_in_word_with_export_pdf] = at_settings;
+
+    // подпись по координатам
+    at_settings.insert_type = SignProcessor::insert_in_exported_pdf;
+    at_settings.signWordFile = false;
+    at_settings.exportToPdf = true;
+    at_settings.ignoreMovingToNextPage = true;
+    automationTest_settings[automationTest_types::insert_in_coords_word] = at_settings;
+
+    // подпись по тэгу
+    at_settings.insert_type = SignProcessor::insert_by_tag_in_table;
+    at_settings.signWordFile = false;
+    at_settings.exportToPdf = true;
+    at_settings.ignoreMovingToNextPage = true;
+    automationTest_settings[automationTest_types::insert_by_tag] = at_settings;
+
+    // PDF
+    // стандартная подпись
+    at_settings.insert_type = SignProcessor::insert_standart;
+    at_settings.ignoreMovingToNextPage = false;
+    automationTest_settings[automationTest_types::standart_insert_in_pdf] = at_settings;
+
+    // стандартная подпись c переходом на новую страницу
+    at_settings.insert_type = SignProcessor::insert_standart;
+    at_settings.ignoreMovingToNextPage = true;
+    automationTest_settings[automationTest_types::standart_insert_in_pdf_with_next_page] = at_settings;
+
+    // подпись по координатам
+    at_settings.insert_type = SignProcessor::insert_in_exported_pdf;
+    at_settings.ignoreMovingToNextPage = true;
+    automationTest_settings[automationTest_types::insert_in_coords_pdf] = at_settings;
+
+    // EXCEL
+    // стандартная подпись
+    at_settings.insert_type = SignProcessor::insert_standart;
+    at_settings.ignoreMovingToNextPage = false;
+    automationTest_settings[automationTest_types::standart_insert_in_excel] = at_settings;
+
+    // стандартная подпись c переходом на новую страницу
+    at_settings.insert_type = SignProcessor::insert_standart;
+    at_settings.ignoreMovingToNextPage = true;
+    automationTest_settings[automationTest_types::standart_insert_in_excel_with_next_page] = at_settings;
+
+    // подпись по координатам
+    at_settings.insert_type = SignProcessor::insert_in_exported_pdf;
+    at_settings.ignoreMovingToNextPage = true;
+    automationTest_settings[automationTest_types::insert_in_coords_excel] = at_settings;
+
+    // ========================================================================================
 
     labelList.append(ui->label); // документ подписан
     labelList.append(ui->label_2); // электронной подписбю
@@ -369,6 +439,7 @@ void MainWindow::on_pushButton_addsign_clicked()
         isClosing = true;
         log.addToLog("Прерывание обработки word");
 //        wordCancel = true;
+        isAutomationTesting = false;
         return;
     }
 
@@ -383,6 +454,7 @@ void MainWindow::on_pushButton_addsign_clicked()
     {
         QMessageBox::warning(this, "Ошибка", "Вы не добавили файлы!");
         log.addToLog("Ошибка, Вы не добавили файлы!");
+        isAutomationTesting = false;
         return;
     }
 
@@ -406,6 +478,7 @@ void MainWindow::on_pushButton_addsign_clicked()
         if(outputDir == "") // если путь вывода пустой
         {
             QMessageBox::warning(this, "Ошибка", "Вы выбрали сохранение подписанных файлов в выбранную папку, но не указали её.\nПожалуйста, укажите, в какую папку сохранить подписанные файлы.");
+            isAutomationTesting = false;
             return;
         }
     }
@@ -414,18 +487,21 @@ void MainWindow::on_pushButton_addsign_clicked()
     if(currentSertificate.isEmpty())
     {
         QMessageBox::warning(this, "Ошибка", "Вы не выбрали сертифакат!");
+        isAutomationTesting = false;
         return;
     }
     auto sertList = CryptoPRO.certmgr.getSertifactesList();
     if(sertList.size() <= ui->comboBox->currentIndex() || ui->comboBox->currentIndex() < 0)
     {
         QMessageBox::warning(this, "Ошибка", "Ошибка соответствия сертификата.\nПопробуйте перезагрузить список сертификатов.");
+        isAutomationTesting = false;
         return;
     }
     auto currentSign = sertList.at(ui->comboBox->currentIndex()); // пытаемся получить полную электронную подпись по данному сертификату
     if(!currentSign.serial.isEmpty() && currentSign.serial != currentSertificate) // если сертификат не пустой и не соответсвует искомому, значит какая-то ошибка
     {
         QMessageBox::warning(this, "Ошибка", "Ошибка соответствия сертификата.\nПопробуйте перезагрузить список сертификатов.");
+        isAutomationTesting = false;
         return;
     }
 
@@ -459,6 +535,7 @@ void MainWindow::on_pushButton_addsign_clicked()
         if(!exportToWord && (signType == SignProcessor::insert_standart) && !exportToPDF)
         {
             QMessageBox::warning(this, "Ошибка", "Не выбраны действия с Word'ом");
+            isAutomationTesting = false;
             return;
         }
     }
@@ -468,6 +545,7 @@ void MainWindow::on_pushButton_addsign_clicked()
     {
         QMessageBox::warning(this, "Ошибка", "Ошибка! Файл qpdf.exe не найден! + " + qpdf_dir);
         log.addToLog("Ошибка! Файл qpdf.exe не найден! + " + qpdf_dir);
+        isAutomationTesting = false;
         return;
     }
 //    if(containsPDFFiles || signType == SignProcessor::insert_in_exported_pdf) // если содержатся PDF файлы, то ищем QPDF
@@ -1418,6 +1496,35 @@ void MainWindow::automationTest_runTest_step(int step)
     removeFiles(files); // удаляем все добавленные файлы
     files.clear();
 
+    automationTest_ui_settings at_ui_settings = automationTest_settings.at(step);   // получаем настройки UI интерфейса для данного типа тестирования
+
+    // устанавливаем переключатель типа вставки подписи
+    switch (at_ui_settings.insert_type)
+    {
+        case SignProcessor::insert_standart:
+        {
+            ui->radioButton_usually_insert->setChecked(true);
+            break;
+        }
+        case SignProcessor::insert_in_exported_pdf:
+        {
+            ui->radioButton_insert_in_exported_pdf->setChecked(true);
+            break;
+        }
+        case SignProcessor::insert_by_tag_in_table:
+        {
+            ui->radioButton_signByTag->setChecked(true);
+            break;
+        }
+    }
+
+    // устанавливаем состояние проверки перехода страницы
+    ui->checkBox_signingOut->setChecked(at_ui_settings.ignoreMovingToNextPage);
+
+    // устанавиваем состояние подписи WORD
+    ui->checkBox_signWordDocument->setChecked(at_ui_settings.signWordFile);
+    ui->checkBox_exportWordToPDF->setChecked(at_ui_settings.exportToPdf);
+
     addFiles(automationTest_sourceFiles.at(step));  // добавляем файлы в список
     ui->pushButton_addsign->click();    // запускаем обработку
 }
@@ -1435,7 +1542,7 @@ void MainWindow::automationTest_step_finished()
     for (auto &&file : addedfiles)
     {
         auto status = getFileStatus(file);  // получаем статус файла
-        if(status != files_status::no_errors)   // если статус файла сигнализирует об ошибке
+        if(status != files_status::no_errors && status != files_status::error_new_page_no_added)   // если статус файла сигнализирует об ошибке
         {
             test_win = false;   // то ставим, что тест провален
             break;
@@ -2288,13 +2395,13 @@ void MainWindow::on_pushButton_acceptCurrentPreset_clicked()
 void MainWindow::on_pushButton_automationTest_clicked()
 {
     ui->stackedWidget->setCurrentIndex(STACKED_PREVIEW);
-    QString current_dir = QDir::currentPath() + "/";
-    QStringList files;
-    isAutomationTesting = true;
-    for (auto &&file : automationTest_sourceFiles[automationTest_types::simple_insert_in_word])
-    {
-        files.append(current_dir + file);   // добавляем файл из списка
-    }
+//    QString current_dir = QDir::currentPath() + "/";
+//    QStringList files;
+//    isAutomationTesting = true;
+//    for (auto &&file : automationTest_sourceFiles[automationTest_types::simple_insert_in_word])
+//    {
+//        files.append(current_dir + file);   // добавляем файл из списка
+//    }
 
     for (int i=0; i<automationTest_types::size; i++)
     {

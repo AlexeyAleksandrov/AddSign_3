@@ -238,16 +238,29 @@ private:
         file xls;
         file xlsc;
     };
+
+    struct automationTest_ui_settings
+    {
+        int insert_type = SignProcessor::insert_standart;
+        bool ignoreMovingToNextPage = false;
+        bool exportToPdf = false;
+        bool signWordFile = false;
+    };
+
     automationTest_example_files automationTesting_exapmleFiles;    // добавить инициализацию файлов
 
-    QVector<QStringList> automationTest_sourceFiles;
-    QVector<int> automationTest_chosedTests;
+    QVector<QStringList> automationTest_sourceFiles;    // массив списка файлов, которые необходимо использовать для каждого из типа тестирования
+    QVector<int> automationTest_chosedTests;    // массив выбранных пользователем типов тестирования
+    QVector<automationTest_ui_settings> automationTest_settings;    // список настроек для каждого из видов тестирования
 
     bool isAutomationTesting = false; // происходит-ли сейчас автоматическое тестирование программы
     int current_automationTest_type = -1;
     void automationTest_runTest_step(int step);    // запуск этапа автоматического тестирования
     void automationTest_step_finished();    // этап автоматического тестирования завершён
+private slots:
     void on_pushButton_automationTest_clicked();    // слот обработки кнопки автотеста
+
+
 
     // =================================================================================
 
