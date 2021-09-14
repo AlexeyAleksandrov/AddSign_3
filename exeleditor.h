@@ -1,11 +1,11 @@
 #ifndef ExcelEditor_H
 #define ExcelEditor_H
 
-#ifdef WINDOWS
+#ifdef WIN32
 #include <QObject>
 #include <QFile>
 #include <QTableWidget>
-#ifdef WINDOWS
+#ifdef WIN32
 #include <QAxObject>
 #endif
 #include <QFileDialog>
@@ -57,7 +57,7 @@ signals:
 private:
     bool ExcelInit(); // инициализация ворда
     bool ExcelQuit(); // завершение ворда
-#ifdef WINDOWS
+#ifdef WIN32
     QAxObject* excel = nullptr;
     QAxObject* workbooks = nullptr;
     QAxObject* workbook = nullptr;

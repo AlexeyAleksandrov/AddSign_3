@@ -1,9 +1,9 @@
 #ifndef WORDEDITOR_H
 #define WORDEDITOR_H
 
-#ifdef WINDOWS
+#ifdef WIN32
 #include <QObject>
-#ifdef WINDOWS
+#ifdef WIN32
 #include <QAxObject>
 #endif
 #include <QDebug>
@@ -35,12 +35,12 @@ public:
     struct WordTables
     {
     public:
-        #ifdef WINDOWS
+        #ifdef WIN32
         WordTables(QAxObject *tables);
 #endif
         int count(); // возвращает количество таблиц в документе
     private:
-        #ifdef WINDOWS
+        #ifdef WIN32
         QAxObject *tables = nullptr;
 #endif
 
@@ -48,7 +48,7 @@ public:
 
     struct TableCell
     {
-#ifdef WINDOWS
+#ifdef WIN32
         TableCell(QAxObject *cell, int row, int col);
 #endif
         QString text();
@@ -60,7 +60,7 @@ public:
         bool clear();
 
         private:
-#ifdef WINDOWS
+#ifdef WIN32
         QAxObject *cell = nullptr;
 #endif
         int tableRow = -1;
@@ -70,7 +70,7 @@ public:
     struct WordTable
     {
     public:
-        #ifdef WINDOWS
+        #ifdef WIN32
         WordTable(QAxObject *table, int index);
 #endif
         bool tableToText(); // перевести таблицу в текст (внутри документа)
@@ -80,7 +80,7 @@ public:
         TableCell cell(int row, int col); // возвращает ячейку таблицы
 
         private:
-        #ifdef WINDOWS
+        #ifdef WIN32
         QAxObject *table = nullptr;
 #endif
         int index = -1;
@@ -119,7 +119,7 @@ public:
 
     // работа с картинками
     bool moveSelectionToEnd(); // перемещаем курсор в конец файла
-    #ifdef WINDOWS
+    #ifdef WIN32
     bool updateShapes(QAxObject *selection = nullptr); // обновляет указатель на smart объекты
     bool addPicture(QString imagedir, const float size_santimetr = 3.0, QAxObject *selection = nullptr); // добавить картинку
 #endif
@@ -133,7 +133,7 @@ public:
 
 //    WordTable tables = WordTable(nullptr);
 
-    #ifdef WINDOWS
+    #ifdef WIN32
     QAxObject *getWord() const;
 #endif
 
@@ -145,7 +145,7 @@ public:
 private:
     bool wordInit(); // инициализация ворда
     bool wordQuit(); // завершение ворда
-    #ifdef WINDOWS
+    #ifdef WIN32
     QAxObject *word = nullptr; // объект ворда
     QAxObject *documents = nullptr; //получаем коллекцию документов
     QAxObject *document = nullptr; // открытый документ

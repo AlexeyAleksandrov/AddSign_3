@@ -1,5 +1,5 @@
 #include "wordeditor.h"
-#ifdef WINDOWS
+#ifdef WIN32
 #define checkAxObject(pointer, object_name)  if(pointer==nullptr) { qDebug() << "Нет данных " + QString(object_name); throw QString("AxObject Error: ") + object_name;  return false; } else { QObject::connect(pointer, SIGNAL(exception(int,QString,QString,QString)), this, SLOT(exception(int,QString,QString,QString))); pointer->setObjectName(object_name); }
 #define checkNullPointer(pointer, texterror) if(pointer == nullptr) { qDebug() << texterror << " is nullptr"; throw QString("NullPointer Error: ") + texterror;  return false; }
 
@@ -21,7 +21,7 @@ WordEditor::~WordEditor()
 
 bool WordEditor::openDocument(QString fileDir)
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     checkNullPointer(word, "word");
     QString f_dir;
     QString f_name;
@@ -52,7 +52,7 @@ bool WordEditor::openDocument(QString fileDir)
 
 bool WordEditor::insertText(QString text)
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     checkNullPointer(word, "word");
     checkNullPointer(Range, "Range");
     Range->dynamicCall("InsertAfter(Text)", text); // вставляем перенос строки
@@ -72,7 +72,7 @@ bool WordEditor::moveSelectionToEnd()
 
 bool WordEditor::updateRange()
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     checkNullPointer(word, "word");
     checkNullPointer(Range, "Range");
     Range = ActiveDocument->querySubObject("Range()");
@@ -82,7 +82,7 @@ bool WordEditor::updateRange()
 
 int WordEditor::getRangeStart()
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     checkNullPointer(Range, "Range");
     if(Range == nullptr)
     {
@@ -94,7 +94,7 @@ int WordEditor::getRangeStart()
 
 int WordEditor::getRangeEnd()
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     checkNullPointer(Range, "Range");
     if(Range == nullptr)
     {
@@ -106,7 +106,7 @@ int WordEditor::getRangeEnd()
 
 bool WordEditor::updateSelection()
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     checkNullPointer(word, "word");
     selection = word->querySubObject("Selection") ; // текущая точка вставки, рабочая область документа
     checkAxObject(selection, "selection");
@@ -116,7 +116,7 @@ bool WordEditor::updateSelection()
 
 bool WordEditor::selectionSetRange(int start, int end)
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     checkNullPointer(selection, "selection");
     checkNullPointer(word, "word");
     updateSelection();
@@ -128,7 +128,7 @@ bool WordEditor::selectionSetRange(int start, int end)
 
 bool WordEditor::selectionCollapse(int postion)
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     checkNullPointer(word, "word");
     if(selection == nullptr)
     {
@@ -146,7 +146,7 @@ bool WordEditor::selectionCollapse(int postion)
 
 bool WordEditor::deleteSelection()
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     checkNullPointer(selection, "selection");
     updateSelection();
     selection->dynamicCall("Delete()");
@@ -154,7 +154,7 @@ bool WordEditor::deleteSelection()
 #endif
 }
 
-#ifdef WINDOWS
+#ifdef WIN32
 bool WordEditor::updateShapes(QAxObject *selection)
 {
     if(selection == nullptr)
@@ -176,7 +176,7 @@ bool WordEditor::updateShapes(QAxObject *selection)
 }
 #endif
 
-#ifdef WINDOWS
+#ifdef WIN32
 bool WordEditor::addPicture(QString imagedir, const float size_santimetr, QAxObject *selection)
 {
     checkNullPointer(word, "word");
@@ -211,7 +211,7 @@ bool WordEditor::addPicture(QString imagedir, const float size_santimetr, QAxObj
 
 WordEditor::WordTables WordEditor::tables()
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     if(!word || !ActiveDocument)
     {
         qDebug() << "Ошибка getTables";
@@ -223,7 +223,7 @@ WordEditor::WordTables WordEditor::tables()
 
 WordEditor::WordTable WordEditor::table(int tableIndex)
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     if(!word || !ActiveDocument)
     {
         qDebug() << "Ошибка getTables";
@@ -233,7 +233,7 @@ WordEditor::WordTable WordEditor::table(int tableIndex)
 #endif
 }
 
-#ifdef WINDOWS
+#ifdef WIN32
 WordEditor::WordTable::WordTable(QAxObject *table, int index)
 {
     this->table = table;
@@ -241,7 +241,7 @@ WordEditor::WordTable::WordTable(QAxObject *table, int index)
 }
 #endif
 
-#ifdef WINDOWS
+#ifdef WIN32
 bool WordEditor::WordTable::tableToText()
 {
     checkNullPointer(table, "table");
@@ -259,7 +259,7 @@ bool WordEditor::WordTable::tableToText()
 
 int WordEditor::WordTable::columnsCount()
 {
-#ifdef WINDOWS
+#ifdef WIN32
     checkNullPointer(table, "table");
     return table->querySubObject("Columns()")->dynamicCall("Count()").toInt();
 #endif
@@ -267,7 +267,7 @@ int WordEditor::WordTable::columnsCount()
 
 int WordEditor::WordTable::rowsCount()
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     checkNullPointer(table, "table");
     return table->querySubObject("Rows()")->dynamicCall("Count()").toInt();
 #endif
@@ -280,7 +280,7 @@ int WordEditor::WordTable::taleIndex() const
 
 WordEditor::TableCell WordEditor::WordTable::cell(int row, int col)
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     if(table == nullptr)
     {
         qDebug() << "Не указана таблица. Получить ячейку невозможно.";
@@ -304,7 +304,7 @@ WordEditor::TableCell WordEditor::WordTable::cell(int row, int col)
 
 bool WordEditor::setParagraphAlignment(int alignment)
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     checkNullPointer(word, "word");
     if(selection == nullptr)
     {
@@ -317,7 +317,7 @@ bool WordEditor::setParagraphAlignment(int alignment)
 
 bool WordEditor::exportToPdf(QString &outputFileName)
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     if((!outputFileName.endsWith(".pdf")) && (outputFileName != ""))
     {
         qDebug() << "Выходной файл должен быть *.pdf";
@@ -382,7 +382,7 @@ bool WordEditor::exportToPdf(QString &outputFileName)
 
 int WordEditor::getPagesCount()
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     checkNullPointer(word, "word");
     checkNullPointer(ActiveDocument, "ActiveDocument");
     QAxObject* content = ActiveDocument->querySubObject("Content"); //
@@ -395,7 +395,7 @@ int WordEditor::getPagesCount()
 
 bool WordEditor::setPageOrientation(pageOrientation orientation)
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     checkNullPointer(word, "word");
     checkNullPointer(ActiveDocument, "ActiveDocument");
     QAxObject *PageSetup = selection->querySubObject("PageSetup"); // получаем параметры страницы
@@ -408,7 +408,7 @@ bool WordEditor::setPageOrientation(pageOrientation orientation)
 
 int WordEditor::getPageOrientation()
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     checkNullPointer(word, "word");
     checkNullPointer(ActiveDocument, "ActiveDocument");
     updateSelection();
@@ -422,7 +422,7 @@ int WordEditor::getPageOrientation()
 
 bool WordEditor::printDocument(QString printer)
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     checkNullPointer(word, "word");
     checkNullPointer(ActiveDocument, "ActiveDocument");
     if(printer != "")
@@ -437,7 +437,7 @@ bool WordEditor::printDocument(QString printer)
 
 bool WordEditor::saveDocument()
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     checkNullPointer(word, "word");
     checkNullPointer(document, "document");
     document->dynamicCall("Save()");
@@ -447,7 +447,7 @@ bool WordEditor::saveDocument()
 
 bool WordEditor::closeDocument()
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     checkNullPointer(word, "word");
     checkNullPointer(document, "document");
     document->dynamicCall("Close()");
@@ -458,7 +458,7 @@ bool WordEditor::closeDocument()
 
 bool WordEditor::wordInit()
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     word = new QAxObject("Word.Application", this);
     checkAxObject(word, "word");
     if(word->control() == "")
@@ -474,7 +474,7 @@ bool WordEditor::wordInit()
 
 bool WordEditor::wordQuit()
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     checkNullPointer(word, "word");
     if(opened) // если уже открыт документ
     {

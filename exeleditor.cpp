@@ -1,6 +1,6 @@
 #include "exeleditor.h"
 
-#ifdef WINDOWS
+#ifdef WIN32
 #define checkAxObject(pointer, object_name)  if(pointer==nullptr) { qDebug() << "Нет данных " + QString(object_name); throw QString("AxObject Error: ") + object_name;  return false; } else { connect(pointer, SIGNAL(exception(int,QString,QString,QString)), this, SLOT(exception(int,QString,QString,QString))); pointer->setObjectName(object_name); }
 #define checkNullPointer(pointer, texterror) if(pointer == nullptr) { qDebug() << texterror << " is nullptr"; log.addToLog(texterror + QString(" is nullptr")); throw QString("NullPointer Error: ") + texterror;  return false; }
 
@@ -19,7 +19,7 @@ ExcelEditor::~ExcelEditor()
 
 bool ExcelEditor::openBook(QString fileDir)
 {
-#ifdef WINDOWS
+#ifdef WIN32
     checkNullPointer(excel, "excel");
     checkNullPointer(workbooks, "workbooks");
 //    excel->dynamicCall("ChDir(String)", QFileInfo(fileDir).absolutePath());
@@ -41,7 +41,7 @@ bool ExcelEditor::openBook(QString fileDir)
 
 bool ExcelEditor::saveBook()
 {
-#ifdef WINDOWS
+#ifdef WIN32
     checkNullPointer(workbook, "workbook");
     workbook->dynamicCall("Save()");
 #endif
@@ -50,7 +50,7 @@ bool ExcelEditor::saveBook()
 
 bool ExcelEditor::exportToPdf(QString outputFileName)
 {
-#ifdef WINDOWS
+#ifdef WIN32
     checkNullPointer(ActiveSheet, "ActiveSheet");
     QString t_dir = "C:/tempAddSign";
     QDir tempdir(t_dir);
@@ -84,7 +84,7 @@ bool ExcelEditor::exportToPdf(QString outputFileName)
 
 bool ExcelEditor::closeBook()
 {
-#ifdef WINDOWS
+#ifdef WIN32
     checkNullPointer(workbook, "workbook");
     workbook->dynamicCall("Close()");
 #endif
@@ -93,7 +93,7 @@ bool ExcelEditor::closeBook()
 
 bool ExcelEditor::updatePageSetup()
 {
-#ifdef WINDOWS
+#ifdef WIN32
     checkNullPointer(ActiveSheet, "ActiveSheet");
     pageSetup = ActiveSheet->querySubObject("PageSetup");
 #endif
@@ -102,7 +102,7 @@ bool ExcelEditor::updatePageSetup()
 
 int ExcelEditor::getPageOrientation()
 {
-#ifdef WINDOWS
+#ifdef WIN32
     checkNullPointer(pageSetup, "pageSetup");
     QVariant orientation = pageSetup->dynamicCall("Orientation()");
     return orientation.toInt(); // получаем значение ориентации
@@ -111,7 +111,7 @@ int ExcelEditor::getPageOrientation()
 
 bool ExcelEditor::setPageOrientation(int PageOrientation)
 {
-#ifdef WINDOWS
+#ifdef WIN32
     checkNullPointer(pageSetup, "pageSetup");
     if(PageOrientation != xlLandscape && PageOrientation != xlPortrait)
     {
@@ -124,7 +124,7 @@ bool ExcelEditor::setPageOrientation(int PageOrientation)
 
 QString **ExcelEditor::readFile(QString fileDiretory, int &rowsCount, int &colsCount, QProgressBar *progressBar)
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     QAxObject* excel = new QAxObject("Excel.Application", 0);
     QAxObject* workbooks = excel->querySubObject("Workbooks");
     QAxObject* workbook = workbooks->querySubObject("Open(const QString&)", fileDiretory);
@@ -187,7 +187,7 @@ QString **ExcelEditor::readFile(QString fileDiretory, int &rowsCount, int &colsC
 
 void ExcelEditor::writeFile(QString fileDiretory, QString **text, int rows, int cols)
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     QAxObject* excel = new QAxObject("Excel.Application", 0);
     QAxObject* workbooks = excel->querySubObject("Workbooks");
     QAxObject* workbook = workbooks->querySubObject("Open(const QString&)", fileDiretory);
@@ -213,7 +213,7 @@ void ExcelEditor::writeFile(QString fileDiretory, QString **text, int rows, int 
 
 bool ExcelEditor::ExcelInit()
 {
-#ifdef WINDOWS
+#ifdef WIN32
     excel = new QAxObject("Excel.Application", 0);
     checkAxObject(excel, "Excel.Application");
     excel->dynamicCall("SetDisplayAlerts(bool)", false);
@@ -225,7 +225,7 @@ bool ExcelEditor::ExcelInit()
 
 bool ExcelEditor::ExcelQuit()
 {
-    #ifdef WINDOWS
+    #ifdef WIN32
     if (excel)
     {
         delete excel;
