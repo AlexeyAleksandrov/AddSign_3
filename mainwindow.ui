@@ -507,7 +507,7 @@ QHeaderView::section{background-color: rgb(114, 159, 207)}
        <string notr="true"/>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_preview">
        <property name="styleSheet">
@@ -1919,7 +1919,7 @@ background-color: rgb(114, 159, 207);
 selection-background-color:rgb(219, 252, 255);
 selection-color:rgb(32, 74, 135);
 
-background-image: url(:/images/logo_background_500_400.png);
+background-image: url(:/images/images/logo_background_500_400.png);
 background-repeat: no-repeat;
 background-position: center;
 background-color: rgb(32, 74, 135);

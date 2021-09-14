@@ -23,7 +23,7 @@ signPrewiew::signPrewiew(QWidget *parent) : QWidget(parent)
     //    #ifdef DEBUGGING
     //    qDebug() << "Ширина. высота: " << imageWight << imageHeight;
     //#endif
-    //    rectImage = QImage(":/images/image_gerb_384_160.jpg");
+    //    rectImage = QImage(":/images/images/image_gerb_384_160.jpg");
     //    drawSmallRect(0,0);
 
     rescale();
@@ -247,7 +247,7 @@ void signPrewiew::rescale()
 #ifdef DEBUGGING
     qDebug() << "Ширина. высота: " << imageWight << imageHeight;
 #endif
-    //    rectImage = QImage(":/images/image_gerb_384_160.jpg");
+    //    rectImage = QImage(":/images/images/image_gerb_384_160.jpg");
     drawSmallRect(smallImagePosXMode,smallImagePosYMode);
 }
 

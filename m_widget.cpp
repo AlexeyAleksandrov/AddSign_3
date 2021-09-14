@@ -5,8 +5,8 @@ m_widget::m_widget(QWidget *parent) : QWidget(parent)
     pen.setWidth(5);
     brush.setColor(Qt::black);
 
-    addImage("С гербом", ":/images/image_gerb_384_160.jpg");
-    addImage("Без герба", ":/images/image_without_gerb_384_160.jpg");
+    addImage("С гербом", ":/images/images/image_gerb_384_160.jpg");
+    addImage("Без герба", ":/images/images/image_without_gerb_384_160.jpg");
     setCurrentImage(imagesList.at(0).imageDir);
 }
 

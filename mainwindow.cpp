@@ -149,9 +149,9 @@ void MainWindow::customConstructor()
 
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("IBM 866"));
 
-    // =======================================================
+    // ====================================================
     // === НАЗВАНИЯ ТИПОВ АВТОМАТИЧЕСКОГО ТЕСТИРОВАНИЯ ====
-    // =======================================================
+    // ====================================================
 
     automationTest_typesNames.resize(automationTest_types::size);   // создаем массив для хранения названий
 
@@ -168,9 +168,9 @@ void MainWindow::customConstructor()
     automationTest_typesNames[automationTest_types::insert_in_coords_pdf] = "Вставка подписи по координатам в документ PDF";
     automationTest_typesNames[automationTest_types::insert_by_tag] = "Подпись WORD документа с вставкой подписи и инициалов по ТЭГу в таблице";
 
-    // =======================================================
-    // === ПУТИ К ФАЙЛАМ ДЛЯ АВТОМАТИЧЕСКОГО ТЕСТИРОВАНИЯ ====
-    // =======================================================
+    // ===================================================================
+    // === СОЗДАЁМ ЧЕКБОКСЫ С ТИПАМИ ДЛЯ АВТОМАТИЧЕСКОГО ТЕСТИРОВАНИЯ ====
+    // ===================================================================
 
     automationTest_checkBoxes.resize(automationTest_types::size);   // создаем массив для хранения CheckBox с типами тестов
 
@@ -181,31 +181,60 @@ void MainWindow::customConstructor()
         ui->verticalLayout_automationTesting->addWidget(checkBox);  // добавляем чекбокс на форму
     }
 
+    // =========================================================
+    // === ИЗВЛЕКАЕМ ФАЙЛЫ ДЛЯ АВТОМАТИЧЕСКОГО ТЕСТИРОВАНИЯ ====
+    // =========================================================
+    QString current_dir = QDir::currentPath() + "/";
+    QString examples_dir = current_dir + "examples/";
+
+    QStringList files_extensions;   // все возможные расширения файлов
+    QStringList files_names;    // все возможные названия файлов
+    files_extensions << ".docx" << ".doc" << ".rtf" << ".pdf" << ".xlsx" << ".xls";
+    files_names << "standart" << "full" << "tag";
+
+    // копируем все файлы
+    for (auto &&file_name : files_names)
+    {
+        for (auto &&file_extension : files_extensions)
+        {
+            QString file = ":/autotest/examples/autotest_examples_docs/" + file_name + file_extension;
+            QDir dir = examples_dir;
+            if(!dir.exists())   // если директория не существует
+            {
+                dir.mkdir(examples_dir);
+            }
+            QFile example_file(file);   // файл с примером в ресурсах
+            if(example_file.exists())   // если файл найден
+            {
+                example_file.copy(examples_dir + file_name + file_extension);   // копируем файл из ресурсов в корень программы в папку примеры
+            }
+        }
+    }
+
     // =======================================================
     // === ПУТИ К ФАЙЛАМ ДЛЯ АВТОМАТИЧЕСКОГО ТЕСТИРОВАНИЯ ====
     // =======================================================
-    QString current_dir = QDir::currentPath() + "/";
 
-    automationTesting_exapmleFiles.doc.standart = current_dir + "standart.doc";
-    automationTesting_exapmleFiles.doc.full = current_dir + "full.doc";
-    automationTesting_exapmleFiles.doc.with_tag = current_dir + "tag.doc";
+    automationTesting_exapmleFiles.doc.standart = examples_dir + "standart.doc";
+    automationTesting_exapmleFiles.doc.full = examples_dir + "full.doc";
+    automationTesting_exapmleFiles.doc.with_tag = examples_dir + "tag.doc";
 
-    automationTesting_exapmleFiles.docx.standart = current_dir + "standart.docx";
-    automationTesting_exapmleFiles.docx.full = current_dir + "full.docx";
-    automationTesting_exapmleFiles.docx.with_tag = current_dir + "tag.docx";
+    automationTesting_exapmleFiles.docx.standart = examples_dir + "standart.docx";
+    automationTesting_exapmleFiles.docx.full = examples_dir + "full.docx";
+    automationTesting_exapmleFiles.docx.with_tag = examples_dir + "tag.docx";
 
-    automationTesting_exapmleFiles.rtf.standart = current_dir + "standart.rtf";
-    automationTesting_exapmleFiles.rtf.full = current_dir + "full.rtf";
-    automationTesting_exapmleFiles.rtf.with_tag = current_dir + "tag.rtf";
+    automationTesting_exapmleFiles.rtf.standart = examples_dir + "standart.rtf";
+    automationTesting_exapmleFiles.rtf.full = examples_dir + "full.rtf";
+    automationTesting_exapmleFiles.rtf.with_tag = examples_dir + "tag.rtf";
 
-    automationTesting_exapmleFiles.pdf.standart = current_dir + "standart.pdf";
-    automationTesting_exapmleFiles.pdf.full = current_dir + "full.pdf";
+    automationTesting_exapmleFiles.pdf.standart = examples_dir + "standart.pdf";
+    automationTesting_exapmleFiles.pdf.full = examples_dir + "full.pdf";
 
-    automationTesting_exapmleFiles.xls.standart = current_dir + "standart.xls";
-    automationTesting_exapmleFiles.xls.full = current_dir + "full.xls";
+    automationTesting_exapmleFiles.xls.standart = examples_dir + "standart.xls";
+    automationTesting_exapmleFiles.xls.full = examples_dir + "full.xls";
 
-    automationTesting_exapmleFiles.xlsc.standart = current_dir + "standart.xlsx";
-    automationTesting_exapmleFiles.xlsc.full = current_dir + "full.xlsx";
+    automationTesting_exapmleFiles.xlsc.standart = examples_dir + "standart.xlsx";
+    automationTesting_exapmleFiles.xlsc.full = examples_dir + "full.xlsx";
 
     // ====================================================
     // === СПИСКИ ФАЙЛОВ ДЛЯ КАЖДОГО ТИПА ТЕСТИРОВАНИЯ ====
@@ -290,9 +319,9 @@ void MainWindow::customConstructor()
     automationTest_sourceFiles[automationTest_types::insert_in_coords_excel].append(automationTesting_exapmleFiles.xlsc.standart);
     automationTest_sourceFiles[automationTest_types::insert_in_coords_excel].append(automationTesting_exapmleFiles.xlsc.full);
 
-    // ====================================================================
-    // настройки UI для каждого из видов тестирования
-    // ====================================================================
+    // =======================================================
+    // === НАСТРОЙКИ UI ДЛЯ КАЖДОГО ИЗ ВИДОВ ТЕСТИРОВАНИЯ ====
+    // =======================================================
     automationTest_ui_settings at_settings; // настройки, создаём один раз, измеяем столько сколько надо
     automationTest_settings.resize(automationTest_types::size); // сразу выделяем память
     // WORD
@@ -670,7 +699,7 @@ void MainWindow::on_pushButton_addsign_clicked()
     pdfSignPreset.paragraphOffset = ui->verticalSlider->value();
 
     SignProcessor::PDFParams PDF_settings;
-    PDF_settings.image_dir = ":/images/MIREA_logo.png";
+    PDF_settings.image_dir = ":/images/images/MIREA_logo.png";
     PDF_settings.qpdf_dir = qpdf_dir;
     PDF_settings.drawLogo = isDrawGerb();
     PDF_settings.pdf_preset = pdfSignPreset;

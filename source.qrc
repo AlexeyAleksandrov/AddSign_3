@@ -1,8 +1,26 @@
 <RCC>
     <qresource prefix="/images">
-        <file>image_gerb_384_160.jpg</file>
-        <file>image_without_gerb_384_160.jpg</file>
-        <file>MIREA_logo.png</file>
-        <file>logo_background_500_400.png</file>
+        <file>images/image_gerb_384_160.jpg</file>
+        <file>images/image_without_gerb_384_160.jpg</file>
+        <file>images/logo_background_500_400.png</file>
+        <file>images/MIREA_logo.ico</file>
+        <file>images/MIREA_logo.png</file>
+    </qresource>
+    <qresource prefix="/autotest/examples">
+        <file>autotest_examples_docs/full.doc</file>
+        <file>autotest_examples_docs/full.docx</file>
+        <file>autotest_examples_docs/full.pdf</file>
+        <file>autotest_examples_docs/full.rtf</file>
+        <file>autotest_examples_docs/full.xls</file>
+        <file>autotest_examples_docs/full.xlsx</file>
+        <file>autotest_examples_docs/standart.doc</file>
+        <file>autotest_examples_docs/standart.docx</file>
+        <file>autotest_examples_docs/standart.pdf</file>
+        <file>autotest_examples_docs/standart.rtf</file>
+        <file>autotest_examples_docs/standart.xls</file>
+        <file>autotest_examples_docs/standart.xlsx</file>
+        <file>autotest_examples_docs/tag.doc</file>
+        <file>autotest_examples_docs/tag.docx</file>
+        <file>autotest_examples_docs/tag.rtf</file>
     </qresource>
 </RCC>
