@@ -358,25 +358,34 @@ void SignProcessor::runProcessing()
                                     QString name;
                                     QString patronymic;
                                     QStringList nameList = CryptoPROOptions.sign.name_and_patronymic.split(" ", SPLITTER); // разбиваем имя и фотчество через пробел
-                                    if(nameList.size() != 2) // если не содержится имя + отчество
+                                    QString text = "";  // текст ФИО
+                                    if(nameList.size() > 0)
                                     {
-                                        QString sertname = CryptoPROOptions.sign.name; // получаем название сертификата
-                                        nameList = sertname.split(" ", SPLITTER);
-                                        if(nameList.size() != 3) // если в названии не содержится Фамилия Имя Отчество
+                                        if(nameList.size() != 2) // если не содержится имя + отчество
                                         {
-                                            qDebug() << "Некорректное значение имени и отчества " << nameList;
-                                            log.addToLog("Некорректное значение имени и отчества ");
-                                            emit newFileStatus(file, files_status::error_no_tabels);
-                                            needContinue = true;
-                                            continue;
+                                            QString sertname = CryptoPROOptions.sign.name; // получаем название сертификата
+                                            nameList = sertname.split(" ", SPLITTER);
+                                            if(nameList.size() != 3) // если в названии не содержится Фамилия Имя Отчество
+                                            {
+                                                qDebug() << "Некорректное значение имени и отчества " << nameList;
+                                                log.addToLog("Некорректное значение имени и отчества ");
+    //                                            nameList.clear();
+    //                                            nameList.append(sertname);  // имя ставим то, что прочитали
+    //                                            nameList.append("");    // фамилия пустая
+    //                                            nameList.append("");    // отчество пустое
+    //                                            emit newFileStatus(file, files_status::error_no_tabels);
+    //                                            needContinue = true;
+    //                                            continue;
+                                            }
+                                            surname = nameList.at(0); // 0 - фамилия
+                                            name = nameList.at(1).at(0); // первая буква имени
+                                            patronymic = nameList.at(2).at(0); // первая буква отчества
                                         }
-                                        surname = nameList.at(0); // 0 - фамилия
-                                        name = nameList.at(1).at(0); // первая буква имени
-                                        patronymic = nameList.at(2).at(0); // первая буква отчества
+                                        name = nameList.at(0).at(0); // берем первый элемент списка и из него 1ю букву
+                                        patronymic = nameList.at(1).at(0); // берем второй элемент списка и из него 1ю букву
+                                        text = surname + " " + name + "." + patronymic + "."; // формируем строку фио
                                     }
-                                    name = nameList.at(0).at(0); // берем первый элемент списка и из него 1ю букву
-                                    patronymic = nameList.at(1).at(0); // берем второй элемент списка и из него 1ю букву
-                                    QString text = surname + " " + name + "." + patronymic + "."; // формируем строку фио
+
                                     cell.setText(text); // ставим картинку в ячейку
                                     hasSignFioTag = true;
                                 }
@@ -393,7 +402,7 @@ void SignProcessor::runProcessing()
                 {
                     qDebug() << "Не найдены тэги в документе " + file.sourceFile;
                     log.addToLog("Не найдены тэги в документе " + file.sourceFile);
-                    emit newFileStatus(file, files_status::error_no_tabels);
+                    emit newFileStatus(file, files_status::error_no_tags);
                     continue;
                 }
 

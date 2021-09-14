@@ -160,7 +160,7 @@ void MainWindow::customConstructor()
 
     automationTesting_exapmleFiles.docx.standart = current_dir + "standart.docx";
     automationTesting_exapmleFiles.docx.full = current_dir + "full.docx";
-    automationTesting_exapmleFiles.docx.with_tag = current_dir + "docx_tag.docx";
+    automationTesting_exapmleFiles.docx.with_tag = current_dir + "tag.docx";
 
     automationTesting_exapmleFiles.rtf.standart = current_dir + "standart.rtf";
     automationTesting_exapmleFiles.rtf.full = current_dir + "full.rtf";
@@ -2394,7 +2394,8 @@ void MainWindow::on_pushButton_acceptCurrentPreset_clicked()
 
 void MainWindow::on_pushButton_automationTest_clicked()
 {
-    ui->stackedWidget->setCurrentIndex(STACKED_PREVIEW);
+//    ui->stackedWidget->setCurrentIndex(STACKED_PREVIEW);
+    on_pushButton_back_to_menu_clicked();   // возвращаемся на главную страницу
     on_pushButton_settings_shower_clicked();    // вызываем нажатие кнопки, чтобы скрыть боковую панель
 //    QString current_dir = QDir::currentPath() + "/";
 //    QStringList files;
@@ -2408,6 +2409,8 @@ void MainWindow::on_pushButton_automationTest_clicked()
     {
         automationTest_chosedTests.append(i);   // просто заносим все тесты в список активных, потом переделать, чтобы выбирать конкретные
     }
+
+//    automationTest_chosedTests.append(automationTest_types::insert_by_tag);
 
     isAutomationTesting = true; // ставим флаг, что запущено автоматическое тестирование
 

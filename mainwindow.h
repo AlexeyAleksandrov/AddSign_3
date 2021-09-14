@@ -243,7 +243,7 @@ private:
     {
         int insert_type = SignProcessor::insert_standart;
         bool ignoreMovingToNextPage = false;
-        bool exportToPdf = false;
+        bool exportToPdf = true;
         bool signWordFile = false;
     };
 

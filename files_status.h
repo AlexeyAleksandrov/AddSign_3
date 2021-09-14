@@ -32,6 +32,7 @@ public:
         error_password_failed,
         error_qpdf_no_image_added,
         error_no_tabels,
+        error_no_tags,
         in_process,
         waiting,
         added,
