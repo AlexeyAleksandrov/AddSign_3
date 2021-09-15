@@ -1,5 +1,6 @@
 #include "exeleditor.h"
 
+#ifdef WINDOWS
 #define checkAxObject(pointer, object_name)  if(pointer==nullptr) { qDebug() << "Нет данных " + QString(object_name); throw QString("AxObject Error: ") + object_name;  return false; } else { connect(pointer, SIGNAL(exception(int,QString,QString,QString)), this, SLOT(exception(int,QString,QString,QString))); pointer->setObjectName(object_name); }
 #define checkNullPointer(pointer, texterror) if(pointer == nullptr) { qDebug() << texterror << " is nullptr"; log.addToLog(texterror + QString(" is nullptr")); throw QString("NullPointer Error: ") + texterror;  return false; }
 
@@ -18,6 +19,7 @@ ExcelEditor::~ExcelEditor()
 
 bool ExcelEditor::openBook(QString fileDir)
 {
+#ifdef WINDOWS
     checkNullPointer(excel, "excel");
     checkNullPointer(workbooks, "workbooks");
 //    excel->dynamicCall("ChDir(String)", QFileInfo(fileDir).absolutePath());
@@ -33,18 +35,22 @@ bool ExcelEditor::openBook(QString fileDir)
     pageSetup = ActiveSheet->querySubObject("PageSetup");
     checkAxObject(pageSetup, "pageSetup");
     qDebug() << "Открыли файл " << fileDir;
+#endif
     return true;
 }
 
 bool ExcelEditor::saveBook()
 {
+#ifdef WINDOWS
     checkNullPointer(workbook, "workbook");
     workbook->dynamicCall("Save()");
+#endif
     return true;
 }
 
 bool ExcelEditor::exportToPdf(QString outputFileName)
 {
+#ifdef WINDOWS
     checkNullPointer(ActiveSheet, "ActiveSheet");
     QString t_dir = "C:/tempAddSign";
     QDir tempdir(t_dir);
@@ -72,43 +78,53 @@ bool ExcelEditor::exportToPdf(QString outputFileName)
         return false;
     }
     qDebug() << "Экспортировано в " << outputFileName;
+#endif
     return true;
 }
 
 bool ExcelEditor::closeBook()
 {
+#ifdef WINDOWS
     checkNullPointer(workbook, "workbook");
     workbook->dynamicCall("Close()");
+#endif
     return true;
 }
 
 bool ExcelEditor::updatePageSetup()
 {
+#ifdef WINDOWS
     checkNullPointer(ActiveSheet, "ActiveSheet");
     pageSetup = ActiveSheet->querySubObject("PageSetup");
+#endif
     return true;
 }
 
 int ExcelEditor::getPageOrientation()
 {
+#ifdef WINDOWS
     checkNullPointer(pageSetup, "pageSetup");
     QVariant orientation = pageSetup->dynamicCall("Orientation()");
     return orientation.toInt(); // получаем значение ориентации
+#endif
 }
 
 bool ExcelEditor::setPageOrientation(int PageOrientation)
 {
+#ifdef WINDOWS
     checkNullPointer(pageSetup, "pageSetup");
     if(PageOrientation != xlLandscape && PageOrientation != xlPortrait)
     {
         return false;
     }
     pageSetup->setProperty("Orientation", PageOrientation);
+#endif
     return true;
 }
 
 QString **ExcelEditor::readFile(QString fileDiretory, int &rowsCount, int &colsCount, QProgressBar *progressBar)
 {
+    #ifdef WINDOWS
     QAxObject* excel = new QAxObject("Excel.Application", 0);
     QAxObject* workbooks = excel->querySubObject("Workbooks");
     QAxObject* workbook = workbooks->querySubObject("Open(const QString&)", fileDiretory);
@@ -166,10 +182,12 @@ QString **ExcelEditor::readFile(QString fileDiretory, int &rowsCount, int &colsC
     excel = NULL;
 
     return text;
+#endif
 }
 
 void ExcelEditor::writeFile(QString fileDiretory, QString **text, int rows, int cols)
 {
+    #ifdef WINDOWS
     QAxObject* excel = new QAxObject("Excel.Application", 0);
     QAxObject* workbooks = excel->querySubObject("Workbooks");
     QAxObject* workbook = workbooks->querySubObject("Open(const QString&)", fileDiretory);
@@ -190,24 +208,29 @@ void ExcelEditor::writeFile(QString fileDiretory, QString **text, int rows, int 
     excel->dynamicCall("Quit()");
     delete  excel;
     excel = NULL;
+#endif
 }
 
 bool ExcelEditor::ExcelInit()
 {
+#ifdef WINDOWS
     excel = new QAxObject("Excel.Application", 0);
     checkAxObject(excel, "Excel.Application");
     excel->dynamicCall("SetDisplayAlerts(bool)", false);
     workbooks = excel->querySubObject("Workbooks");
     checkAxObject(workbooks, "workbooks");
+#endif
     return true;
 }
 
 bool ExcelEditor::ExcelQuit()
 {
+    #ifdef WINDOWS
     if (excel)
     {
         delete excel;
     }
+#endif
     return true;
 }
 
@@ -215,3 +238,5 @@ void ExcelEditor::exception(int code, QString source, QString desc, QString help
 {
     qDebug() << "EXCEPTION: " << "Sender: " + sender()->objectName() << "code: " << code << "Source: " + source << "Desc: " +  desc << "Help: " + help;
 }
+
+#endif

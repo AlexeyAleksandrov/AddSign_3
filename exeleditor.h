@@ -1,10 +1,13 @@
 #ifndef ExcelEditor_H
 #define ExcelEditor_H
 
+#ifdef WINDOWS
 #include <QObject>
 #include <QFile>
 #include <QTableWidget>
+#ifdef WINDOWS
 #include <QAxObject>
+#endif
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QProgressBar>
@@ -54,6 +57,7 @@ signals:
 private:
     bool ExcelInit(); // инициализация ворда
     bool ExcelQuit(); // завершение ворда
+#ifdef WINDOWS
     QAxObject* excel = nullptr;
     QAxObject* workbooks = nullptr;
     QAxObject* workbook = nullptr;
@@ -61,6 +65,7 @@ private:
     QAxObject* sheet = nullptr;
     QAxObject *ActiveSheet = nullptr;
     QAxObject *pageSetup = nullptr;
+#endif
 
     logClass log;
 
@@ -68,5 +73,5 @@ private slots:
     void exception(int code, QString source, QString desc, QString help); // слот получения ошибок
 
 };
-
+#endif
 #endif // ExcelEditor_H

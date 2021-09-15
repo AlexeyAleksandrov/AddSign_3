@@ -1,8 +1,11 @@
 #ifndef WORDEDITOR_H
 #define WORDEDITOR_H
 
+#ifdef WINDOWS
 #include <QObject>
+#ifdef WINDOWS
 #include <QAxObject>
+#endif
 #include <QDebug>
 #include <QFileInfo>
 
@@ -32,16 +35,22 @@ public:
     struct WordTables
     {
     public:
+        #ifdef WINDOWS
         WordTables(QAxObject *tables);
+#endif
         int count(); // возвращает количество таблиц в документе
     private:
+        #ifdef WINDOWS
         QAxObject *tables = nullptr;
+#endif
 
     };
 
     struct TableCell
     {
+#ifdef WINDOWS
         TableCell(QAxObject *cell, int row, int col);
+#endif
         QString text();
         bool setText(QString text);
         bool insertText(QString text);
@@ -51,7 +60,9 @@ public:
         bool clear();
 
         private:
+#ifdef WINDOWS
         QAxObject *cell = nullptr;
+#endif
         int tableRow = -1;
         int tableColumn = -1;
     };
@@ -59,7 +70,9 @@ public:
     struct WordTable
     {
     public:
+        #ifdef WINDOWS
         WordTable(QAxObject *table, int index);
+#endif
         bool tableToText(); // перевести таблицу в текст (внутри документа)
         int columnsCount(); // получить количество столбцов в таблице
         int rowsCount(); // возвращает количество строк
@@ -67,7 +80,9 @@ public:
         TableCell cell(int row, int col); // возвращает ячейку таблицы
 
         private:
+        #ifdef WINDOWS
         QAxObject *table = nullptr;
+#endif
         int index = -1;
     };
 
@@ -104,8 +119,10 @@ public:
 
     // работа с картинками
     bool moveSelectionToEnd(); // перемещаем курсор в конец файла
+    #ifdef WINDOWS
     bool updateShapes(QAxObject *selection = nullptr); // обновляет указатель на smart объекты
     bool addPicture(QString imagedir, const float size_santimetr = 3.0, QAxObject *selection = nullptr); // добавить картинку
+#endif
 
     // перемещение по документу
     bool typeBackspace(); // вызов клавиши backspace
@@ -116,7 +133,9 @@ public:
 
 //    WordTable tables = WordTable(nullptr);
 
+    #ifdef WINDOWS
     QAxObject *getWord() const;
+#endif
 
     signals:
 
@@ -126,6 +145,7 @@ public:
 private:
     bool wordInit(); // инициализация ворда
     bool wordQuit(); // завершение ворда
+    #ifdef WINDOWS
     QAxObject *word = nullptr; // объект ворда
     QAxObject *documents = nullptr; //получаем коллекцию документов
     QAxObject *document = nullptr; // открытый документ
@@ -133,6 +153,7 @@ private:
     QAxObject* Range = nullptr; // рабочая область
     QAxObject* selection = nullptr; // выделенная область
     QAxObject* shapes = nullptr; // объект работы со смарт-объектами
+#endif
 
     QString activeFile; // текущий открытый файл
     bool opened = false;
@@ -140,5 +161,5 @@ private:
 
 
 };
-
+#endif
 #endif // WORDEDITOR_H

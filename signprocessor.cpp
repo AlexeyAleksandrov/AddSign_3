@@ -1,5 +1,6 @@
 #include "signprocessor.h"
 
+#include <QApplication>
 #include <QDir>
 
 //#define MIREA_LOGO_HTML ":/img/MIREA_logo_resize.png"
@@ -118,7 +119,9 @@ void SignProcessor::runProcessing()
             file.signPDFFile = tempFilename;
         }
 
+
         // обрабатывем файл
+        #ifdef WINDOWS
         if(isWordFile(file.sourceFile)) // если у нас вордовский файл
         {
             WordEditor word; // создаем обработчик ворда
@@ -725,6 +728,7 @@ void SignProcessor::runProcessing()
                 continue;
             }
         }
+#endif
         else if (isPDFFile(file.sourceFile)) // обрабатываем PDF файл
         {
             QString tempPdfFile; // место хранения временного файла
