@@ -609,30 +609,6 @@ void MainWindow::on_pushButton_addsign_clicked()
         isAutomationTesting = false;
         return;
     }
-//    if(containsPDFFiles || signType == SignProcessor::insert_in_exported_pdf) // если содержатся PDF файлы, то ищем QPDF
-//    {
-//        if(qpdf_dir == "")
-//        {
-//            if(!findQpdf(qpdf_dir))
-//            {
-//                QMessageBox::warning(this, "Ошибка", "Ошибка! Не указан путь к qpdf.exe");
-//                log.addToLog("Ошибка! Не указан путь к qpdf.exe");
-//                return;
-//            }
-//        }
-//        if(!QFile::exists(qpdf_dir))
-//        {
-//            if(!findQpdf(qpdf_dir))
-//            {
-//                QMessageBox::warning(this, "Ошибка", "Ошибка! Файл qpdf.exe не найден!");
-//                log.addToLog("Ошибка! Файл qpdf.exe не найден!");
-//                return;
-//            }
-//        }
-//    }
-
-    // страый метод
-//    cryptoObject.setCurrentSign(currentSign); // устанавливаем актуальную подпись
 
     // === ПОДГОТОВКА К ЗАПУСКУ ===
 
@@ -654,7 +630,6 @@ void MainWindow::on_pushButton_addsign_clicked()
 
     dir.mkpath(outputDir); // создаём директорию вывода
     log.addToLog("Запуск Word");
-//    countFilesReady = 0; // обнуляем счётчик обработанных файлов
 
     clearAllOutputsToolTipData(); // очищаем пути вывода для всех файлов в таблице
     QApplication::processEvents(); // прогружаем интерфейс
@@ -673,15 +648,7 @@ void MainWindow::on_pushButton_addsign_clicked()
         insertType = SignProcessor::insert_by_tag_in_table;
     }
 
-//    QString signtag = SIGN_IMAGE_TAG;
-//    if(signtag == "" && insertType == SignProcessor::insert_by_tag_in_table)
-//    {
-//        QMessageBox::warning(this, "Ошибка", "Не выбраны действия тег для поиска");
-//        return;
-//    }
-
     SignProcessor::WordParams word_settings;
-//    word_settings.files = listAddedFiles; // передаём файлы для обработки
     word_settings.tempdir = tempFilesDir + "/"; // директория для хранения временных файлов
     word_settings.outputdir = outputDir; // директория, в которую будем выводить
     word_settings.imageDir = imageDir; // устанавливаем директорию, где находится картинка
@@ -712,35 +679,12 @@ void MainWindow::on_pushButton_addsign_clicked()
 
     ui->closeButton->setDisabled(true);
 
-    // настраиваем обработчик подписей
-//    signProscessor = new fileSignProcessor;
-
-//    signProscessor->processor.setWordOptions(word_settings);
-//    signProscessor->processor.setPDFOptions(PDF_settings);
-//    signProscessor->processor.setCryptoPROOptions(CryptoPRO_settings);
-//    signProscessor->processor.setFilesList(listAddedFiles);
-
-//    signProscessor = new fileSignProcessor;
-
     processor.setWordOptions(word_settings);
     processor.setPDFOptions(PDF_settings);
     processor.setCryptoPROOptions(CryptoPRO_settings);
     processor.setFilesList(listAddedFiles);
 
-//    signThread = new QThread(this);
-//    signProscessor->moveToThread(signThread);
-
-    // логика запуска потоков
-//    connect(signThread, &QThread::started, signProscessor, &fileSignProcessor::run); // когдазаустился Word, начинаем обработку файлов
-//    connect(signProscessor, &fileSignProcessor::ready, signThread, &QThread::quit); // как только поток подписи завершился, отправляем его закрываться
-//    connect(signThread, &QThread::finished, this, &MainWindow::threadFinished); // как только поток Word завершился удаляем его
-    //взаимодействие с файлами
-//    connect(&signProscessor->processor, &SignProcessor::newFileStatus, this, &MainWindow::fileReady); // сигнал о полной обработке файла (заменить на обработчик потока подписи)
-//    connect(signProscessor, &fileSignProcessor::newFileStatus, this, &MainWindow::updateFileStatus); // сигнал обновления статуса файла
-
     connect(&processor, &SignProcessor::newFileStatus, this, &MainWindow::fileReady);
-//    connect(&processor, &SignProcessor::procesingFinished, this, &MainWindow::threadFinished);
-
 
     SigningInProcess = false;
     log.addToLog("Запущена обработка файлов");

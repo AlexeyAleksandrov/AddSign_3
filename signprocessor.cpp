@@ -121,7 +121,7 @@ void SignProcessor::runProcessing()
 
 
         // обрабатывем файл
-        #ifdef WINDOWS
+        #ifdef WIN32
         if(isWordFile(file.sourceFile)) // если у нас вордовский файл
         {
             WordEditor word; // создаем обработчик ворда
