@@ -125,7 +125,11 @@ private:
     inline QString getFileName(QString file); // возвращает имя файла без директории
     static QString getDir(QString dir); // добавляет в конец директории /, если таковой необходим
 
-    void processPDFFile(QString sourceFile, QString outputFile);
+private:
+    void standartAddImageToWordFile(FileForSign &file, QString tempFile, QString imagedir, WordParams WordOptions, int &fileStatus, bool &movedToNextPage);   // выполняет стандартную вставку картинки в ворд документ (в конец)
+    void addImageToWordFileByTagInTable(FileForSign &file, QString tempFile, QString imagedir, WordParams WordOptions, int &fileStatus, bool &movedToNextPage);   // выполняет вставку картинки в ворд документ в таблицу по специальным тэгам
+    void addImageToPdfFileInCoordinates(QString input_file, QString output_file, WordParams WordOptions, PDFParams PDFOptions, PDFCreator::orientation pdfPageOrientation, QString gerb_file, int &fileStatus);  // вставить подпись по координатам в PDF документ
+    void addImageToPdfFileInEndOfFile(QString input_file, QString output_file, WordParams WordOptions, PDFParams PDFOptions, PDFCreator::orientation pdfPageOrientation, QString gerb_file, int &fileStatus);  // вставить подпись по координатам в PDF документ
 
 signals:
     void newFileStatus(FileForSign, int status);
