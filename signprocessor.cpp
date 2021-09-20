@@ -5,6 +5,7 @@
 
 //#define MIREA_LOGO_HTML ":/img/MIREA_logo_resize.png"
 #define MIREA_LOGO_HTML PDFOptions.image_dir
+#define APACHI_POI_DIR QDir::currentPath() + "/libpoi/libpoi.jar"
 
 #define DISPLAY_STATUS_ON_NEW_PAGE
 #define assert(var, texterror) if(var == false) { qDebug() << "Assert: " << texterror; log.addToLog(texterror); return; }
@@ -151,39 +152,75 @@ void SignProcessor::runProcessing()
             // вставка по координатам
             else if (WordOptions.insertType == insert_in_exported_pdf) // если выбрана вставка в PDF
             {
-                // экспортируем в PDF
-                WordEditor word; // создаем обработчик ворда
-                word.openDocument(tempFile); // открываем документ
-                int wordPageOrientation = word.getPageOrientation(); // получаем ориентацию страницы
+                PDFCreator::orientation pdfPageOrientation = PDFCreator::Portrait; // ориентация страницы в PDF
 
-                tempFile = WordOptions.getTempdir() + getFileNameInPDFFormat(QFileInfo(file.sourceFile).fileName()); // временный файл подписи
+                QString tempPdfFile = WordOptions.getTempdir() + getFileNameInPDFFormat(QFileInfo(file.sourceFile).fileName()); // временный файл подписи
                 AutoDeleter tempFileDirContol(tempFile); // автоматическое удаление файла
-                if(!word.exportToPdf(tempFile)) // экспортируем файл в PDF
-                {
-                    qDebug() << "Не удалось экспортировать файл в PDF";
-                    log.addToLog("Не удалось экспортировать файл в PDF");
-                    emit newFileStatus(file, files_status::error_pdf_no_export);
-                    continue;
-                }
-                word.closeDocument(); // закрываем
 
-                // получаем ориентацию документа
-                PDFCreator::orientation pdfPageOrientation; // ориентация страницы в PDF
-                if(wordPageOrientation == WordEditor::pageOrientation::wdOrientLandscape)
+                if(filesHendlerType == MS_COM)  // если используем COM
                 {
-                    pdfPageOrientation = PDFCreator::Landscape; // ставим альбомную ориентацию
+                    // экспортируем в PDF
+                    WordEditor word; // создаем обработчик ворда
+                    word.openDocument(tempFile); // открываем документ
+                    int wordPageOrientation = word.getPageOrientation(); // получаем ориентацию страницы
+
+                    if(!word.exportToPdf(tempPdfFile)) // экспортируем файл в PDF
+                    {
+                        qDebug() << "Не удалось экспортировать файл в PDF";
+                        log.addToLog("Не удалось экспортировать файл в PDF");
+                        emit newFileStatus(file, files_status::error_pdf_no_export);
+                        continue;
+                    }
+                    word.closeDocument(); // закрываем
+
+                    // получаем ориентацию документа
+                    if(wordPageOrientation == WordEditor::pageOrientation::wdOrientLandscape)
+                    {
+                        pdfPageOrientation = PDFCreator::Landscape; // ставим альбомную ориентацию
+                    }
+                    else
+                    {
+                        pdfPageOrientation = PDFCreator::Portrait; // ставим портретную ориентацию
+                    }
                 }
-                else
+                else if (filesHendlerType == APACHI_POI)    // если используем POI
                 {
-                    pdfPageOrientation = PDFCreator::Portrait; // ставим портретную ориентацию
+                    if(!file.sourceFile.endsWith(".docx"))
+                    {
+                        qDebug() << "Данное расширение файла не поддерживается Apachi POI" << file.sourceFile;
+                        log.addToLog("Данное расширение файла не поддерживается Apachi POI: " + file.sourceFile);
+                        emit newFileStatus(file, files_status::no_supported);
+                        continue;
+                    }
+
+                    LibPOI libpoi;  // обработчик POI
+                    libpoi.setJarDir(APACHI_POI_DIR);   // директория файла
+
+                    LibPOI::jar_params JarOptions;  // параметры обработчика
+                    JarOptions.imageFile = imagedir;
+                    JarOptions.inputWordFile = tempFile;
+                    JarOptions.outputWordFile = tempFile;
+
+                    JarOptions.outputPdfFile = tempPdfFile;
+                    JarOptions.insertType = LibPOI::insertTypes::simple_export_pdf;    // ставим вставку с экспортом в PDF
+
+                    bool success = libpoi.process(JarOptions); // запускаем обработчик POI
+                    if(!success)    // если возникла ошибка при обработке файла
+                    {
+                        emit newFileStatus(file, files_status::error_no_open);
+                        continue;
+                    }
+                    pdfPageOrientation = PDFCreator::Portrait;
                 }
 
                 // вставляем подпись в PDF по координатам
                 int status = -1;
-                addImageToPdfFileInCoordinates(tempFile, file.signPDFFile, WordOptions, PDFOptions, pdfPageOrientation, MIREA_LOGO_HTML, status);   // добавляем картинку по координатам
+                qDebug() << "tempFile = " << tempPdfFile << "signPDFFile = " << file.signPDFFile;
+                addImageToPdfFileInCoordinates(tempPdfFile, file.signPDFFile, WordOptions, PDFOptions, pdfPageOrientation, MIREA_LOGO_HTML, status);   // добавляем картинку по координатам
                 assert(status != -1, "addImageToPdfFileInCoordinates"); // если произошла критическая ошибка и статус файла == -1
                 emit newFileStatus(file, status);  // отправляем сигнал обновления статуса файла
                 check_file_status(status);  // проверяем статус файла и делаем continue, если необходимо
+
             }
 
             // вставка по тэгу
@@ -198,73 +235,81 @@ void SignProcessor::runProcessing()
         }
         else if (isExcelFile(file.sourceFile))  // обработчик Excel файлов
         {
-            // создаём временный файл
-            QString tempFile; // место хранения временного файла
-            tempFile = createFileCopy(file.sourceFile, WordOptions.getTempdir()); // создаем временный файл, который будет иметь такое же название как и исходный
-            AutoDeleter tempFileDirContol(tempFile); // автоматическое удаление файла
-            if(tempFile == "")
+            if(filesHendlerType == MS_COM)
             {
-                qDebug() << "Произошла ошибка создания временного файла!";
-                log.addToLog("Произошла ошибка создания временного файла!");
-                emit newFileStatus(file, files_status::error_no_open);
-                continue;
-            }
+                // создаём временный файл
+                QString tempFile; // место хранения временного файла
+                tempFile = createFileCopy(file.sourceFile, WordOptions.getTempdir()); // создаем временный файл, который будет иметь такое же название как и исходный
+                AutoDeleter tempFileDirContol(tempFile); // автоматическое удаление файла
+                if(tempFile == "")
+                {
+                    qDebug() << "Произошла ошибка создания временного файла!";
+                    log.addToLog("Произошла ошибка создания временного файла!");
+                    emit newFileStatus(file, files_status::error_no_open);
+                    continue;
+                }
 
-            // экспортируем Excel в PDF
-            ExcelEditor excel; // создаем обработчик ворда
-            excel.openBook(tempFile); // открываем документ
-            int excelPageOrientation = excel.getPageOrientation(); // получаем ориентацию страницы
+                // экспортируем Excel в PDF
+                ExcelEditor excel; // создаем обработчик ворда
+                excel.openBook(tempFile); // открываем документ
+                int excelPageOrientation = excel.getPageOrientation(); // получаем ориентацию страницы
 
-            QString tempPdfFile = WordOptions.getTempdir() + getFileNameInPDFFormat(QFileInfo(file.sourceFile).fileName()); // создаем временный pdf файл
-            AutoDeleter tempPdfFileDirContol(tempPdfFile); // автоматическое удаление файла
-            excel.saveBook();
-            if(!excel.exportToPdf(tempPdfFile)) // экспортируем файл в PDF
-            {
-                qDebug() << "Не удалось экспортировать файл в PDF";
-                log.addToLog("Не удалось экспортировать файл в PDF");
-                emit newFileStatus(file, files_status::error_pdf_no_export);
-                continue;
-            }
-            excel.closeBook(); // закрываем
+                QString tempPdfFile = WordOptions.getTempdir() + getFileNameInPDFFormat(QFileInfo(file.sourceFile).fileName()); // создаем временный pdf файл
+                AutoDeleter tempPdfFileDirContol(tempPdfFile); // автоматическое удаление файла
+                excel.saveBook();
+                if(!excel.exportToPdf(tempPdfFile)) // экспортируем файл в PDF
+                {
+                    qDebug() << "Не удалось экспортировать файл в PDF";
+                    log.addToLog("Не удалось экспортировать файл в PDF");
+                    emit newFileStatus(file, files_status::error_pdf_no_export);
+                    continue;
+                }
+                excel.closeBook(); // закрываем
 
-            // получаем ориентацию книги
-            PDFCreator::orientation pdfPageOrientation; // ориентация страницы в PDF
-            if(excelPageOrientation == ExcelEditor::orientation::xlLandscape)
-            {
-                pdfPageOrientation = PDFCreator::Landscape; // ставим альбомную ориентацию
-            }
-            else
-            {
-                pdfPageOrientation = PDFCreator::Portrait; // ставим портретную ориентацию
-            }
+                // получаем ориентацию книги
+                PDFCreator::orientation pdfPageOrientation; // ориентация страницы в PDF
+                if(excelPageOrientation == ExcelEditor::orientation::xlLandscape)
+                {
+                    pdfPageOrientation = PDFCreator::Landscape; // ставим альбомную ориентацию
+                }
+                else
+                {
+                    pdfPageOrientation = PDFCreator::Portrait; // ставим портретную ориентацию
+                }
 
-            // стандартная вставка
-            if(WordOptions.insertType == insert_standart)
-            {
-                // вставляем подпись в PDF по координатам
-                int status = -1;
-                addImageToPdfFileInEndOfFile(tempPdfFile, file.signPDFFile, WordOptions, PDFOptions, pdfPageOrientation, MIREA_LOGO_HTML, status);   // добавляем картинку по координатам
-                assert(status != -1, "addImageToPdfFileInEndOfFile"); // если произошла критическая ошибка и статус файла == -1
-                emit newFileStatus(file, status);  // отправляем сигнал обновления статуса файла
-                check_file_status(status);  // проверяем статус файла и делаем continue, если необходимо
-            }
+                // стандартная вставка
+                if(WordOptions.insertType == insert_standart)
+                {
+                    // вставляем подпись в PDF по координатам
+                    int status = -1;
+                    addImageToPdfFileInEndOfFile(tempPdfFile, file.signPDFFile, WordOptions, PDFOptions, pdfPageOrientation, MIREA_LOGO_HTML, status);   // добавляем картинку по координатам
+                    assert(status != -1, "addImageToPdfFileInEndOfFile"); // если произошла критическая ошибка и статус файла == -1
+                    emit newFileStatus(file, status);  // отправляем сигнал обновления статуса файла
+                    check_file_status(status);  // проверяем статус файла и делаем continue, если необходимо
+                }
 
-            // вставка по координатам
-            else if (WordOptions.insertType == insert_in_exported_pdf)
-            {
-                // вставляем подпись в PDF по координатам
-                int status = -1;
-                addImageToPdfFileInCoordinates(tempPdfFile, file.signPDFFile, WordOptions, PDFOptions, pdfPageOrientation, MIREA_LOGO_HTML, status);   // добавляем картинку по координатам
-                assert(status != -1, "addImageToPdfFileInCoordinates"); // если произошла критическая ошибка и статус файла == -1
-                emit newFileStatus(file, status);  // отправляем сигнал обновления статуса файла
-                check_file_status(status);  // проверяем статус файла и делаем continue, если необходимо
-            }
+                // вставка по координатам
+                else if (WordOptions.insertType == insert_in_exported_pdf)
+                {
+                    // вставляем подпись в PDF по координатам
+                    int status = -1;
+                    addImageToPdfFileInCoordinates(tempPdfFile, file.signPDFFile, WordOptions, PDFOptions, pdfPageOrientation, MIREA_LOGO_HTML, status);   // добавляем картинку по координатам
+                    assert(status != -1, "addImageToPdfFileInCoordinates"); // если произошла критическая ошибка и статус файла == -1
+                    emit newFileStatus(file, status);  // отправляем сигнал обновления статуса файла
+                    check_file_status(status);  // проверяем статус файла и делаем continue, если необходимо
+                }
 
-            // вставка по тэгу
-            else
+                // вставка по тэгу
+                else
+                {
+                    qDebug() << "Для данного типа файла невозможно выполнить действие " << file.sourceFile;
+                    log.addToLog("Для данного типа файла невозможно выполнить действие " + file.sourceFile);
+                    emit newFileStatus(file, files_status::no_supported);
+                    continue;
+                }
+            }
+            else if (filesHendlerType == APACHI_POI)    // если используем POI
             {
-                qDebug() << "Для данного типа файла невозможно выполнить действие " << file.sourceFile;
-                log.addToLog("Для данного типа файла невозможно выполнить действие " + file.sourceFile);
                 emit newFileStatus(file, files_status::no_supported);
                 continue;
             }
@@ -384,6 +429,11 @@ void SignProcessor::runProcessing()
     log.addToLog("Завершена обработка файлов");
     emit procesingFinished();
     QApplication::processEvents(); // прогружаем интерфейс
+}
+
+void SignProcessor::setFilesHendlerType(int newFilesHendlerType)
+{
+    filesHendlerType = newFilesHendlerType;
 }
 
 bool SignProcessor::isExtension(QString file, QStringList filesExtensions)
@@ -525,227 +575,309 @@ QString SignProcessor::getDir(QString dir)
 
 void SignProcessor::standartAddImageToWordFile(FileForSign &file, QString tempFile, QString imagedir, WordParams WordOptions, int &fileStatus, bool &movedToNextPage)
 {
-    WordEditor word; // создаем обработчик ворда
-
-    assert(word.openDocument(tempFile), "openDocument"); // открываем документ
-    int pagesCountBefore = word.getPagesCount(); // получаем количество страниц
-    assert(word.insertText("\r"), "insertText"); // добавляем перенос строки (по умолчанию добавляется в конец документа
-
-    if(!WordOptions.noInsertImage) // если нет запрета на вставку картинки
+    if(filesHendlerType == MS_COM)
     {
-        assert(word.moveSelectionToEnd(), "moveSelectionToEnd"); // перемещаем курсор в конец (потому что обработчик смарт-объектов указывает на начало документа)
-        assert(word.addPicture(imagedir, 3.0), "addPicture"); // вставляем картинку
-    }
-    assert(word.setParagraphAlignment(WordEditor::paragrapfAlignment::center), "setParagraphAlignment"); // выравниваем по центру
-    int pageCountAfter = word.getPagesCount(); // получаем количество страниц после вставки
+        WordEditor word; // создаем обработчик ворда
 
-    if(pageCountAfter > pagesCountBefore)
-    {
-        if(!WordOptions.ignoreMovingToNextList) // если нельзя игнорировать переход на новую страницу и переход произошёл
+        assert(word.openDocument(tempFile), "openDocument"); // открываем документ
+        int pagesCountBefore = word.getPagesCount(); // получаем количество страниц
+        assert(word.insertText("\r"), "insertText"); // добавляем перенос строки (по умолчанию добавляется в конец документа
+
+        if(!WordOptions.noInsertImage) // если нет запрета на вставку картинки
         {
-            qDebug() << "Произошло увеличение количества страниц. Отменяем подпись.";
-            log.addToLog("Произошло увеличение количества страниц. Отменяем подпись.");
-//            emit newFileStatus(file, files_status::error_new_page_no_added);
-//                        word.closeDocument(); // закрываем
-//            continue;
-            fileStatus = files_status::error_new_page_no_added;
+            assert(word.moveSelectionToEnd(), "moveSelectionToEnd"); // перемещаем курсор в конец (потому что обработчик смарт-объектов указывает на начало документа)
+            assert(word.addPicture(imagedir, 3.0), "addPicture"); // вставляем картинку
+        }
+        assert(word.setParagraphAlignment(WordEditor::paragrapfAlignment::center), "setParagraphAlignment"); // выравниваем по центру
+        int pageCountAfter = word.getPagesCount(); // получаем количество страниц после вставки
+
+        if(pageCountAfter > pagesCountBefore)
+        {
+            if(!WordOptions.ignoreMovingToNextList) // если нельзя игнорировать переход на новую страницу и переход произошёл
+            {
+                qDebug() << "Произошло увеличение количества страниц. Отменяем подпись.";
+                log.addToLog("Произошло увеличение количества страниц. Отменяем подпись.");
+                fileStatus = files_status::error_new_page_no_added;
+                return;
+            }
+            movedToNextPage = true; // иначе ставим флаг, что произошёл переход
+        }
+
+        if(WordOptions.exportToPDF)
+        {
+            if(!word.exportToPdf(file.signPDFFile)) // экспортируем файл в PDF
+            {
+                qDebug() << "Не удалось экспортировать файл в PDF";
+                log.addToLog("Не удалось экспортировать файл в PDF");
+                fileStatus = files_status::error_pdf_no_export;
+                return;
+            }
+        }
+        assert(word.saveDocument(), "saveDocument"); // сохраняем
+        word.closeDocument(); // закрываем
+    }
+    else if (filesHendlerType == APACHI_POI)
+    {
+        if(!file.sourceFile.endsWith(".docx"))
+        {
+            qDebug() << "Данное расширение файла не поддерживается Apachi POI" << file.sourceFile;
+            log.addToLog("Данное расширение файла не поддерживается Apachi POI: " + file.sourceFile);
+            fileStatus = files_status::no_supported;
             return;
         }
-        movedToNextPage = true; // иначе ставим флаг, что произошёл переход
-    }
+        LibPOI libpoi;  // обработчик POI
+        libpoi.setJarDir(APACHI_POI_DIR);   // директория файла
 
-//                assert(word.saveDocument(), "saveDocument"); // сохраняем
-    if(WordOptions.exportToPDF)
-    {
-        if(!word.exportToPdf(file.signPDFFile)) // экспортируем файл в PDF
+        LibPOI::jar_params JarOptions;  // параметры обработчика
+        JarOptions.imageFile = imagedir;
+        JarOptions.inputWordFile = tempFile;
+        JarOptions.outputWordFile = tempFile;
+        JarOptions.insertType = LibPOI::insertTypes::simple_insert; // по умолчанию стандартная вставка в Word файл
+
+        if(WordOptions.exportToPDF) // если надо экспортировать в PDF
         {
-            qDebug() << "Не удалось экспортировать файл в PDF";
-            log.addToLog("Не удалось экспортировать файл в PDF");
-//            emit newFileStatus(file, files_status::error_pdf_no_export);
-//            continue;
-            fileStatus = files_status::error_pdf_no_export;
-            return;
+            JarOptions.outputPdfFile = file.signPDFFile;
+            JarOptions.insertType = LibPOI::insertTypes::insert_with_export_pdf;    // ставим вставку с экспортом в PDF
+        }
+
+        if(WordOptions.exportToWord)    // если необходимо получить вордовский файл, то мы обрабатываем файл вордом
+        {
+            bool success = libpoi.process(JarOptions); // запускаем обработчик POI
+            if(!success)    // если возникла ошибка при обработке файла
+            {
+                fileStatus = files_status::error_no_open;
+                return;
+            }
+        }
+        else   // но, если необходимости в Word файле нет, то мы можем сразу экспортировать в PDF и поставить картинку в конец
+        {
+            QString tempPdfFile = WordOptions.getTempdir() + "/temppoipdf.pdf";    // создаём временный pdf файл
+            AutoDeleter tempPdfFileDeleter(tempPdfFile);   // автоудаление временного файла
+
+            JarOptions.insertType = LibPOI::insertTypes::simple_export_pdf;    // выбираем экспорт в PDF
+            JarOptions.outputPdfFile = tempPdfFile; // указываем файл экспорта наш временный PDF
+
+            bool success = libpoi.process(JarOptions); // запускаем обработчик POI
+            if(!success)    // если возникла ошибка при обработке файла
+            {
+                fileStatus = files_status::error_no_open;
+                return;
+            }
+
+            int status = -1;
+            addImageToPdfFileInEndOfFile(tempPdfFile, file.signPDFFile, WordOptions, PDFOptions, PDFCreator::Portrait, MIREA_LOGO_HTML, status);    // выполянем вставку в PDF в конец документа
+            qDebug() << "Файл: " << file.sourceFile << " Статус: " << status;
+            if(status == -1)
+            {
+                qDebug() << "Не удалось добавить картинку к PDF файлу после обработки POI" << tempPdfFile;
+                log.addToLog("Не удалось добавить картинку к PDF файлу после обработки POI - " + tempPdfFile);
+                fileStatus = files_status::error_no_open;
+                return;
+            }
+            if(status != files_status::in_process)  // если произошла ошибка во время обработки
+            {
+                qDebug() << "Не удалось добавить картинку к PDF файлу после обработки POI" << file.sourceFile << " статус " << fileStatus;
+                log.addToLog("Не удалось добавить картинку к PDF файлу после обработки POI - " + file.sourceFile + " статус " + fileStatus);
+                fileStatus = status;    // возвращаем статус файла
+                return;
+            }
         }
     }
-    assert(word.saveDocument(), "saveDocument"); // сохраняем
-    word.closeDocument(); // закрываем
     if(WordOptions.exportToWord)
     {
         if(!replaceOriginalFileByTemp(file.signWordFile, tempFile)) // копируем временный файл в необходимый
         {
             qDebug() << "Не удалось экспортировать файл Word";
             log.addToLog("Не удалось экспортировать файл Word");
-//            emit newFileStatus(file, files_status::error_no_open);
-//            continue;
             fileStatus = files_status::error_no_open;
             return;
         }
     }
-
     fileStatus = files_status::in_process;   // ставим статус, что всё хорошо
+    return;
 }
 
 void SignProcessor::addImageToWordFileByTagInTable(FileForSign &file, QString tempFile, QString imagedir, WordParams WordOptions, int &fileStatus, bool &movedToNextPage)
 {
-    WordEditor word;
-    assert(word.openDocument(tempFile), "openDocument"); // открываем документ
-    int pagesCountBefore = word.getPagesCount(); // получаем количество страниц
-
-    int tableCount = word.tables().count();
-    if(tableCount <= 0)
+    if(filesHendlerType == MS_COM)
     {
-        qDebug() << "В файле отсутвуют таблицы " + file.sourceFile;
-        log.addToLog("В файле отсутвуют таблицы " + file.sourceFile);
-//        emit newFileStatus(file, files_status::error_no_tabels);
-//        continue;
-        fileStatus = files_status::error_no_tabels;
-        return;
-    }
+        WordEditor word;
+        assert(word.openDocument(tempFile), "openDocument"); // открываем документ
+        int pagesCountBefore = word.getPagesCount(); // получаем количество страниц
 
-    // проверка тэга картинки
-    bool hasSignImageTag = false;
-    if(WordOptions.signImageTag != "")
-    {
-        for (int i=1; i<=tableCount; i++)
+        int tableCount = word.tables().count();
+        if(tableCount <= 0)
         {
-            WordEditor::WordTable table = word.table(i); // получаем таблицу
-
-            int rowsCount = table.rowsCount();
-            int colsCount = table.columnsCount();
-
-            for (int row=1; row<=rowsCount; row++)
-            {
-                for (int col=1; col<=colsCount; col++)
-                {
-                    WordEditor::TableCell cell = table.cell(row, col); // получем ячейку
-                    QString currentText = cell.text(); // получаем текст ячейки
-
-                    if(currentText.contains(WordOptions.signImageTag)) // если ячейка содержит тэг
-                    {
-                        cell.clear(); // очищаем ячейку
-                        cell.setImage(imagedir); // ставим картинку в ячейку
-                        hasSignImageTag = true;
-                    }
-                }
-            }
+            qDebug() << "В файле отсутвуют таблицы " + file.sourceFile;
+            log.addToLog("В файле отсутвуют таблицы " + file.sourceFile);
+            fileStatus = files_status::error_no_tabels;
+            return;
         }
-    }
 
-    // проверка тэга фио
-    bool hasSignFioTag = true;
-    bool needContinue = false;
-    if(WordOptions.signFioTag != "")
-    {
-        for (int i=1; i<=tableCount; i++)
+        // проверка тэга картинки
+        bool hasSignImageTag = false;
+        if(WordOptions.signImageTag != "")
         {
-            WordEditor::WordTable table = word.table(i); // получаем таблицу
-
-            int rowsCount = table.rowsCount();
-            int colsCount = table.columnsCount();
-
-            for (int row=1; row<=rowsCount; row++)
+            for (int i=1; i<=tableCount; i++)
             {
-                for (int col=1; col<=colsCount; col++)
-                {
-                    WordEditor::TableCell cell = table.cell(row, col); // получем ячейку
-                    QString currentText = cell.text(); // получаем текст ячейки
+                WordEditor::WordTable table = word.table(i); // получаем таблицу
 
-                    if(currentText.contains(WordOptions.signFioTag)) // если ячейка содержит тэг
+                int rowsCount = table.rowsCount();
+                int colsCount = table.columnsCount();
+
+                for (int row=1; row<=rowsCount; row++)
+                {
+                    for (int col=1; col<=colsCount; col++)
                     {
-                        QString surname = CryptoPROOptions.sign.surname; // получаем фамилию по сертификату
-                        QString name;
-                        QString patronymic;
-                        QStringList nameList = CryptoPROOptions.sign.name_and_patronymic.split(" ", SPLITTER); // разбиваем имя и фотчество через пробел
-                        QString text = "";  // текст ФИО
-                        if(nameList.size() > 0)
+                        WordEditor::TableCell cell = table.cell(row, col); // получем ячейку
+                        QString currentText = cell.text(); // получаем текст ячейки
+
+                        if(currentText.contains(WordOptions.signImageTag)) // если ячейка содержит тэг
                         {
-                            if(nameList.size() != 2) // если не содержится имя + отчество
-                            {
-                                QString sertname = CryptoPROOptions.sign.name; // получаем название сертификата
-                                nameList = sertname.split(" ", SPLITTER);
-                                if(nameList.size() != 3) // если в названии не содержится Фамилия Имя Отчество
-                                {
-                                    qDebug() << "Некорректное значение имени и отчества " << nameList;
-                                    log.addToLog("Некорректное значение имени и отчества ");
-                                }
-                                surname = nameList.at(0); // 0 - фамилия
-                                name = nameList.at(1).at(0); // первая буква имени
-                                patronymic = nameList.at(2).at(0); // первая буква отчества
-                            }
-                            name = nameList.at(0).at(0); // берем первый элемент списка и из него 1ю букву
-                            patronymic = nameList.at(1).at(0); // берем второй элемент списка и из него 1ю букву
-                            text = surname + " " + name + "." + patronymic + "."; // формируем строку фио
+                            cell.clear(); // очищаем ячейку
+                            cell.setImage(imagedir); // ставим картинку в ячейку
+                            hasSignImageTag = true;
                         }
-
-                        cell.setText(text); // ставим картинку в ячейку
-                        hasSignFioTag = true;
                     }
                 }
             }
         }
-    }
-    if(needContinue)
-    {
-//        continue;
+
+        // проверка тэга фио
+        bool hasSignFioTag = true;
+        bool needContinue = false;
+        if(WordOptions.signFioTag != "")
+        {
+            for (int i=1; i<=tableCount; i++)
+            {
+                WordEditor::WordTable table = word.table(i); // получаем таблицу
+
+                int rowsCount = table.rowsCount();
+                int colsCount = table.columnsCount();
+
+                for (int row=1; row<=rowsCount; row++)
+                {
+                    for (int col=1; col<=colsCount; col++)
+                    {
+                        WordEditor::TableCell cell = table.cell(row, col); // получем ячейку
+                        QString currentText = cell.text(); // получаем текст ячейки
+
+                        if(currentText.contains(WordOptions.signFioTag)) // если ячейка содержит тэг
+                        {
+                            QString surname = CryptoPROOptions.sign.surname; // получаем фамилию по сертификату
+                            QString name;
+                            QString patronymic;
+                            QStringList nameList = CryptoPROOptions.sign.name_and_patronymic.split(" ", SPLITTER); // разбиваем имя и фотчество через пробел
+                            QString text = "";  // текст ФИО
+                            if(nameList.size() > 0)
+                            {
+                                if(nameList.size() != 2) // если не содержится имя + отчество
+                                {
+                                    QString sertname = CryptoPROOptions.sign.name; // получаем название сертификата
+                                    nameList = sertname.split(" ", SPLITTER);
+                                    if(nameList.size() != 3) // если в названии не содержится Фамилия Имя Отчество
+                                    {
+                                        qDebug() << "Некорректное значение имени и отчества " << nameList;
+                                        log.addToLog("Некорректное значение имени и отчества ");
+                                    }
+                                    surname = nameList.at(0); // 0 - фамилия
+                                    name = nameList.at(1).at(0); // первая буква имени
+                                    patronymic = nameList.at(2).at(0); // первая буква отчества
+                                }
+                                name = nameList.at(0).at(0); // берем первый элемент списка и из него 1ю букву
+                                patronymic = nameList.at(1).at(0); // берем второй элемент списка и из него 1ю букву
+                                text = surname + " " + name + "." + patronymic + "."; // формируем строку фио
+                            }
+
+                            cell.setText(text); // ставим картинку в ячейку
+                            hasSignFioTag = true;
+                        }
+                    }
+                }
+            }
+        }
+        if(needContinue)
+        {
+            return;
+        }
+
+        if(!hasSignImageTag && !hasSignFioTag)
+        {
+            qDebug() << "Не найдены тэги в документе " + file.sourceFile;
+            log.addToLog("Не найдены тэги в документе " + file.sourceFile);
+            fileStatus = files_status::error_no_tags;
+            return;
+        }
+
+        int pageCountAfter = word.getPagesCount(); // получаем количество страниц после вставки
+
+        if(pageCountAfter > pagesCountBefore)
+        {
+            if(!WordOptions.ignoreMovingToNextList) // если нельзя игнорировать переход на новую страницу и переход произошёл
+            {
+                qDebug() << "Произошло увеличение количества страниц. Отменяем подпись.";
+                log.addToLog("Произошло увеличение количества страниц. Отменяем подпись.");
+                fileStatus = files_status::error_new_page_no_added;
+                return;
+
+            }
+            movedToNextPage = true; // иначе ставим флаг, что произошёл переход
+        }
+
+        if(WordOptions.exportToPDF)
+        {
+            if(!word.exportToPdf(file.signPDFFile)) // экспортируем файл в PDF
+            {
+                qDebug() << "Не удалось экспортировать файл в PDF";
+                log.addToLog("Не удалось экспортировать файл в PDF");
+                fileStatus = files_status::error_pdf_no_export;
+                return;
+            }
+        }
+        assert(word.saveDocument(), "saveDocument"); // сохраняем
+        word.closeDocument(); // закрываем
+        if(WordOptions.exportToWord)
+        {
+            if(!replaceOriginalFileByTemp(file.signWordFile, tempFile)) // копируем временный файл в необходимый
+            {
+                qDebug() << "Не удалось экспортировать файл Word";
+                log.addToLog("Не удалось экспортировать файл Word");
+                fileStatus = files_status::error_no_open;
+                return;
+            }
+        }
+        fileStatus = files_status::in_process;
         return;
     }
-
-    if(!hasSignImageTag && !hasSignFioTag)
+    else if (filesHendlerType == APACHI_POI)
     {
-        qDebug() << "Не найдены тэги в документе " + file.sourceFile;
-        log.addToLog("Не найдены тэги в документе " + file.sourceFile);
-//        emit newFileStatus(file, files_status::error_no_tags);
-//        continue;
-        fileStatus = files_status::error_no_tags;
-        return;
-    }
-
-    int pageCountAfter = word.getPagesCount(); // получаем количество страниц после вставки
-
-    if(pageCountAfter > pagesCountBefore)
-    {
-        if(!WordOptions.ignoreMovingToNextList) // если нельзя игнорировать переход на новую страницу и переход произошёл
+        if(!file.sourceFile.endsWith(".docx"))
         {
-            qDebug() << "Произошло увеличение количества страниц. Отменяем подпись.";
-            log.addToLog("Произошло увеличение количества страниц. Отменяем подпись.");
-//            emit newFileStatus(file, files_status::error_new_page_no_added);
-//                        word.closeDocument(); // закрываем
-//            continue;
-            fileStatus = files_status::error_new_page_no_added;
-            return;
-
-        }
-        movedToNextPage = true; // иначе ставим флаг, что произошёл переход
-    }
-
-//                assert(word.saveDocument(), "saveDocument"); // сохраняем
-    if(WordOptions.exportToPDF)
-    {
-        if(!word.exportToPdf(file.signPDFFile)) // экспортируем файл в PDF
-        {
-            qDebug() << "Не удалось экспортировать файл в PDF";
-            log.addToLog("Не удалось экспортировать файл в PDF");
-//            emit newFileStatus(file, files_status::error_pdf_no_export);
-//            continue;
-            fileStatus = files_status::error_pdf_no_export;
+            qDebug() << "Данное расширение файла не поддерживается Apachi POI" << file.sourceFile;
+            log.addToLog("Данное расширение файла не поддерживается Apachi POI: " + file.sourceFile);
+            fileStatus = files_status::no_supported;
             return;
         }
-    }
-    assert(word.saveDocument(), "saveDocument"); // сохраняем
-    word.closeDocument(); // закрываем
-    if(WordOptions.exportToWord)
-    {
-        if(!replaceOriginalFileByTemp(file.signWordFile, tempFile)) // копируем временный файл в необходимый
+        LibPOI libpoi;  // обработчик POI
+        libpoi.setJarDir(APACHI_POI_DIR);   // директория файла
+
+        LibPOI::jar_params JarOptions;  // параметры обработчика
+        JarOptions.imageFile = imagedir;
+        JarOptions.inputWordFile = tempFile;
+        JarOptions.outputWordFile = tempFile;
+        JarOptions.outputPdfFile = file.signPDFFile;
+        JarOptions.insertType = LibPOI::insertTypes::insert_by_tag; // вставка по тэгу
+        JarOptions.signOwner = PDFOptions.htmlParams.lineOwner;
+
+        bool success = libpoi.process(JarOptions); // запускаем обработчик POI
+        if(!success)    // если возникла ошибка при обработке файла
         {
-            qDebug() << "Не удалось экспортировать файл Word";
-            log.addToLog("Не удалось экспортировать файл Word");
-//            emit newFileStatus(file, files_status::error_no_open);
-//            continue;
             fileStatus = files_status::error_no_open;
             return;
         }
+        fileStatus = files_status::in_process;
+        return;
     }
-    fileStatus = files_status::in_process;
 }
 
 void SignProcessor::addImageToPdfFileInCoordinates(QString input_file, QString output_file, WordParams WordOptions, PDFParams PDFOptions, PDFCreator::orientation pdfPageOrientation, QString gerb_file, int &fileStatus)
@@ -764,8 +896,6 @@ void SignProcessor::addImageToPdfFileInCoordinates(QString input_file, QString o
     {
         qDebug() << "Не удалось создать PDF файл подписи!";
         log.addToLog("Не удалось создать PDF файл подписи!");
-//        emit newFileStatus(file, files_status::error_pdf_no_export);
-//        continue;
         fileStatus = files_status::error_pdf_no_export;
         return;
     }
@@ -780,8 +910,6 @@ void SignProcessor::addImageToPdfFileInCoordinates(QString input_file, QString o
         {
             qDebug() << "Не удалось создать герб PDF файл подписи!";
             log.addToLog("Не удалось создать герб PDF файл подписи!");
-//            emit newFileStatus(file, files_status::error_pdf_no_export);
-//            continue;
             fileStatus = files_status::error_pdf_no_export;
             return;
         }
@@ -797,8 +925,6 @@ void SignProcessor::addImageToPdfFileInCoordinates(QString input_file, QString o
         {
             qDebug() << "Не удалось объединить файлы" << input_file << simpleSignFile;
             log.addToLog("Не удалось объединить файлы " + input_file + " " + simpleSignFile);
-//            emit newFileStatus(file, files_status::error_pdf_no_export);
-//            continue;
             fileStatus = files_status::error_pdf_no_export;
             return;
         }
@@ -806,8 +932,6 @@ void SignProcessor::addImageToPdfFileInCoordinates(QString input_file, QString o
         {
             qDebug() << "Не удалось объединить файлы" << input_file << simpleSignFile;
             log.addToLog("Не удалось объединить файлы " + input_file + " " + simpleSignFile);
-//            emit newFileStatus(file, files_status::error_pdf_no_export);
-//            continue;
             fileStatus = files_status::error_pdf_no_export;
             return;
         }
@@ -823,8 +947,6 @@ void SignProcessor::addImageToPdfFileInCoordinates(QString input_file, QString o
         {
             qDebug() << "Не удалось объединить файлы" << input_file << simpleSignFile;
             log.addToLog("Не удалось объединить файлы " + input_file + " " + simpleSignFile);
-//            emit newFileStatus(file, files_status::error_pdf_no_export);
-//            continue;
             fileStatus = files_status::error_pdf_no_export;
             return;
         }
@@ -842,8 +964,6 @@ void SignProcessor::addImageToPdfFileInEndOfFile(QString input_file, QString out
     {
         qDebug() << "Произошла ошибка получения информации о PDF файле!";
         log.addToLog("Произошла ошибка получения информации о PDF файле!");
-//        emit newFileStatus(file, files_status::error_no_open);
-//        continue;
         fileStatus = files_status::error_no_open;
         return;
     }
@@ -867,8 +987,6 @@ void SignProcessor::addImageToPdfFileInEndOfFile(QString input_file, QString out
     {
         qDebug() << "Не удалось создать PDF файл подписи!";
         log.addToLog("Не удалось создать PDF файл подписи!");
-//        emit newFileStatus(file, files_status::error_pdf_no_export);
-//        continue;
         fileStatus = files_status::error_pdf_no_export;
         return;
     }
@@ -887,15 +1005,12 @@ void SignProcessor::addImageToPdfFileInEndOfFile(QString input_file, QString out
         {
             qDebug() << "Не удалось создать герб PDF файл подписи!";
             log.addToLog("Не удалось создать герб PDF файл подписи!");
-//            emit newFileStatus(file, files_status::error_pdf_no_export);
-//            continue;
             fileStatus = files_status::error_pdf_no_export;
             return;
         }
 
         // временный файл с подпиьсю + гербом
         tempSignFile = WordOptions.getTempdir() + "tempSignFile.pdf";
-//                AutoDeleter tempSignDirContol(simpleGerbFile); // автоматическое удаление файла
 
         // теперь с помощью QPDF объединяем файлы
         qpdf_cmd qpdf;
@@ -904,8 +1019,6 @@ void SignProcessor::addImageToPdfFileInEndOfFile(QString input_file, QString out
         {
             qDebug() << "Не удалось объединить файлы" << input_file << simpleSignFile;
             log.addToLog("Не удалось объединить файлы " + input_file + " " + simpleSignFile);
-//            emit newFileStatus(file, files_status::error_pdf_no_export);
-//            continue;
             fileStatus = files_status::error_pdf_no_export;
             return;
         }
@@ -925,8 +1038,6 @@ void SignProcessor::addImageToPdfFileInEndOfFile(QString input_file, QString out
             {
                 qDebug() << "Не удалось объединить (merge) файлы" << input_file << tempSignFile;
                 log.addToLog("Не удалось объединить (merge) файлы " + input_file + " " + tempSignFile);
-//                emit newFileStatus(file, files_status::error_pdf_no_export);
-//                continue;
                 fileStatus = files_status::error_pdf_no_export;
                 return;
             }
@@ -935,8 +1046,6 @@ void SignProcessor::addImageToPdfFileInEndOfFile(QString input_file, QString out
         {
             qDebug() << "Произошло увеличение количества страниц. Отменяем подпись.";
             log.addToLog("Произошло увеличение количества страниц. Отменяем подпись.");
-//            emit newFileStatus(file, files_status::error_new_page_no_added);
-//            continue;
             fileStatus = files_status::error_new_page_no_added;
             return;
         }
@@ -947,8 +1056,6 @@ void SignProcessor::addImageToPdfFileInEndOfFile(QString input_file, QString out
         {
             qDebug() << "Не удалось объединить (overlay) файлы" << input_file << tempSignFile;
             log.addToLog("Не удалось объединить (overlay) файлы " + input_file + " " + tempSignFile);
-//            emit newFileStatus(file, files_status::error_pdf_no_export);
-//            continue;
             fileStatus = files_status::error_pdf_no_export;
             return;
         }

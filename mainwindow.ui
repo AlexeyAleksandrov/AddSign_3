@@ -2749,6 +2749,32 @@ background-color: rgb(32, 74, 135);
              </layout>
             </widget>
            </item>
+           <item row="9" column="1">
+            <widget class="QGroupBox" name="groupBox_9">
+             <property name="title">
+              <string>Выбор обработчика</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_12">
+              <item row="0" column="0">
+               <widget class="QRadioButton" name="radioButton_com">
+                <property name="text">
+                 <string>COM</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QRadioButton" name="radioButton_poi">
+                <property name="text">
+                 <string>POI</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>

@@ -13,6 +13,7 @@
 #include "cryptopro_csp.h"
 #include "pdfcreator.h"
 #include "pdftopngconverter.h"
+#include "libpoi.h"
 
 class SignProcessor : public QObject
 {
@@ -90,6 +91,12 @@ public:
         insert_by_tag_in_table
     };
 
+    enum filesHandlers  // обработчики файлов
+    {
+        MS_COM,
+        APACHI_POI
+    };
+
 
     void setFilesList(const QList<FileForSign> &value);
     void setFilesList(const QStringList &files);
@@ -106,7 +113,7 @@ private:
     WordParams WordOptions;
     PDFParams PDFOptions;
     CryptoPROParams CryptoPROOptions;
-
+    int filesHendlerType = filesHandlers::MS_COM;   // тип обработчика файлов
 
 private:
     bool isExtension(QString file, QStringList filesExtensions);
@@ -150,6 +157,8 @@ private:
 
 public:
     bool *closing = nullptr;
+
+    void setFilesHendlerType(int newFilesHendlerType);
 
 private:
     logClass log;

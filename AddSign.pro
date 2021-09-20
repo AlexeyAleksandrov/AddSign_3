@@ -16,6 +16,7 @@ SOURCES += \
     exeleditor.cpp \
     files_status.cpp \
     imagetransformer.cpp \
+    libpoi.cpp \
     m_widget.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -36,6 +37,7 @@ HEADERS += \
     exeleditor.h \
     files_status.h \
     imagetransformer.h \
+    libpoi.h \
     m_widget.h \
     mainwindow.h \
     my_tablewidget.h \

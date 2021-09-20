@@ -447,6 +447,8 @@ void MainWindow::customConstructor()
     uisaver.add(ui->checkBox_createSubFolder);
     uisaver.add(ui->checkBox_signWordDocument);
     uisaver.add(ui->checkBox_subjectInfo);
+    uisaver.add(ui->checkBox_exportWordToPDF);
+    uisaver.add(ui->checkBox_signWordDocument);
 
     // составляем список lineEdit, колторые надо сохранить/загрузить
     uisaver.add(ui->lineEdit_wordDirectory);
@@ -469,16 +471,17 @@ void MainWindow::customConstructor()
     // добавляем mainWindow
     uisaver.add(this);
 
+
     // пресеты
     presets.add(ui->verticalSlider);
     presets.add(ui->horizontalSlider);
 
-    uisaver.add(ui->checkBox_exportWordToPDF);
-    uisaver.add(ui->checkBox_signWordDocument);
-
+    // радиобаттоны
     uisaver.addRb(ui->radioButton_usually_insert);
     uisaver.addRb(ui->radioButton_insert_in_exported_pdf);
     uisaver.addRb(ui->radioButton_signByTag);
+    uisaver.addRb(ui->radioButton_com);
+    uisaver.addRb(ui->radioButton_poi);
 
     ui->radioButton_runSourceFile->setChecked(true);  // по умолчанию ставим, чтобы запускался исходный файл
     reshowSidebar(); // прячем бокове меню
@@ -500,6 +503,23 @@ void MainWindow::on_pushButton_addsign_clicked()
         isClosing = true;
         log.addToLog("Прерывание обработки word");
 //        wordCancel = true;
+        isAutomationTesting = false;
+        return;
+    }
+
+    int filesHandlerType = -1;    // тип обработчика файлов
+    if(ui->radioButton_com->isChecked())
+    {
+        filesHandlerType = SignProcessor::filesHandlers::MS_COM;
+    }
+    else if(ui->radioButton_poi->isChecked())
+    {
+        filesHandlerType = SignProcessor::filesHandlers::APACHI_POI;
+    }
+    if(filesHandlerType == -1)
+    {
+        QMessageBox::warning(this, "Ошибка", "Вы не выбрали тип обработчика!");
+        log.addToLog("Ошибка, Вы не выбрали тип обработчика!");
         isAutomationTesting = false;
         return;
     }
@@ -610,6 +630,24 @@ void MainWindow::on_pushButton_addsign_clicked()
         return;
     }
 
+    QString pdftopng_dir = QDir::currentPath() + "/pdftopng/pdftopng.exe";
+    if(!QFile::exists(pdftopng_dir))
+    {
+        QMessageBox::warning(this, "Ошибка", "Ошибка! Файл pdftopng.exe не найден! + " + pdftopng_dir);
+        log.addToLog("Ошибка! Файл pdftopng.exe не найден! + " + pdftopng_dir);
+        isAutomationTesting = false;
+        return;
+    }
+
+    QString libpoi_dir = QDir::currentPath() + "/libpoi/libpoi.jar";
+    if(!QFile::exists(libpoi_dir))
+    {
+        QMessageBox::warning(this, "Ошибка", "Ошибка! Файл libpoi.jar не найден! + " + libpoi_dir);
+        log.addToLog("Ошибка! Файл libpoi.jar не найден! + " + libpoi_dir);
+        isAutomationTesting = false;
+        return;
+    }
+
     // === ПОДГОТОВКА К ЗАПУСКУ ===
 
     log.addToLog("Обработка превью превью в картинку");
@@ -683,6 +721,7 @@ void MainWindow::on_pushButton_addsign_clicked()
     processor.setPDFOptions(PDF_settings);
     processor.setCryptoPROOptions(CryptoPRO_settings);
     processor.setFilesList(listAddedFiles);
+    processor.setFilesHendlerType(filesHandlerType);
 
     connect(&processor, &SignProcessor::newFileStatus, this, &MainWindow::fileReady);
 
@@ -1547,7 +1586,7 @@ void MainWindow::automationTest_step_finished()
     for (auto &&file : addedfiles)
     {
         auto status = getFileStatus(file);  // получаем статус файла
-        if(status != files_status::no_errors && status != files_status::error_new_page_no_added)   // если статус файла сигнализирует об ошибке
+        if(status != files_status::no_errors && status != files_status::error_new_page_no_added && status != files_status::no_supported)   // если статус файла сигнализирует об ошибке
         {
             test_win = false;   // то ставим, что тест провален
             break;

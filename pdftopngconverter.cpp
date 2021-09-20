@@ -82,7 +82,15 @@ PDFToPNGConverter::PDFLastPageInfo PDFToPNGConverter::getLastLineInfo(QString fi
         }
     }
     QFile::remove(useImage);
-    return PDFLastPageInfo();
+    qDebug() << "Информация не была получена " << image.height() << image.width();
+    PDFLastPageInfo info;
+    info.width = image.width();
+    info.height = image.height();
+    info.lastLine = 0;  // ставим последнюю строку (верхнюю)
+    info.onNextPage = false;
+    info.offsetLine = 15;
+    if(ok != nullptr) *ok = true;
+    return info;
 
     // 118 - верхняя граница
     // 1608 - нижняя граница (без колонтитулов)
