@@ -10,11 +10,11 @@
 
 #define SETTINGS_PASSWORD "oozioozi21" // worker21
 #define SETTINGS_PASSWORD_RU "щщяшщщяш21" // worker21
-#define PROGRAM_INFORMATION "Версия программы: 3.6" \
+#define PROGRAM_INFORMATION "Версия программы: 3.9" \
 "\n\nРазработчики:\nАлександров А.С.\nБабуркина С.С.\n\n" \
 "Отдел обеспечения защиты информации и управления информатизации\n" \
 "РТУ МИРЭА - Российский Технологический Университет\n\n" \
-"Дата релиза: 04.09.2021"
+"Дата релиза: 22.09.2021"
 
 
 #define SHOW_MSG_DEBUG // РАЗКОММЕНТИРВОАТЬ ДЛЯ ДЕБАГА
@@ -124,6 +124,8 @@ MainWindow::MainWindow(QWidget *parent)
     CryptoPRO.setCryptoProDirectory("");
 //    auto sertificates = CryptoPRO.certmgr.getSertifactesList();
 //    cryptoSignListReady(sertificates); // обрабатываем полученные сертификаты
+
+    ui->groupBox_21->hide();    // шаблоны отвалились? Ну хрен с ними! Когда нибудь потом починим
 }
 
 MainWindow::~MainWindow()

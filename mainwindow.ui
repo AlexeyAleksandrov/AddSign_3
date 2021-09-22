@@ -507,7 +507,7 @@ QHeaderView::section{background-color: rgb(114, 159, 207)}
        <string notr="true"/>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_preview">
        <property name="styleSheet">
@@ -1978,98 +1978,7 @@ background-color: rgb(32, 74, 135);
            <string>Настройки подписи документов</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_20">
-           <item row="1" column="1">
-            <widget class="QGroupBox" name="groupBox_8">
-             <property name="font">
-              <font>
-               <family>MS Shell Dlg 2</family>
-               <pointsize>12</pointsize>
-               <weight>50</weight>
-               <italic>false</italic>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="title">
-              <string>Настройка фона</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_15">
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_18">
-                <property name="text">
-                 <string>Тип герба:</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignJustify|Qt::AlignVCenter</set>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="label_24">
-                <property name="text">
-                 <string>Отображение:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0" colspan="2">
-               <widget class="QLabel" name="label_19">
-                <property name="text">
-                 <string>Выберите настройки для подписи:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="label_23">
-                <property name="text">
-                 <string>Владелец подписи:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QComboBox" name="comboBox_choseImageGerb"/>
-              </item>
-              <item row="3" column="1">
-               <widget class="QComboBox" name="comboBox_signHost"/>
-              </item>
-              <item row="5" column="0" colspan="2">
-               <widget class="QCheckBox" name="checkBox_subjectInfo">
-                <property name="text">
-                 <string>Отображать субъект подписи вместо названия</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item row="5" column="0" colspan="2">
-            <spacer name="verticalSpacer_24">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="0" colspan="2">
-            <spacer name="verticalSpacer_22">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="2" column="0" colspan="2">
+           <item row="3" column="0" colspan="2">
             <widget class="QGroupBox" name="groupBox_6">
              <property name="font">
               <font>
@@ -2225,7 +2134,72 @@ background-color: rgb(32, 74, 135);
              </layout>
             </widget>
            </item>
-           <item row="4" column="0" colspan="2">
+           <item row="1" column="1">
+            <widget class="QGroupBox" name="groupBox_8">
+             <property name="font">
+              <font>
+               <family>MS Shell Dlg 2</family>
+               <pointsize>12</pointsize>
+               <weight>50</weight>
+               <italic>false</italic>
+               <bold>false</bold>
+              </font>
+             </property>
+             <property name="title">
+              <string>Настройка фона</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_15">
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_18">
+                <property name="text">
+                 <string>Тип герба:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_24">
+                <property name="text">
+                 <string>Отображение:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0" colspan="2">
+               <widget class="QLabel" name="label_19">
+                <property name="text">
+                 <string>Выберите настройки для подписи:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_23">
+                <property name="text">
+                 <string>Владелец подписи:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QComboBox" name="comboBox_choseImageGerb"/>
+              </item>
+              <item row="3" column="1">
+               <widget class="QComboBox" name="comboBox_signHost"/>
+              </item>
+              <item row="5" column="0" colspan="2">
+               <widget class="QCheckBox" name="checkBox_subjectInfo">
+                <property name="text">
+                 <string>Отображать субъект подписи вместо названия</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="5" column="0" colspan="2">
             <widget class="QGroupBox" name="groupBox_21">
              <property name="font">
               <font>
@@ -2374,7 +2348,20 @@ background-color: rgb(32, 74, 135);
              </layout>
             </widget>
            </item>
-           <item row="3" column="0">
+           <item row="6" column="0" colspan="2">
+            <spacer name="verticalSpacer_24">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="4" column="0">
             <spacer name="verticalSpacer_27">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -2430,6 +2417,32 @@ background-color: rgb(32, 74, 135);
               </item>
              </layout>
             </widget>
+           </item>
+           <item row="0" column="0" colspan="2">
+            <spacer name="verticalSpacer_22">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="2" column="0">
+            <spacer name="verticalSpacer_29">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
