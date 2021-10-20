@@ -573,10 +573,11 @@ void MainWindow::on_pushButton_addsign_clicked()
         isAutomationTesting = false;
         return;
     }
-    auto sertList = CryptoPRO.certmgr.getSertifactesList();
+    auto sertList = CryptoPRO.certmgr.getSertifactesList(); // получаем сертификаты в текущий момет времени для проверки, т.к. после момента запуска программы, сертификаты в хранилище могут быть изменены
     if(sertList.size() <= ui->comboBox->currentIndex() || ui->comboBox->currentIndex() < 0)
     {
         QMessageBox::warning(this, "Ошибка", "Ошибка соответствия сертификата.\nПопробуйте перезагрузить список сертификатов.");
+        log.addToLog("Что-то не так с хранилищем сертификатов!!");
         isAutomationTesting = false;
         return;
     }
@@ -585,6 +586,7 @@ void MainWindow::on_pushButton_addsign_clicked()
     {
         QMessageBox::warning(this, "Ошибка", "Ошибка соответствия сертификата.\nПопробуйте перезагрузить список сертификатов.");
         isAutomationTesting = false;
+        log.addToLog("Номер сертификата не соответсвует тому, который был получен ранее!!");
         return;
     }
 
