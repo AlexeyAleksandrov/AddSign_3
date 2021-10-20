@@ -13,6 +13,7 @@ CONFIG += c++11
 
 SOURCES += \
     cryptopro_csp.cpp \
+    dialogsearchsertificate.cpp \
     exeleditor.cpp \
     files_status.cpp \
     imagetransformer.cpp \
@@ -34,6 +35,7 @@ SOURCES += \
 
 HEADERS += \
     cryptopro_csp.h \
+    dialogsearchsertificate.h \
     exeleditor.h \
     files_status.h \
     imagetransformer.h \
@@ -53,6 +55,7 @@ HEADERS += \
     logclass.h
 
 FORMS += \
+    dialogsearchsertificate.ui \
     mainwindow.ui
 
 # Default rules for deployment.

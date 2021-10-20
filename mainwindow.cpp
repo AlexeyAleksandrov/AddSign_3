@@ -10,11 +10,11 @@
 
 #define SETTINGS_PASSWORD "oozioozi21" // worker21
 #define SETTINGS_PASSWORD_RU "щщяшщщяш21" // worker21
-#define PROGRAM_INFORMATION "Версия программы: 3.9" \
+#define PROGRAM_INFORMATION "Версия программы: 4.0" \
 "\n\nРазработчики:\nАлександров А.С.\nБабуркина С.С.\n\n" \
 "Отдел обеспечения защиты информации и управления информатизации\n" \
 "РТУ МИРЭА - Российский Технологический Университет\n\n" \
-"Дата релиза: 22.09.2021"
+"Дата релиза: 20.10.2021"
 
 
 #define SHOW_MSG_DEBUG // РАЗКОММЕНТИРВОАТЬ ДЛЯ ДЕБАГА
@@ -2474,3 +2474,30 @@ void MainWindow::on_checkBox_automationTest_useAll_stateChanged(int arg1)
     }
 }
 
+
+void MainWindow::on_pushButton_findSertificate_clicked()
+{
+    DialogSearchSertificate dialog;
+    dialog.setAllSertificatesList(sertificatesList);
+    dialog.updateSearchedSerts();    // обновляем сертификаты при запуске
+    dialog.exec();
+//    qDebug() << " Выбранный сертификат: " + dialog.getChosedSertificate().toString() + "\r\n";
+//    int chosedSertNumber = dialog.getCurrentSertificateNumber();
+//    if(chosedSertNumber != -1)
+//    {
+//        ui->comboBox->setCurrentIndex(chosedSertNumber);
+//    }
+//    int index = sertificatesList.indexOf(dialog.getChosedSertificate());
+    auto chosedSert = dialog.getChosedSertificate();
+//    qDebug() << "Выбранный сертификат: " << chosedSert.toString();
+//    int index = -1;
+    for (int i=0; i<sertificatesList.size(); i++)   // находим индекс того сертификата, который выбрал пользователь
+    {
+        auto sert = sertificatesList.at(i);
+        if(sert.serial == chosedSert.serial)
+        {
+            ui->comboBox->setCurrentIndex(i);
+            break;
+        }
+    }
+}

@@ -30,6 +30,7 @@
 #include <imagetransformer.h>
 #include "uipreset.h"
 #include <signprocessor.h>
+#include "dialogsearchsertificate.h"
 
 //#define DEBUGGING
 //#define INSERT_IN_CENTER
@@ -360,5 +361,6 @@ private slots:
 //    void on_radioButton_signByTag_clicked();
     void on_radioButton_signByTag_clicked(bool checked);
     void on_checkBox_automationTest_useAll_stateChanged(int arg1);
+    void on_pushButton_findSertificate_clicked();
 };
 #endif // MAINWINDOW_H
