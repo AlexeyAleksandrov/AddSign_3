@@ -591,11 +591,6 @@ void MainWindow::on_pushButton_addsign_clicked()
     }
 
     log.addToLog("CurrentSign = " + currentSign.toString());
-    for (int i=0; i<sertList.size(); i++)
-    {
-        auto sertVal = sertList.at(i);
-        log.addToLog("Сертификат " + QString::number(i) + ": " + sertVal.toString());
-    }
 
     bool containsWordFiles = false;
     bool containsPDFFiles = false;

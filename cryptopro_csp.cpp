@@ -79,6 +79,7 @@ QString CryptoPRO_CSP::s_certmgr::getConsoleText(QStringList options)
             QTextCodec *codec = QTextCodec::codecForName("IBM 866");
             QString dirout =  codec->toUnicode(certmgr_process.readLine());
             outText.append(dirout);
+            log.addToLog("line = " + dirout);
         }
         consoleText.append(outText);
     }
@@ -91,6 +92,7 @@ QString CryptoPRO_CSP::s_certmgr::getConsoleText(QStringList options)
     }
 
     log.addToLog("Текст certmgr получен");
+    log.addToLog("Полученный текст: " + consoleText);
     return consoleText;
 }
 
@@ -98,6 +100,15 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
 {
     log.addToLog("Запускаем процесс получения списка подписей");
     QString cmd_out = getConsoleText(QStringList() << "-list" << "-store" << "uMy");
+//    QString cmd_out;
+//    QFile filecmdout("C:/Users/ASUS/Desktop/cmd_out.txt");
+//    filecmdout.open(QIODevice::ReadOnly);
+//    while (!filecmdout.atEnd())
+//    {
+//        QString line = filecmdout.readLine();
+//        cmd_out.append(line);
+//    }
+
     if(cmd_out == "")
     {
         return QList<CryptoSignData>(); // возвращаем пустоту
@@ -109,6 +120,7 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
         if((block.contains("Subject") && block.contains("Serial") && block.contains("Not valid before") && block.contains("Not valid after")) ||
                 (block.contains("Субъект") && block.contains("Серийный номер") && block.contains("Выдан") && block.contains("Истекает")))
         {
+            log.addToLog("Обрабатываем блок: " + block);
             CryptoSignData SignCMD;
             QString host_name_and_patronymic = "";
             QString host_surname = "";
@@ -207,7 +219,29 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
             }
             if(!SignCMD.name.isEmpty() && !SignCMD.email.isEmpty()) // если данные есть
             {
-                SignsList.append(SignCMD); // добавляем в общий список
+                bool contains = false;
+                for(auto &&sign : SignsList)
+                {
+                    if(sign.serial == SignCMD.serial)
+                    {
+                        contains = true;
+                        break;
+                    }
+                }
+                if(contains)
+                {
+                    log.addToLog("WARNING: Данный сертификат уже существует! Добавление в список невозможно! Сертификат: " + SignCMD.toString());
+                }
+                else
+                {
+                    SignsList.append(SignCMD); // добавляем в общий список
+                    log.addToLog("Добавляем подпись в список: " + QString::number(SignsList.size()) + " - " + SignCMD.toString());
+                }
+
+            }
+            else
+            {
+                log.addToLog("WARNING: Сертификат не был добавлен в список, т.к. он не имеет названия, либо emqil. Данные о сертфикате: " + SignCMD.toString());
             }
 
         }
@@ -223,6 +257,11 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
         sign.index = getSignIndex(SignsList, sign); // получаем информацию об индексе
     }
     log.addToLog("Список подписей сформирован");
+    for (int i=0; i<SignsList.size(); i++)
+    {
+        auto sertVal = SignsList.at(i);
+        log.addToLog("Сертификат " + QString::number(i) + ": " + sertVal.toString());
+    }
     return SignsList;
 }
 
