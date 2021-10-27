@@ -79,7 +79,7 @@ QString CryptoPRO_CSP::s_certmgr::getConsoleText(QStringList options)
             QTextCodec *codec = QTextCodec::codecForName("IBM 866");
             QString dirout =  codec->toUnicode(certmgr_process.readLine());
             outText.append(dirout);
-            log.addToLog("line = " + dirout);
+//            log.addToLog("line = " + dirout);
         }
         consoleText.append(outText);
     }
@@ -92,7 +92,7 @@ QString CryptoPRO_CSP::s_certmgr::getConsoleText(QStringList options)
     }
 
     log.addToLog("Текст certmgr получен");
-    log.addToLog("Полученный текст: " + consoleText);
+//    log.addToLog("Полученный текст: " + consoleText);
     return consoleText;
 }
 
@@ -120,7 +120,7 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
         if((block.contains("Subject") && block.contains("Serial") && block.contains("Not valid before") && block.contains("Not valid after")) ||
                 (block.contains("Субъект") && block.contains("Серийный номер") && block.contains("Выдан") && block.contains("Истекает")))
         {
-            log.addToLog("Обрабатываем блок: " + block);
+//            log.addToLog("Обрабатываем блок: " + block);
             CryptoSignData SignCMD;
             QString host_name_and_patronymic = "";
             QString host_surname = "";
@@ -230,18 +230,18 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
                 }
                 if(contains)
                 {
-                    log.addToLog("WARNING: Данный сертификат уже существует! Добавление в список невозможно! Сертификат: " + SignCMD.toString());
+//                    log.addToLog("WARNING: Данный сертификат уже существует! Добавление в список невозможно! Сертификат: " + SignCMD.toString());
                 }
                 else
                 {
                     SignsList.append(SignCMD); // добавляем в общий список
-                    log.addToLog("Добавляем подпись в список: " + QString::number(SignsList.size()) + " - " + SignCMD.toString());
+//                    log.addToLog("Добавляем подпись в список: " + QString::number(SignsList.size()) + " - " + SignCMD.toString());
                 }
 
             }
             else
             {
-                log.addToLog("WARNING: Сертификат не был добавлен в список, т.к. он не имеет названия, либо emqil. Данные о сертфикате: " + SignCMD.toString());
+//                log.addToLog("WARNING: Сертификат не был добавлен в список, т.к. он не имеет названия, либо emqil. Данные о сертфикате: " + SignCMD.toString());
             }
 
         }
