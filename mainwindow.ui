@@ -276,6 +276,7 @@
 color: rgb(32, 74, 135);
 background-color: rgb(114, 159, 207);
 font: 12pt &quot;MS Shell Dlg 2&quot;;
+
 }
 
 QPushButton#pushButton_addsign{
@@ -366,7 +367,7 @@ QHeaderView::section{background-color: rgb(114, 159, 207)}
          <x>0</x>
          <y>0</y>
          <width>178</width>
-         <height>830</height>
+         <height>851</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_6">

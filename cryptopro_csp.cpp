@@ -3,15 +3,9 @@
 #include <QFile>
 #include <QTextCodec>
 
-#if QT_VERSION >= 0x050f00 // версия Qt 5.15.2
-    #define SPLITTER Qt::SplitBehavior(Qt::SkipEmptyParts)
-#else
-    #define SPLITTER QString::SkipEmptyParts
-#endif
-
 CryptoPRO_CSP::CryptoPRO_CSP(QObject *parent) : QObject(parent)
 {
-    CryptoProDirectory = "C:/Program Files/Crypto Pro/CSP/";
+    CryptoProDirectory = CRYPTO_PRO_DIRECTORY;
 }
 
 void CryptoPRO_CSP::setCryptoProDirectory(const QString &value)
@@ -19,7 +13,7 @@ void CryptoPRO_CSP::setCryptoProDirectory(const QString &value)
     CryptoProDirectory = value;
     if(value == "")
     {
-        CryptoProDirectory = "C:/Program Files/Crypto Pro/CSP/";
+        CryptoProDirectory = CRYPTO_PRO_DIRECTORY;
     }
     if(!value.endsWith("/") && !value.endsWith("\\"))
     {
@@ -54,7 +48,7 @@ QString CryptoPRO_CSP::s_certmgr::getConsoleText(QStringList options)
     QProcess certmgr_process;
     certmgr_process.setReadChannel(QProcess::StandardOutput);
 
-//    qDebug() << "runfile = " << runfile;
+    qDebug() << "runfile = " << runfile;
     certmgr_process.start(this->runfile, options); // запускаем процесс
     QString consoleText;
     if(!certmgr_process.waitForStarted())
@@ -76,7 +70,11 @@ QString CryptoPRO_CSP::s_certmgr::getConsoleText(QStringList options)
         }
         while(certmgr_process.bytesAvailable())
         {
+#ifdef _WIN32
             QTextCodec *codec = QTextCodec::codecForName("IBM 866");
+#elif __linux__
+            QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+#endif
             QString dirout =  codec->toUnicode(certmgr_process.readLine());
             outText.append(dirout);
 //            log.addToLog("line = " + dirout);
@@ -93,6 +91,7 @@ QString CryptoPRO_CSP::s_certmgr::getConsoleText(QStringList options)
 
     log.addToLog("Текст certmgr получен");
 //    log.addToLog("Полученный текст: " + consoleText);
+//    qDebug() << "consoleText = " << consoleText;
     return consoleText;
 }
 
@@ -114,20 +113,26 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
         return QList<CryptoSignData>(); // возвращаем пустоту
     }
     QStringList cmdBlocksList = cmd_out.split((QString)"----", SPLITTER);
+    for(auto && block : cmdBlocksList)
+    {
+        qDebug() << "block = " << block;
+    }
+    log.addToLog("cmd_out = " + cmd_out);
     QList<CryptoSignData> SignsList; // список подписей
     for(auto &&block : cmdBlocksList) // рзбиваем на блоки, которые представляют из себя подписи (это строки между 1------ и 2----- и т.д.
     {
         if((block.contains("Subject") && block.contains("Serial") && block.contains("Not valid before") && block.contains("Not valid after")) ||
                 (block.contains("Субъект") && block.contains("Серийный номер") && block.contains("Выдан") && block.contains("Истекает")))
         {
-//            log.addToLog("Обрабатываем блок: " + block);
+            log.addToLog("Обрабатываем блок: " + block);
             CryptoSignData SignCMD;
             QString host_name_and_patronymic = "";
             QString host_surname = "";
-            QStringList cmdLinesList = block.split("\r\n", SPLITTER);
+            QStringList cmdLinesList = block.split(SPLITTER_NEW_LINE, SPLITTER);
             for(auto &&line : cmdLinesList)
             {
                 // ФИО + e-mail
+                log.addToLog("Обрабатываем строку: " + line);
                 if(line.contains("Subject") || line.contains("Субъект"))
                 {
                     QString subline = line.remove("Subject             : ");
@@ -256,7 +261,7 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
     {
         sign.index = getSignIndex(SignsList, sign); // получаем информацию об индексе
     }
-    log.addToLog("Список подписей сформирован");
+    log.addToLog("Список подписей сформирован. Количество: " + QString::number(SignsList.size()));
     for (int i=0; i<SignsList.size(); i++)
     {
         auto sertVal = SignsList.at(i);

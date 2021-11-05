@@ -1,7 +1,7 @@
 #ifndef WORDEDITOR_H
 #define WORDEDITOR_H
 
-#ifdef WIN32
+
 #include <QObject>
 #ifdef WIN32
 #include <QAxObject>
@@ -161,5 +161,4 @@ private:
 
 
 };
-#endif
 #endif // WORDEDITOR_H
