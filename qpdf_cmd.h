@@ -7,6 +7,12 @@
 
 #include "logclass.h"
 
+#ifdef __linux__
+    #define QPDF_DIRECTORY "/qpdf/qpdf"
+#elif _WIN32
+    #define QPDF_DIRECTORY "/qpdf/qpdf.exe"
+#endif
+
 class qpdf_cmd : public QObject
 {
     Q_OBJECT

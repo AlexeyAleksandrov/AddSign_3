@@ -627,7 +627,7 @@ void MainWindow::on_pushButton_addsign_clicked()
         }
     }
 
-    QString qpdf_dir = QDir::currentPath() + "/qpdf/qpdf.exe";
+    QString qpdf_dir = QDir::currentPath() + QPDF_DIRECTORY;
     if(!QFile::exists(qpdf_dir))
     {
         QMessageBox::warning(this, "Ошибка", "Ошибка! Файл qpdf.exe не найден! + " + qpdf_dir);
@@ -636,7 +636,7 @@ void MainWindow::on_pushButton_addsign_clicked()
         return;
     }
 
-    QString pdftopng_dir = QDir::currentPath() + "/pdftopng/pdftopng.exe";
+    QString pdftopng_dir = QDir::currentPath() + PDFTOPNG_DIRECTORY;
     if(!QFile::exists(pdftopng_dir))
     {
         QMessageBox::warning(this, "Ошибка", "Ошибка! Файл pdftopng.exe не найден! + " + pdftopng_dir);
@@ -645,6 +645,7 @@ void MainWindow::on_pushButton_addsign_clicked()
         return;
     }
 
+#ifdef _WIN32
     QString libpoi_dir = QDir::currentPath() + "/libpoi/libpoi.jar";
     if(!QFile::exists(libpoi_dir))
     {
@@ -653,6 +654,7 @@ void MainWindow::on_pushButton_addsign_clicked()
         isAutomationTesting = false;
         return;
     }
+#endif
 
     // === ПОДГОТОВКА К ЗАПУСКУ ===
 

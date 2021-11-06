@@ -113,10 +113,10 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
         return QList<CryptoSignData>(); // возвращаем пустоту
     }
     QStringList cmdBlocksList = cmd_out.split((QString)"----", SPLITTER);
-    for(auto && block : cmdBlocksList)
-    {
-        qDebug() << "block = " << block;
-    }
+//    for(auto && block : cmdBlocksList)
+//    {
+//        qDebug() << "block = " << block;
+//    }
     log.addToLog("cmd_out = " + cmd_out);
     QList<CryptoSignData> SignsList; // список подписей
     for(auto &&block : cmdBlocksList) // рзбиваем на блоки, которые представляют из себя подписи (это строки между 1------ и 2----- и т.д.
@@ -273,13 +273,25 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
 void CryptoPRO_CSP::s_certmgr::setCryptoProDirectory(const QString &value)
 {
     runfile = value + runfile;
+    qDebug() << "s_certmgr runfile = " << runfile;
 }
 
 bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSignData sign)
 {
     log.addToLog("Запускатся процесс подписи файла " + file);
+
+    qDebug() << "sign runfile = " << runfile << " csptest = " << CRYPTO_PRO_DIRECTORY;
+    QStringList params = QStringList() << file << QString::number(sign.index) << sign.email;
+
+#ifdef _WIN32
     QFile csptest_bat_file(QDir::currentPath() + "/csptest_bat.bat");
     QString bat_text = QString("echo %2 | \"") + runfile + QString("\" -sfsign -sign -detached -add -in %1 -out %1.sig -my %3"); // универсальный текст батника
+#elif __linux__
+    QFile csptest_bat_file(QDir::currentPath() + "/csptest_bat.sh");
+    QString bat_text = QString("echo %2 | \"") + runfile + QString("\" -sfsign -sign -detached -add -in \"%1\" -out \"%1.sig\" -my %3"); // универсальный текст батника
+    bat_text = bat_text.arg(params.at(0)).arg(params.at(1)).arg(params.at(2));
+#endif
+
 
     csptest_bat_file.open(QIODevice::WriteOnly);
     csptest_bat_file.write(bat_text.toUtf8()); // создаём батник
@@ -288,7 +300,7 @@ bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSig
     QString filebatDir = csptest_bat_file.fileName();
     if(!QFile::exists(filebatDir))
     {
-        qDebug() << "Файл не найден " << filebatDir;
+        qDebug() << "File not found" << filebatDir;
         log.addToLog("Файл не найден " + filebatDir);
         return false;
     }
@@ -298,7 +310,7 @@ bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSig
 
     if(!QFile::exists(file))
     {
-        qDebug() << "Файл для подписи не найден " + file;
+        qDebug() << "File for sign not found " + file;
         log.addToLog("Файл для подписи не найден " + file);
         return false;
     }
@@ -307,8 +319,11 @@ bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSig
 //        sigFile.remove(); // удаляем sig файл, если таковой уже имеется
 //    }
 
-    QStringList params = QStringList() << file << QString::number(sign.index) << sign.email;
+#ifdef _WIN32
     csptest_bat.start(csptest_bat_file.fileName(), params); // запускаем батник с параметрами
+#elif __linux__
+    csptest_bat.start(csptest_bat_file.fileName(), QStringList()); // запускаем батник
+#endif
     if (!csptest_bat.waitForStarted())
     {
         qDebug() << "The process didnt start" << csptest_bat.error();
@@ -336,11 +351,13 @@ bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSig
     QFile sigFile(file + ".sig");
     if(sigFile.exists() && cmd_out.contains("[ErrorCode: 0x00000000]")) //  && cmd_out.contains("[ErrorCode: 0x00000000]")
     {
+        qDebug() << "Singature succesfull created " + sigFile.fileName();
         log.addToLog("Подпись успешно создана " + sigFile.fileName());
         return true;
     }
     else
     {
+        qDebug() << "Failed to create singature - file not found " + sigFile.fileName();
         log.addToLog("Не удалось создать подпись - файл не найден " + sigFile.fileName());
         return false;
     }
@@ -349,4 +366,5 @@ bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSig
 void CryptoPRO_CSP::s_csptest::setCryptoProDirectory(const QString &value)
 {
     runfile = value + runfile;
+    qDebug() << "s_csptest runfile = " << runfile;
 }

@@ -9,7 +9,7 @@
 #include "logclass.h"
 
 #ifdef __linux__
-    #define CRYPTO_PRO_DIRECTORY "/opt/cprocsp/bin/amd64"
+    #define CRYPTO_PRO_DIRECTORY "/opt/cprocsp/bin/amd64/"
     #define CERTMGR "certmgr"
     #define CSPTEST "csptest"
     #define SPLITTER_NEW_LINE "\n"
