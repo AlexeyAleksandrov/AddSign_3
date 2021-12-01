@@ -575,6 +575,7 @@ QString SignProcessor::getDir(QString dir)
 
 void SignProcessor::standartAddImageToWordFile(FileForSign &file, QString tempFile, QString imagedir, WordParams WordOptions, int &fileStatus, bool &movedToNextPage)
 {
+    #ifdef WIN32
     if(filesHendlerType == MS_COM)
     {
         WordEditor word; // создаем обработчик ворда
@@ -616,7 +617,9 @@ void SignProcessor::standartAddImageToWordFile(FileForSign &file, QString tempFi
         assert(word.saveDocument(), "saveDocument"); // сохраняем
         word.closeDocument(); // закрываем
     }
-    else if (filesHendlerType == APACHI_POI)
+    else
+#endif
+        if (filesHendlerType == APACHI_POI)
     {
         if(!file.sourceFile.endsWith(".docx"))
         {

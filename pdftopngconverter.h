@@ -8,6 +8,12 @@
 #include <QImage>
 #include <qdebug.h>
 
+#ifdef __linux__
+    #define PDFTOPNG_DIRECTORY "/pdftopng/pdftopng"
+#elif _WIN32
+    #define PDFTOPNG_DIRECTORY "/pdftopng/pdftopng.exe"
+#endif
+
 class PDFToPNGConverter : public QObject
 {
     Q_OBJECT

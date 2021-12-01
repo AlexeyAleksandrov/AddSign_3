@@ -3,15 +3,9 @@
 #include <QFile>
 #include <QTextCodec>
 
-#if QT_VERSION >= 0x050f00 // версия Qt 5.15.2
-    #define SPLITTER Qt::SplitBehavior(Qt::SkipEmptyParts)
-#else
-    #define SPLITTER QString::SkipEmptyParts
-#endif
-
 CryptoPRO_CSP::CryptoPRO_CSP(QObject *parent) : QObject(parent)
 {
-    CryptoProDirectory = "C:/Program Files/Crypto Pro/CSP/";
+    CryptoProDirectory = CRYPTO_PRO_DIRECTORY;
 }
 
 void CryptoPRO_CSP::setCryptoProDirectory(const QString &value)
@@ -19,7 +13,7 @@ void CryptoPRO_CSP::setCryptoProDirectory(const QString &value)
     CryptoProDirectory = value;
     if(value == "")
     {
-        CryptoProDirectory = "C:/Program Files/Crypto Pro/CSP/";
+        CryptoProDirectory = CRYPTO_PRO_DIRECTORY;
     }
     if(!value.endsWith("/") && !value.endsWith("\\"))
     {
@@ -54,7 +48,7 @@ QString CryptoPRO_CSP::s_certmgr::getConsoleText(QStringList options)
     QProcess certmgr_process;
     certmgr_process.setReadChannel(QProcess::StandardOutput);
 
-//    qDebug() << "runfile = " << runfile;
+    qDebug() << "runfile = " << runfile;
     certmgr_process.start(this->runfile, options); // запускаем процесс
     QString consoleText;
     if(!certmgr_process.waitForStarted())
@@ -76,9 +70,14 @@ QString CryptoPRO_CSP::s_certmgr::getConsoleText(QStringList options)
         }
         while(certmgr_process.bytesAvailable())
         {
+#ifdef _WIN32
             QTextCodec *codec = QTextCodec::codecForName("IBM 866");
+#elif __linux__
+            QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+#endif
             QString dirout =  codec->toUnicode(certmgr_process.readLine());
             outText.append(dirout);
+//            log.addToLog("line = " + dirout);
         }
         consoleText.append(outText);
     }
@@ -91,6 +90,8 @@ QString CryptoPRO_CSP::s_certmgr::getConsoleText(QStringList options)
     }
 
     log.addToLog("Текст certmgr получен");
+//    log.addToLog("Полученный текст: " + consoleText);
+//    qDebug() << "consoleText = " << consoleText;
     return consoleText;
 }
 
@@ -98,24 +99,40 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
 {
     log.addToLog("Запускаем процесс получения списка подписей");
     QString cmd_out = getConsoleText(QStringList() << "-list" << "-store" << "uMy");
+//    QString cmd_out;
+//    QFile filecmdout("C:/Users/ASUS/Desktop/cmd_out.txt");
+//    filecmdout.open(QIODevice::ReadOnly);
+//    while (!filecmdout.atEnd())
+//    {
+//        QString line = filecmdout.readLine();
+//        cmd_out.append(line);
+//    }
+
     if(cmd_out == "")
     {
         return QList<CryptoSignData>(); // возвращаем пустоту
     }
     QStringList cmdBlocksList = cmd_out.split((QString)"----", SPLITTER);
+//    for(auto && block : cmdBlocksList)
+//    {
+//        qDebug() << "block = " << block;
+//    }
+    log.addToLog("cmd_out = " + cmd_out);
     QList<CryptoSignData> SignsList; // список подписей
     for(auto &&block : cmdBlocksList) // рзбиваем на блоки, которые представляют из себя подписи (это строки между 1------ и 2----- и т.д.
     {
         if((block.contains("Subject") && block.contains("Serial") && block.contains("Not valid before") && block.contains("Not valid after")) ||
                 (block.contains("Субъект") && block.contains("Серийный номер") && block.contains("Выдан") && block.contains("Истекает")))
         {
+            log.addToLog("Обрабатываем блок: " + block);
             CryptoSignData SignCMD;
             QString host_name_and_patronymic = "";
             QString host_surname = "";
-            QStringList cmdLinesList = block.split("\r\n", SPLITTER);
+            QStringList cmdLinesList = block.split(SPLITTER_NEW_LINE, SPLITTER);
             for(auto &&line : cmdLinesList)
             {
                 // ФИО + e-mail
+                log.addToLog("Обрабатываем строку: " + line);
                 if(line.contains("Subject") || line.contains("Субъект"))
                 {
                     QString subline = line.remove("Subject             : ");
@@ -207,7 +224,29 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
             }
             if(!SignCMD.name.isEmpty() && !SignCMD.email.isEmpty()) // если данные есть
             {
-                SignsList.append(SignCMD); // добавляем в общий список
+                bool contains = false;
+                for(auto &&sign : SignsList)
+                {
+                    if(sign.serial == SignCMD.serial)
+                    {
+                        contains = true;
+                        break;
+                    }
+                }
+                if(contains)
+                {
+//                    log.addToLog("WARNING: Данный сертификат уже существует! Добавление в список невозможно! Сертификат: " + SignCMD.toString());
+                }
+                else
+                {
+                    SignsList.append(SignCMD); // добавляем в общий список
+//                    log.addToLog("Добавляем подпись в список: " + QString::number(SignsList.size()) + " - " + SignCMD.toString());
+                }
+
+            }
+            else
+            {
+//                log.addToLog("WARNING: Сертификат не был добавлен в список, т.к. он не имеет названия, либо emqil. Данные о сертфикате: " + SignCMD.toString());
             }
 
         }
@@ -222,20 +261,37 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
     {
         sign.index = getSignIndex(SignsList, sign); // получаем информацию об индексе
     }
-    log.addToLog("Список подписей сформирован");
+    log.addToLog("Список подписей сформирован. Количество: " + QString::number(SignsList.size()));
+    for (int i=0; i<SignsList.size(); i++)
+    {
+        auto sertVal = SignsList.at(i);
+        log.addToLog("Сертификат " + QString::number(i) + ": " + sertVal.toString());
+    }
     return SignsList;
 }
 
 void CryptoPRO_CSP::s_certmgr::setCryptoProDirectory(const QString &value)
 {
     runfile = value + runfile;
+    qDebug() << "s_certmgr runfile = " << runfile;
 }
 
 bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSignData sign)
 {
     log.addToLog("Запускатся процесс подписи файла " + file);
+
+    qDebug() << "sign runfile = " << runfile << " csptest = " << CRYPTO_PRO_DIRECTORY;
+    QStringList params = QStringList() << file << QString::number(sign.index) << sign.email;
+
+#ifdef _WIN32
     QFile csptest_bat_file(QDir::currentPath() + "/csptest_bat.bat");
     QString bat_text = QString("echo %2 | \"") + runfile + QString("\" -sfsign -sign -detached -add -in %1 -out %1.sig -my %3"); // универсальный текст батника
+#elif __linux__
+    QFile csptest_bat_file(QDir::currentPath() + "/csptest_bat.sh");
+    QString bat_text = QString("echo %2 | \"") + runfile + QString("\" -sfsign -sign -detached -add -in \"%1\" -out \"%1.sig\" -my %3"); // универсальный текст батника
+    bat_text = bat_text.arg(params.at(0)).arg(params.at(1)).arg(params.at(2));
+#endif
+
 
     csptest_bat_file.open(QIODevice::WriteOnly);
     csptest_bat_file.write(bat_text.toUtf8()); // создаём батник
@@ -244,7 +300,7 @@ bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSig
     QString filebatDir = csptest_bat_file.fileName();
     if(!QFile::exists(filebatDir))
     {
-        qDebug() << "Файл не найден " << filebatDir;
+        qDebug() << "File not found" << filebatDir;
         log.addToLog("Файл не найден " + filebatDir);
         return false;
     }
@@ -254,7 +310,7 @@ bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSig
 
     if(!QFile::exists(file))
     {
-        qDebug() << "Файл для подписи не найден " + file;
+        qDebug() << "File for sign not found " + file;
         log.addToLog("Файл для подписи не найден " + file);
         return false;
     }
@@ -263,8 +319,11 @@ bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSig
 //        sigFile.remove(); // удаляем sig файл, если таковой уже имеется
 //    }
 
-    QStringList params = QStringList() << file << QString::number(sign.index) << sign.email;
+#ifdef _WIN32
     csptest_bat.start(csptest_bat_file.fileName(), params); // запускаем батник с параметрами
+#elif __linux__
+    csptest_bat.start(csptest_bat_file.fileName(), QStringList()); // запускаем батник
+#endif
     if (!csptest_bat.waitForStarted())
     {
         qDebug() << "The process didnt start" << csptest_bat.error();
@@ -292,11 +351,13 @@ bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSig
     QFile sigFile(file + ".sig");
     if(sigFile.exists() && cmd_out.contains("[ErrorCode: 0x00000000]")) //  && cmd_out.contains("[ErrorCode: 0x00000000]")
     {
+        qDebug() << "Singature succesfull created " + sigFile.fileName();
         log.addToLog("Подпись успешно создана " + sigFile.fileName());
         return true;
     }
     else
     {
+        qDebug() << "Failed to create singature - file not found " + sigFile.fileName();
         log.addToLog("Не удалось создать подпись - файл не найден " + sigFile.fileName());
         return false;
     }
@@ -305,4 +366,5 @@ bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSig
 void CryptoPRO_CSP::s_csptest::setCryptoProDirectory(const QString &value)
 {
     runfile = value + runfile;
+    qDebug() << "s_csptest runfile = " << runfile;
 }

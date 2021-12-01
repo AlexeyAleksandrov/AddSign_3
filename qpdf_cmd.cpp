@@ -2,7 +2,7 @@
 
 qpdf_cmd::qpdf_cmd(QObject *parent) : QObject(parent)
 {
-    QString qpdfFile = QDir::currentPath() + "/qpdf/qpdf.exe";
+    QString qpdfFile = QDir::currentPath() + QPDF_DIRECTORY;
     if(QFile::exists(qpdfFile))
     {
         this->qpdfPath = qpdfFile;

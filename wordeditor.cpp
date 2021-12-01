@@ -1,5 +1,5 @@
 #include "wordeditor.h"
-#ifdef WIN32
+
 #define checkAxObject(pointer, object_name)  if(pointer==nullptr) { qDebug() << "Нет данных " + QString(object_name); throw QString("AxObject Error: ") + object_name;  return false; } else { QObject::connect(pointer, SIGNAL(exception(int,QString,QString,QString)), this, SLOT(exception(int,QString,QString,QString))); pointer->setObjectName(object_name); }
 #define checkNullPointer(pointer, texterror) if(pointer == nullptr) { qDebug() << texterror << " is nullptr"; throw QString("NullPointer Error: ") + texterror;  return false; }
 
@@ -485,42 +485,52 @@ bool WordEditor::wordQuit()
 #endif
 }
 
+#ifdef WIN32
 QAxObject *WordEditor::getWord() const
 {
     return word;
 }
+#endif
 
 void WordEditor::exception(int code, QString source, QString desc, QString help)
 {
     qDebug() << "EXCEPTION: " << "Sender: " + sender()->objectName() << "code: " << code << "Source: " + source << "Desc: " +  desc << "Help: " + help;
 }
 
+#ifdef WIN32
 WordEditor::WordTables::WordTables(QAxObject *tables)
 {
     this->tables = tables;
 }
+#endif
 
 int WordEditor::WordTables::count()
 {
+    #ifdef WIN32
     checkNullPointer(this->tables, "tables");
     return tables->dynamicCall("Count()").toInt();
+#endif
 }
 
+#ifdef WIN32
 WordEditor::TableCell::TableCell(QAxObject *cell, int row, int col)
 {
     this->cell = cell;
     this->tableRow = row;
     this->tableColumn = col;
 }
+#endif
 
 QString WordEditor::TableCell::text()
 {
+    #ifdef WIN32
     if(cell == nullptr)
     {
         qDebug() <<  "Не удалось получить текст ячейки " + QString::number(tableRow) + " " + QString::number(tableColumn) + ". Не задана ячейка.";
         return "";
     }
     return cell->querySubObject("Range()")->dynamicCall("Text()").toString();
+#endif
 }
 
 bool WordEditor::TableCell::setText(QString text)
@@ -534,12 +544,14 @@ bool WordEditor::TableCell::setText(QString text)
 
 bool WordEditor::TableCell::insertText(QString text)
 {
+    #ifdef WIN32
     if(cell == nullptr)
     {
         qDebug() << "Не удалось установить текст ячейки " + QString::number(tableRow) + " " + QString::number(tableColumn) + ". Не задана ячейка.";
         return false;
     }
     cell->querySubObject("Range()")->dynamicCall("InsertAfter(String)", text);
+#endif
     return true;
 }
 
@@ -555,6 +567,7 @@ int WordEditor::TableCell::column()
 
 bool WordEditor::TableCell::setImage(QString imageDir)
 {
+    #ifdef WIN32
     QAxObject *range = cell->querySubObject("Range()");
     if(range == nullptr)
     {
@@ -579,10 +592,12 @@ bool WordEditor::TableCell::setImage(QString imageDir)
     image->dynamicCall( "ScaleHeight", height );
     image->dynamicCall( "ScaleWidth", width );
     return true;
+#endif
 }
 
 bool WordEditor::TableCell::clear()
 {
+    #ifdef WIN32
     if(cell == nullptr)
     {
         qDebug() << "Не удалось очистить данные ячейки " + QString::number(tableRow) + " " + QString::number(tableColumn) + ". Не задана ячейка.";
@@ -590,5 +605,6 @@ bool WordEditor::TableCell::clear()
     }
     cell->querySubObject("Range()")->dynamicCall("Delete()");
     return true;
-}
 #endif
+}
+

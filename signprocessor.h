@@ -81,7 +81,7 @@ public:
     struct CryptoPROParams
     {
         CryptoPRO_CSP::CryptoSignData sign;
-        QString CryptoPRODirectore = "C:/Program Files/Crypto Pro/CSP/";
+        QString CryptoPRODirectore = CRYPTO_PRO_DIRECTORY;
     };
 
     enum signInsertType

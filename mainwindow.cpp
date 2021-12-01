@@ -10,11 +10,11 @@
 
 #define SETTINGS_PASSWORD "oozioozi21" // worker21
 #define SETTINGS_PASSWORD_RU "щщяшщщяш21" // worker21
-#define PROGRAM_INFORMATION "Версия программы: 3.9" \
+#define PROGRAM_INFORMATION "Версия программы: 4.0" \
 "\n\nРазработчики:\nАлександров А.С.\nБабуркина С.С.\n\n" \
 "Отдел обеспечения защиты информации и управления информатизации\n" \
 "РТУ МИРЭА - Российский Технологический Университет\n\n" \
-"Дата релиза: 22.09.2021"
+"Дата релиза: 20.10.2021"
 
 
 #define SHOW_MSG_DEBUG // РАЗКОММЕНТИРВОАТЬ ДЛЯ ДЕБАГА
@@ -573,10 +573,11 @@ void MainWindow::on_pushButton_addsign_clicked()
         isAutomationTesting = false;
         return;
     }
-    auto sertList = CryptoPRO.certmgr.getSertifactesList();
+    auto sertList = CryptoPRO.certmgr.getSertifactesList(); // получаем сертификаты в текущий момет времени для проверки, т.к. после момента запуска программы, сертификаты в хранилище могут быть изменены
     if(sertList.size() <= ui->comboBox->currentIndex() || ui->comboBox->currentIndex() < 0)
     {
         QMessageBox::warning(this, "Ошибка", "Ошибка соответствия сертификата.\nПопробуйте перезагрузить список сертификатов.");
+        log.addToLog("Что-то не так с хранилищем сертификатов!!");
         isAutomationTesting = false;
         return;
     }
@@ -585,8 +586,11 @@ void MainWindow::on_pushButton_addsign_clicked()
     {
         QMessageBox::warning(this, "Ошибка", "Ошибка соответствия сертификата.\nПопробуйте перезагрузить список сертификатов.");
         isAutomationTesting = false;
+        log.addToLog("Номер сертификата не соответсвует тому, который был получен ранее!!");
         return;
     }
+
+    log.addToLog("CurrentSign = " + currentSign.toString());
 
     bool containsWordFiles = false;
     bool containsPDFFiles = false;
@@ -623,7 +627,7 @@ void MainWindow::on_pushButton_addsign_clicked()
         }
     }
 
-    QString qpdf_dir = QDir::currentPath() + "/qpdf/qpdf.exe";
+    QString qpdf_dir = QDir::currentPath() + QPDF_DIRECTORY;
     if(!QFile::exists(qpdf_dir))
     {
         QMessageBox::warning(this, "Ошибка", "Ошибка! Файл qpdf.exe не найден! + " + qpdf_dir);
@@ -632,7 +636,7 @@ void MainWindow::on_pushButton_addsign_clicked()
         return;
     }
 
-    QString pdftopng_dir = QDir::currentPath() + "/pdftopng/pdftopng.exe";
+    QString pdftopng_dir = QDir::currentPath() + PDFTOPNG_DIRECTORY;
     if(!QFile::exists(pdftopng_dir))
     {
         QMessageBox::warning(this, "Ошибка", "Ошибка! Файл pdftopng.exe не найден! + " + pdftopng_dir);
@@ -641,6 +645,7 @@ void MainWindow::on_pushButton_addsign_clicked()
         return;
     }
 
+#ifdef _WIN32
     QString libpoi_dir = QDir::currentPath() + "/libpoi/libpoi.jar";
     if(!QFile::exists(libpoi_dir))
     {
@@ -649,6 +654,7 @@ void MainWindow::on_pushButton_addsign_clicked()
         isAutomationTesting = false;
         return;
     }
+#endif
 
     // === ПОДГОТОВКА К ЗАПУСКУ ===
 
@@ -2474,3 +2480,30 @@ void MainWindow::on_checkBox_automationTest_useAll_stateChanged(int arg1)
     }
 }
 
+
+void MainWindow::on_pushButton_findSertificate_clicked()
+{
+    DialogSearchSertificate dialog;
+    dialog.setAllSertificatesList(sertificatesList);
+    dialog.updateSearchedSerts();    // обновляем сертификаты при запуске
+    dialog.exec();
+//    qDebug() << " Выбранный сертификат: " + dialog.getChosedSertificate().toString() + "\r\n";
+//    int chosedSertNumber = dialog.getCurrentSertificateNumber();
+//    if(chosedSertNumber != -1)
+//    {
+//        ui->comboBox->setCurrentIndex(chosedSertNumber);
+//    }
+//    int index = sertificatesList.indexOf(dialog.getChosedSertificate());
+    auto chosedSert = dialog.getChosedSertificate();
+//    qDebug() << "Выбранный сертификат: " << chosedSert.toString();
+//    int index = -1;
+    for (int i=0; i<sertificatesList.size(); i++)   // находим индекс того сертификата, который выбрал пользователь
+    {
+        auto sert = sertificatesList.at(i);
+        if(sert.serial == chosedSert.serial)
+        {
+            ui->comboBox->setCurrentIndex(i);
+            break;
+        }
+    }
+}

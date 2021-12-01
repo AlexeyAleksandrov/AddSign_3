@@ -8,7 +8,7 @@ PDFToPNGConverter::PDFToPNGConverter(QObject *parent) : QObject(parent)
 PDFToPNGConverter::PDFLastPageInfo PDFToPNGConverter::getLastLineInfo(QString fileName, bool *ok)
 {
     if(ok != nullptr) *ok = false;
-    QString pdftopngDir = QDir::currentPath() + "/pdftopng/pdftopng.exe";
+    QString pdftopngDir = QDir::currentPath() + PDFTOPNG_DIRECTORY;
     if(!QFile::exists(pdftopngDir))
     {
         qDebug() << "Ошибка! Отсутствует файл запуска!";

@@ -8,6 +8,26 @@
 
 #include "logclass.h"
 
+#ifdef __linux__
+    #define CRYPTO_PRO_DIRECTORY "/opt/cprocsp/bin/amd64/"
+    #define CERTMGR "certmgr"
+    #define CSPTEST "csptest"
+    #define SPLITTER_NEW_LINE "\n"
+#elif _WIN32
+    #define CRYPTO_PRO_DIRECTORY "C:/Program Files/Crypto Pro/CSP/"
+    #define CERTMGR "certmgr.exe"
+    #define CSPTEST "csptest.exe"
+    #define SPLITTER_NEW_LINE "\r\n"
+#else
+
+#endif
+
+#if QT_VERSION >= 0x050f00 // версия Qt 5.15.2
+    #define SPLITTER Qt::SplitBehavior(Qt::SkipEmptyParts)
+#else
+    #define SPLITTER QString::SkipEmptyParts
+#endif
+
 class CryptoPRO_CSP : public QObject
 {
     Q_OBJECT
@@ -30,14 +50,17 @@ public:
         QDate finishDate;
 
         int index = -1; // информация о подписи для создания sig файла
+
+        QString toString()
+        {
+            return "email = " + this->email + ", name = " + this->name + ", serial = " + this->serial + ", subname = " + this->subname + ", surname = " + this->surname + ", name_and_patronymic = " + this->name_and_patronymic + ", date_start = " + this->startDate.toString() + ", date_end = " + this->finishDate.toString();
+        }
     };
 
 signals:
 
 private:
     QString CryptoProDirectory;
-
-
 
     static int getSignIndex(QList<CryptoSignData> allSignsList, CryptoSignData searchSign); // получает подпись по e-mail
 
@@ -48,7 +71,7 @@ private:
         QList<CryptoSignData> getSertifactesList(); // получить список сертификатов
         void setCryptoProDirectory(const QString &value);
     private:
-        QString runfile = "certmgr.exe";
+        QString runfile = CERTMGR;
         logClass log;
 
     };
@@ -58,7 +81,7 @@ private:
         bool createSign(QString file, CryptoSignData sign); // создать подпись для файла
         void setCryptoProDirectory(const QString &value);
     private:
-        QString runfile = "csptest.exe";
+        QString runfile = CSPTEST;
         logClass log;
     };
 
