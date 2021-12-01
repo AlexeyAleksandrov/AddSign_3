@@ -25,7 +25,7 @@ public:
     };
 
 
-    bool drawSign(QString fileName, int image_pos_x, int image_pos_y, QString line_sertifacate, QString line_owner, QString line_validTime, orientation orientation);
+    bool drawSign(QString fileName, int image_pos_x, int image_pos_y, QString line_sertifacate, QString line_owner, QString line_validTime, orientation orientation);   // для вставки по координатам (точные координаты)
     bool drawSign(QString fileName, QPoint pixel, QString line_sertifacate, QString line_owner, QString line_validTime, orientation orientation, bool *onNextPage = nullptr); // рисует подпись по центру и координате Y
     bool drawImage(QString fileName, QString imageDir, int image_pos_x, int image_pos_y, orientation orientation);
     bool drawImage(QString fileName, QString imageDir, QPoint pixel, orientation orientation);

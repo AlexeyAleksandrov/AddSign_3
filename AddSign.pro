@@ -17,6 +17,7 @@ SOURCES += \
     files_status.cpp \
     imagetransformer.cpp \
     libpoi.cpp \
+    libreoffice.cpp \
     m_widget.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -38,6 +39,7 @@ HEADERS += \
     files_status.h \
     imagetransformer.h \
     libpoi.h \
+    libreoffice.h \
     m_widget.h \
     mainwindow.h \
     my_tablewidget.h \
