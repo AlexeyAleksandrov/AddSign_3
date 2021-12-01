@@ -484,6 +484,7 @@ void MainWindow::customConstructor()
     uisaver.addRb(ui->radioButton_signByTag);
     uisaver.addRb(ui->radioButton_com);
     uisaver.addRb(ui->radioButton_poi);
+    uisaver.addRb(ui->radioButton_libreOffice);
 
     ui->radioButton_runSourceFile->setChecked(true);  // по умолчанию ставим, чтобы запускался исходный файл
     reshowSidebar(); // прячем бокове меню
@@ -517,6 +518,10 @@ void MainWindow::on_pushButton_addsign_clicked()
     else if(ui->radioButton_poi->isChecked())
     {
         filesHandlerType = SignProcessor::filesHandlers::APACHI_POI;
+    }
+    else if(ui->radioButton_libreOffice->isChecked())
+    {
+        filesHandlerType = SignProcessor::filesHandlers::LIBRE_OFFICE;
     }
     if(filesHandlerType == -1)
     {

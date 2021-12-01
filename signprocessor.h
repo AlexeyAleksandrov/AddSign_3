@@ -94,7 +94,8 @@ public:
     enum filesHandlers  // обработчики файлов
     {
         MS_COM,
-        APACHI_POI
+        APACHI_POI,
+        LIBRE_OFFICE
     };
 
 
