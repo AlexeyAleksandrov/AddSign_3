@@ -14,6 +14,7 @@
 #include "pdfcreator.h"
 #include "pdftopngconverter.h"
 #include "libpoi.h"
+#include "libreoffice.h"
 
 class SignProcessor : public QObject
 {

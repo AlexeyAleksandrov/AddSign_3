@@ -19,7 +19,8 @@ public:
         rtf,
         xlsx,
         xls,
-        pdf
+        pdf,
+        no_supported
     };
 
     void convertFile(QString inputFile, QString outputFile = "", LibreOfficeFormats inputFormat = LibreOfficeFormats::pdf, bool *ok = nullptr);    // функция конвертации файла в другой формат

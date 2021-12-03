@@ -212,6 +212,35 @@ void SignProcessor::runProcessing()
                     }
                     pdfPageOrientation = PDFCreator::Portrait;
                 }
+                else if (filesHendlerType == LIBRE_OFFICE)
+                {
+                    QString tempPdfFile = WordOptions.getTempdir() + getFileNameInPDFFormat(QFileInfo(file.sourceFile).fileName()); // временный файл подписи
+                    AutoDeleter tempFileDirContol(tempFile); // автоматическое удаление файла
+
+                    LibreOffice libreOffice;
+                    if(isExtension(tempFile, filesExtensionsWord))
+                    {
+                        // получаем формат файла
+                        LibreOffice::LibreOfficeFormats fileExtensionType = tempFile.endsWith(".docx")
+                                ? LibreOffice::LibreOfficeFormats::docx : tempFile.endsWith(".doc")
+                                  ? LibreOffice::LibreOfficeFormats::doc : tempFile.endsWith(".rtf")
+                                    ? LibreOffice::LibreOfficeFormats::rtf : LibreOffice::LibreOfficeFormats::no_supported;
+                        // если файл не подходящего формата
+                        if(fileExtensionType == LibreOffice::LibreOfficeFormats::no_supported)
+                        {
+                            emit newFileStatus(file, files_status::no_supported);
+                            continue;
+                        }
+                        // переводим в PDF
+                        bool succes = false;    // флаг успешности
+                        libreOffice.convertFile(tempFile, tempPdfFile, fileExtensionType, &succes); // пытаемся конвертировать файл
+                        if(!succes) // если не успешно
+                        {
+                            emit newFileStatus(file, files_status::error_pdf_no_export);
+                            continue;
+                        }
+                    }
+                }
 
                 // вставляем подпись в PDF по координатам
                 int status = -1;
@@ -619,7 +648,7 @@ void SignProcessor::standartAddImageToWordFile(FileForSign &file, QString tempFi
     }
     else
 #endif
-        if (filesHendlerType == APACHI_POI)
+    if (filesHendlerType == APACHI_POI)
     {
         if(!file.sourceFile.endsWith(".docx"))
         {
