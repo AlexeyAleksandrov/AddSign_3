@@ -6,6 +6,7 @@
 //#define MIREA_LOGO_HTML ":/img/MIREA_logo_resize.png"
 #define MIREA_LOGO_HTML PDFOptions.image_dir
 #define APACHI_POI_DIR QDir::currentPath() + "/libpoi/libpoi.jar"
+#define APACHI_POI_DIR_WITHOUT_EXPORT_TO_PDF QDir::currentPath() + "/libpoi/libpoi_lo.jar"
 
 #define DISPLAY_STATUS_ON_NEW_PAGE
 #define assert(var, texterror) if(var == false) { qDebug() << "Assert: " << texterror; log.addToLog(texterror); return; }
@@ -38,7 +39,7 @@ void SignProcessor::setFilesList(const QStringList &files)
 
         if(WordOptions.outputdir == "") // если редачим оригинал файла
         {
-            if(WordOptions.exportToWord) // если нужно подписать исодный Word
+            if(WordOptions.exportToWord) // если нужно подписать исходный Word
             {
                 file.signWordFile = inputFile;
             }
@@ -49,11 +50,11 @@ void SignProcessor::setFilesList(const QStringList &files)
         }
         else // если экспортируем в какую-то папку
         {
-            if(WordOptions.exportToWord) // если нужно подписать Word файл
+            if(WordOptions.exportToWord || (WordOptions.insertType == insert_by_tag_in_table && filesHendlerType == filesHandlers::LIBRE_OFFICE)) // если нужно подписать Word файл
             {
                 file.signWordFile = WordOptions.getOutputdir() + getFileName(file.sourceFile); // формируем путь к ворду, который экспортируем
             }
-            if(((WordOptions.insertType == insert_standart || WordOptions.insertType == insert_by_tag_in_table) && WordOptions.exportToPDF) || WordOptions.insertType == insert_in_exported_pdf) // если нужно экспортировать в PDF
+            if(((WordOptions.insertType == insert_standart || WordOptions.insertType == insert_by_tag_in_table) && WordOptions.exportToPDF) || WordOptions.insertType == insert_in_exported_pdf || filesHendlerType == filesHandlers::LIBRE_OFFICE) // если нужно экспортировать в PDF
             {
                 file.signPDFFile = getFileNameInPDFFormat(WordOptions.getOutputdir() + getFileName(file.sourceFile)); // тоже самое, но меняем расширение файла
                 qDebug() << "PDF filename: " << file.signPDFFile;
@@ -715,7 +716,56 @@ void SignProcessor::standartAddImageToWordFile(FileForSign &file, QString tempFi
             }
         }
     }
-    if(WordOptions.exportToWord)
+    // если выбрано использование LibreOffice
+    else if (filesHendlerType == LIBRE_OFFICE)
+    {
+        QString tempPdfFile = WordOptions.getTempdir() + getFileNameInPDFFormat(QFileInfo(file.sourceFile).fileName()); // временный файл подписи
+        AutoDeleter tempFileDirContol(tempFile); // автоматическое удаление файла
+
+        LibreOffice libreOffice;
+        if(isExtension(tempFile, filesExtensionsWord))
+        {
+            // получаем формат файла
+            LibreOffice::LibreOfficeFormats fileExtensionType = tempFile.endsWith(".docx")
+                    ? LibreOffice::LibreOfficeFormats::docx : tempFile.endsWith(".doc")
+                      ? LibreOffice::LibreOfficeFormats::doc : tempFile.endsWith(".rtf")
+                        ? LibreOffice::LibreOfficeFormats::rtf : LibreOffice::LibreOfficeFormats::no_supported;
+            // если файл не подходящего формата
+            if(fileExtensionType == LibreOffice::LibreOfficeFormats::no_supported)
+            {
+                emit newFileStatus(file, files_status::no_supported);
+                return;;
+            }
+            // переводим в PDF
+            bool succes = false;    // флаг успешности
+            libreOffice.convertFile(tempFile, tempPdfFile, fileExtensionType, &succes); // пытаемся конвертировать файл
+            if(!succes) // если не успешно
+            {
+                emit newFileStatus(file, files_status::error_pdf_no_export);
+                return;
+            }
+        }
+
+        int status = -1;
+        addImageToPdfFileInEndOfFile(tempPdfFile, file.signPDFFile, WordOptions, PDFOptions, PDFCreator::Portrait, MIREA_LOGO_HTML, status);    // выполянем вставку в PDF в конец документа
+        qDebug() << "Файл: " << file.sourceFile << " Статус: " << status;
+        if(status == -1)
+        {
+            qDebug() << "Не удалось добавить картинку к PDF файлу после обработки Libre Office" << tempPdfFile;
+            log.addToLog("Не удалось добавить картинку к PDF файлу после обработки Libre Office - " + tempPdfFile);
+            fileStatus = files_status::error_no_open;
+            return;
+        }
+        if(status != files_status::in_process)  // если произошла ошибка во время обработки
+        {
+            qDebug() << "Не удалось добавить картинку к PDF файлу после обработки Libre Office" << file.sourceFile << " статус " << fileStatus;
+            log.addToLog("Не удалось добавить картинку к PDF файлу после обработки Libre Office - " + file.sourceFile + " статус " + fileStatus);
+            fileStatus = status;    // возвращаем статус файла
+            return;
+        }
+
+    }
+    if(WordOptions.exportToWord && (filesHendlerType == MS_COM || filesHendlerType == APACHI_POI))
     {
         if(!replaceOriginalFileByTemp(file.signWordFile, tempFile)) // копируем временный файл в необходимый
         {
@@ -908,6 +958,45 @@ void SignProcessor::addImageToWordFileByTagInTable(FileForSign &file, QString te
             return;
         }
         fileStatus = files_status::in_process;
+        return;
+    }
+    else if (filesHendlerType == LIBRE_OFFICE)
+    {
+        if(!file.sourceFile.endsWith(".docx"))
+        {
+            qDebug() << "Данное расширение файла не поддерживается Apachi POI" << file.sourceFile;
+            log.addToLog("Данное расширение файла не поддерживается Apachi POI: " + file.sourceFile);
+            fileStatus = files_status::no_supported;
+            return;
+        }
+        LibPOI libpoi;  // обработчик POI
+        libpoi.setJarDir(APACHI_POI_DIR_WITHOUT_EXPORT_TO_PDF);   // директория файла
+
+        LibPOI::jar_params JarOptions;  // параметры обработчика
+        JarOptions.imageFile = imagedir;
+        JarOptions.inputWordFile = tempFile;
+        JarOptions.outputWordFile = file.signWordFile;
+        JarOptions.outputPdfFile = file.signPDFFile;
+        JarOptions.insertType = LibPOI::insertTypes::insert_by_tag; // вставка по тэгу
+        JarOptions.signOwner = PDFOptions.htmlParams.lineOwner;
+
+        bool success = libpoi.process(JarOptions); // запускаем обработчик POI
+        if(!success)    // если возникла ошибка при обработке файла
+        {
+            fileStatus = files_status::error_no_open;
+            return;
+        }
+        fileStatus = files_status::in_process;
+
+        // переводим в PDF
+        bool succes = false;    // флаг успешности
+        LibreOffice libreOffice;
+        libreOffice.convertFile(JarOptions.outputWordFile, JarOptions.outputPdfFile, LibreOffice::docx, &succes); // пытаемся конвертировать файл
+        if(!succes) // если не успешно
+        {
+            fileStatus = files_status::error_pdf_no_export;
+        }
+
         return;
     }
 }

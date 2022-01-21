@@ -135,8 +135,11 @@ private:
     static QString getDir(QString dir); // добавляет в конец директории /, если таковой необходим
 
 private:
+    // вставка подписи в Word файл
     void standartAddImageToWordFile(FileForSign &file, QString tempFile, QString imagedir, WordParams WordOptions, int &fileStatus, bool &movedToNextPage);   // выполняет стандартную вставку картинки в ворд документ (в конец)
     void addImageToWordFileByTagInTable(FileForSign &file, QString tempFile, QString imagedir, WordParams WordOptions, int &fileStatus, bool &movedToNextPage);   // выполняет вставку картинки в ворд документ в таблицу по специальным тэгам
+
+    // вставка подписи в PDF файл
     void addImageToPdfFileInCoordinates(QString input_file, QString output_file, WordParams WordOptions, PDFParams PDFOptions, PDFCreator::orientation pdfPageOrientation, QString gerb_file, int &fileStatus);  // вставить подпись по координатам в PDF документ
     void addImageToPdfFileInEndOfFile(QString input_file, QString output_file, WordParams WordOptions, PDFParams PDFOptions, PDFCreator::orientation pdfPageOrientation, QString gerb_file, int &fileStatus);  // вставить подпись по координатам в PDF документ
 

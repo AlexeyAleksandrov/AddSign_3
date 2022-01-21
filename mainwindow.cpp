@@ -10,11 +10,11 @@
 
 #define SETTINGS_PASSWORD "oozioozi21" // worker21
 #define SETTINGS_PASSWORD_RU "щщяшщщяш21" // worker21
-#define PROGRAM_INFORMATION "Версия программы: 4.0" \
+#define PROGRAM_INFORMATION "Версия программы: 4.1" \
 "\n\nРазработчики:\nАлександров А.С.\nБабуркина С.С.\n\n" \
 "Отдел обеспечения защиты информации и управления информатизации\n" \
 "РТУ МИРЭА - Российский Технологический Университет\n\n" \
-"Дата релиза: 20.10.2021"
+"Дата релиза: 21.11.2022"
 
 
 #define SHOW_MSG_DEBUG // РАЗКОММЕНТИРВОАТЬ ДЛЯ ДЕБАГА
@@ -733,8 +733,8 @@ void MainWindow::on_pushButton_addsign_clicked()
     processor.setWordOptions(word_settings);
     processor.setPDFOptions(PDF_settings);
     processor.setCryptoPROOptions(CryptoPRO_settings);
-    processor.setFilesList(listAddedFiles);
     processor.setFilesHendlerType(filesHandlerType);
+    processor.setFilesList(listAddedFiles);
 
     connect(&processor, &SignProcessor::newFileStatus, this, &MainWindow::fileReady);
 
