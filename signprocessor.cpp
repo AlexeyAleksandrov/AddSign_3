@@ -43,18 +43,22 @@ void SignProcessor::setFilesList(const QStringList &files)
             {
                 file.signWordFile = inputFile;
             }
-            if(((WordOptions.insertType == insert_standart || WordOptions.insertType == insert_by_tag_in_table) && WordOptions.exportToPDF) || WordOptions.insertType == insert_in_exported_pdf) // если нужно экспортировать в PDF
+            if(((WordOptions.insertType == insert_standart || WordOptions.insertType == insert_by_tag_in_table) && WordOptions.exportToPDF)
+                    || WordOptions.insertType == insert_in_exported_pdf) // если нужно экспортировать в PDF
             {
                 file.signPDFFile = getFileNameInPDFFormat(inputFile); // просто меняем расщирение файла, а пуь оставляем тот же самый
             }
         }
         else // если экспортируем в какую-то папку
         {
-            if(WordOptions.exportToWord || (WordOptions.insertType == insert_by_tag_in_table && filesHendlerType == filesHandlers::LIBRE_OFFICE)) // если нужно подписать Word файл
+            if(WordOptions.exportToWord
+                    || (WordOptions.insertType == insert_by_tag_in_table && filesHendlerType == filesHandlers::LIBRE_OFFICE)) // если нужно подписать Word файл
             {
                 file.signWordFile = WordOptions.getOutputdir() + getFileName(file.sourceFile); // формируем путь к ворду, который экспортируем
             }
-            if(((WordOptions.insertType == insert_standart || WordOptions.insertType == insert_by_tag_in_table) && WordOptions.exportToPDF) || WordOptions.insertType == insert_in_exported_pdf || filesHendlerType == filesHandlers::LIBRE_OFFICE) // если нужно экспортировать в PDF
+            if(((WordOptions.insertType == insert_standart || WordOptions.insertType == insert_by_tag_in_table) && WordOptions.exportToPDF)
+                    || WordOptions.insertType == insert_in_exported_pdf
+                    /*|| filesHendlerType == filesHandlers::LIBRE_OFFICE*/) // если нужно экспортировать в PDF
             {
                 file.signPDFFile = getFileNameInPDFFormat(WordOptions.getOutputdir() + getFileName(file.sourceFile)); // тоже самое, но меняем расширение файла
                 qDebug() << "PDF filename: " << file.signPDFFile;
