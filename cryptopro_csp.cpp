@@ -146,20 +146,24 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
                             if(pairList.at(0) == "CN")
                             {
                                 SignCMD.name = pairList.at(1);
+                                log.addToLog("Найдено название: " + SignCMD.name);
                             }
                             if(pairList.at(0) == "E")
                             {
                                 SignCMD.email = pairList.at(1);
+                                log.addToLog("Найдено e-mail: " + SignCMD.email);
                             }
                             if(pairList.at(0) == "G")
                             {
                                 host_name_and_patronymic = pairList.at(1); // имя + отчество
                                 SignCMD.name_and_patronymic = pairList.at(1);
+                                log.addToLog("Найдено имя и отчество: " + SignCMD.name_and_patronymic);
                             }
                             if(pairList.at(0) == "SN")
                             {
                                 host_surname = pairList.at(1); // фамилия
                                 SignCMD.surname = pairList.at(1);
+                                log.addToLog("Найдено фамилия: " + SignCMD.surname);
                             }
                         }
                     }
@@ -171,6 +175,7 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
                     subline = subline.remove("Серийный номер      : 0x");
 //                    qDebug() << "Серийный номер сертификата: " << subline;
                     SignCMD.serial = subline;
+                    log.addToLog("Найдено серийный номер сертификата: " + SignCMD.serial);
                 }
                 // дата начала действия
                 if(line.contains("Not valid before") || line.contains("Выдан"))
@@ -187,6 +192,7 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
                             QDate date(dateList.at(2).toInt(), dateList.at(1).toInt(), dateList.at(0).toInt());
 //                            qDebug() << "Начало действия: " << date;
                             SignCMD.startDate = date;
+                            log.addToLog("Найдено начало действия: " + SignCMD.startDate.toString());
                         }
                     }
                 }
@@ -205,6 +211,7 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
                             QDate date(dateList.at(2).toInt(), dateList.at(1).toInt(), dateList.at(0).toInt());
 //                            qDebug() << "Конец действия: " << date;
                             SignCMD.finishDate = date;
+                            log.addToLog("Найдено конец действия: " + SignCMD.startDate.toString());
                         }
                     }
                 }
@@ -235,18 +242,18 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
                 }
                 if(contains)
                 {
-//                    log.addToLog("WARNING: Данный сертификат уже существует! Добавление в список невозможно! Сертификат: " + SignCMD.toString());
+                    log.addToLog("WARNING: Данный сертификат уже существует! Добавление в список невозможно! Сертификат: " + SignCMD.toString());
                 }
                 else
                 {
                     SignsList.append(SignCMD); // добавляем в общий список
-//                    log.addToLog("Добавляем подпись в список: " + QString::number(SignsList.size()) + " - " + SignCMD.toString());
+                    log.addToLog("Добавляем подпись в список: " + QString::number(SignsList.size()) + " - " + SignCMD.toString());
                 }
 
             }
             else
             {
-//                log.addToLog("WARNING: Сертификат не был добавлен в список, т.к. он не имеет названия, либо emqil. Данные о сертфикате: " + SignCMD.toString());
+                log.addToLog("WARNING: Сертификат не был добавлен в список, т.к. он не имеет названия, либо emqil. Данные о сертфикате: " + SignCMD.toString());
             }
 
         }
@@ -319,6 +326,9 @@ bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSig
 //        sigFile.remove(); // удаляем sig файл, если таковой уже имеется
 //    }
 
+    qDebug() << "Запускаем процесс подписи: " + csptest_bat_file.fileName() + params[0] + " " + params[1] + " " + params[2];
+    log.addToLog("Запускаем процесс подписи: " + csptest_bat_file.fileName() + params[0] + " " + params[1] + " " + params[2]);
+
 #ifdef _WIN32
     csptest_bat.start(csptest_bat_file.fileName(), params); // запускаем батник с параметрами
 #elif __linux__
@@ -328,7 +338,7 @@ bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSig
     {
         qDebug() << "The process didnt start" << csptest_bat.error();
         log.addToLog(&"The process didnt start " [ csptest_bat.error()]);
-        csptest_bat_file.remove();
+//        csptest_bat_file.remove();
         return false;
     }
     QString cmd_out;
@@ -344,10 +354,10 @@ bool CryptoPRO_CSP::s_csptest::createSign(QString file, CryptoPRO_CSP::CryptoSig
     {
         qDebug() << "The process didnt finished" << csptest_bat.error();
         log.addToLog(&"The process didnt finished " [ csptest_bat.error()]);
-        csptest_bat_file.remove();
+//        csptest_bat_file.remove();
         return false;
     }
-    csptest_bat_file.remove();
+//    csptest_bat_file.remove();
     QFile sigFile(file + ".sig");
     if(sigFile.exists() && cmd_out.contains("[ErrorCode: 0x00000000]")) //  && cmd_out.contains("[ErrorCode: 0x00000000]")
     {

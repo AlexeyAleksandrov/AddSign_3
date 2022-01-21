@@ -2054,7 +2054,7 @@ void MainWindow::on_advancedSettingsButton_clicked()
 //    QString password = QInputDialog::getText(this,"Введите пароль", "", QLineEdit::Password);
     while(true)
     {
-        QString password = QInputDialog::getText(this,"Введите пароль", "", QLineEdit::Password);
+        QString password = QInputDialog::getText(this,"Введите пароль", "", QLineEdit::Password).toLower();
         if (password == SETTINGS_PASSWORD || password == SETTINGS_PASSWORD_RU)
         {
             ui->stackedWidget->setCurrentIndex(STACKED_SYSTEM_SETTINGS);
