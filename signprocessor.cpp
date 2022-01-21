@@ -725,45 +725,77 @@ void SignProcessor::standartAddImageToWordFile(FileForSign &file, QString tempFi
         LibreOffice libreOffice;
         if(isExtension(tempFile, filesExtensionsWord))
         {
-            // получаем формат файла
-            LibreOffice::LibreOfficeFormats fileExtensionType = tempFile.endsWith(".docx")
-                    ? LibreOffice::LibreOfficeFormats::docx : tempFile.endsWith(".doc")
-                      ? LibreOffice::LibreOfficeFormats::doc : tempFile.endsWith(".rtf")
-                        ? LibreOffice::LibreOfficeFormats::rtf : LibreOffice::LibreOfficeFormats::no_supported;
-            // если файл не подходящего формата
-            if(fileExtensionType == LibreOffice::LibreOfficeFormats::no_supported)
+            if(WordOptions.exportToWord)    // если необходимо получить вордовский файл, то мы обрабатываем файл вордом через POI
             {
-                emit newFileStatus(file, files_status::no_supported);
-                return;;
-            }
-            // переводим в PDF
-            bool succes = false;    // флаг успешности
-            libreOffice.convertFile(tempFile, tempPdfFile, fileExtensionType, &succes); // пытаемся конвертировать файл
-            if(!succes) // если не успешно
-            {
-                emit newFileStatus(file, files_status::error_pdf_no_export);
+                if(!file.sourceFile.endsWith(".docx"))
+                {
+                    qDebug() << "Данное расширение файла не поддерживается Apachi POI" << file.sourceFile;
+                    log.addToLog("Данное расширение файла не поддерживается Apachi POI: " + file.sourceFile);
+                    fileStatus = files_status::no_supported;
+                    return;
+                }
+
+                LibPOI libpoi;  // обработчик POI
+                libpoi.setJarDir(APACHI_POI_DIR);   // директория файла
+
+                LibPOI::jar_params JarOptions;  // параметры обработчика
+                JarOptions.imageFile = imagedir;
+                JarOptions.inputWordFile = tempFile;
+                JarOptions.outputWordFile = file.signWordFile;
+                JarOptions.insertType = LibPOI::insertTypes::simple_insert; // по умолчанию стандартная вставка в Word файл
+
+                bool success = libpoi.process(JarOptions); // запускаем обработчик POI
+                if(!success)    // если возникла ошибка при обработке файла
+                {
+                    fileStatus = files_status::error_no_open;
+                    return;
+                }
+
+                fileStatus = files_status::in_process;    // возвращаем нормальный статус файла
                 return;
             }
-        }
 
-        int status = -1;
-        addImageToPdfFileInEndOfFile(tempPdfFile, file.signPDFFile, WordOptions, PDFOptions, PDFCreator::Portrait, MIREA_LOGO_HTML, status);    // выполянем вставку в PDF в конец документа
-        qDebug() << "Файл: " << file.sourceFile << " Статус: " << status;
-        if(status == -1)
-        {
-            qDebug() << "Не удалось добавить картинку к PDF файлу после обработки Libre Office" << tempPdfFile;
-            log.addToLog("Не удалось добавить картинку к PDF файлу после обработки Libre Office - " + tempPdfFile);
-            fileStatus = files_status::error_no_open;
-            return;
-        }
-        if(status != files_status::in_process)  // если произошла ошибка во время обработки
-        {
-            qDebug() << "Не удалось добавить картинку к PDF файлу после обработки Libre Office" << file.sourceFile << " статус " << fileStatus;
-            log.addToLog("Не удалось добавить картинку к PDF файлу после обработки Libre Office - " + file.sourceFile + " статус " + fileStatus);
-            fileStatus = status;    // возвращаем статус файла
-            return;
-        }
+            if(WordOptions.exportToPDF) // если надо экспортировать в PDF, то используем Libre Office
+            {
+                // получаем формат файла
+                LibreOffice::LibreOfficeFormats fileExtensionType = tempFile.endsWith(".docx")
+                        ? LibreOffice::LibreOfficeFormats::docx : tempFile.endsWith(".doc")
+                          ? LibreOffice::LibreOfficeFormats::doc : tempFile.endsWith(".rtf")
+                            ? LibreOffice::LibreOfficeFormats::rtf : LibreOffice::LibreOfficeFormats::no_supported;
+                // если файл не подходящего формата
+                if(fileExtensionType == LibreOffice::LibreOfficeFormats::no_supported)
+                {
+                    emit newFileStatus(file, files_status::no_supported);
+                    return;;
+                }
+                // переводим в PDF
+                bool succes = false;    // флаг успешности
+                libreOffice.convertFile(tempFile, tempPdfFile, fileExtensionType, &succes); // пытаемся конвертировать файл
+                if(!succes) // если не успешно
+                {
+                    emit newFileStatus(file, files_status::error_pdf_no_export);
+                    return;
+                }
 
+                int status = -1;
+                addImageToPdfFileInEndOfFile(tempPdfFile, file.signPDFFile, WordOptions, PDFOptions, PDFCreator::Portrait, MIREA_LOGO_HTML, status);    // выполянем вставку в PDF в конец документа
+                qDebug() << "Файл: " << file.sourceFile << " Статус: " << status;
+                if(status == -1)
+                {
+                    qDebug() << "Не удалось добавить картинку к PDF файлу после обработки Libre Office" << tempPdfFile;
+                    log.addToLog("Не удалось добавить картинку к PDF файлу после обработки Libre Office - " + tempPdfFile);
+                    fileStatus = files_status::error_no_open;
+                    return;
+                }
+                if(status != files_status::in_process)  // если произошла ошибка во время обработки
+                {
+                    qDebug() << "Не удалось добавить картинку к PDF файлу после обработки Libre Office" << file.sourceFile << " статус " << fileStatus;
+                    log.addToLog("Не удалось добавить картинку к PDF файлу после обработки Libre Office - " + file.sourceFile + " статус " + fileStatus);
+                    fileStatus = status;    // возвращаем статус файла
+                    return;
+                }
+            }
+        }
     }
     if(WordOptions.exportToWord && (filesHendlerType == MS_COM || filesHendlerType == APACHI_POI))
     {
@@ -975,7 +1007,7 @@ void SignProcessor::addImageToWordFileByTagInTable(FileForSign &file, QString te
         LibPOI::jar_params JarOptions;  // параметры обработчика
         JarOptions.imageFile = imagedir;
         JarOptions.inputWordFile = tempFile;
-        JarOptions.outputWordFile = file.signWordFile;
+        JarOptions.outputWordFile = tempFile;
         JarOptions.outputPdfFile = file.signPDFFile;
         JarOptions.insertType = LibPOI::insertTypes::insert_by_tag; // вставка по тэгу
         JarOptions.signOwner = PDFOptions.htmlParams.lineOwner;

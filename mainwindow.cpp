@@ -8,8 +8,11 @@
 #define SIGN_IMAGE_TAG "<место_для_подписи>"
 #define SIGN_FIO_TAG "<имя_владельца_подписи>"
 
-#define SETTINGS_PASSWORD "oozioozi21" // worker21
+//#define SETTINGS_PASSWORD "oozioozi21" // worker21
 #define SETTINGS_PASSWORD_RU "щщяшщщяш21" // worker21
+#ifndef SETTINGS_PASSWORD
+#define SETTINGS_PASSWORD "" // пустой пароль для дебага
+#endif
 #define PROGRAM_INFORMATION "Версия программы: 4.1" \
 "\n\nРазработчики:\nАлександров А.С.\nБабуркина С.С.\n\n" \
 "Отдел обеспечения защиты информации и управления информатизации\n" \

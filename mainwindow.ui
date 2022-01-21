@@ -367,7 +367,7 @@ QHeaderView::section{background-color: rgb(114, 159, 207)}
          <x>0</x>
          <y>0</y>
          <width>178</width>
-         <height>853</height>
+         <height>854</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_6">
@@ -377,9 +377,7 @@ QHeaderView::section{background-color: rgb(114, 159, 207)}
            <widget class="QPushButton" name="pushButton_back_to_menu">
             <property name="font">
              <font>
-              <family>MS Shell Dlg 2</family>
               <pointsize>12</pointsize>
-              <weight>50</weight>
               <italic>false</italic>
               <bold>false</bold>
              </font>
@@ -393,9 +391,7 @@ QHeaderView::section{background-color: rgb(114, 159, 207)}
            <widget class="QPushButton" name="pushButton_moveToSigning">
             <property name="font">
              <font>
-              <family>MS Shell Dlg 2</family>
               <pointsize>12</pointsize>
-              <weight>50</weight>
               <italic>false</italic>
               <bold>false</bold>
              </font>
@@ -409,9 +405,7 @@ QHeaderView::section{background-color: rgb(114, 159, 207)}
            <widget class="QPushButton" name="advancedSettingsButton">
             <property name="font">
              <font>
-              <family>MS Shell Dlg 2</family>
               <pointsize>12</pointsize>
-              <weight>50</weight>
               <italic>false</italic>
               <bold>false</bold>
              </font>
@@ -447,9 +441,7 @@ QHeaderView::section{background-color: rgb(114, 159, 207)}
             </property>
             <property name="font">
              <font>
-              <family>MS Shell Dlg 2</family>
               <pointsize>12</pointsize>
-              <weight>50</weight>
               <italic>false</italic>
               <bold>false</bold>
              </font>
@@ -519,9 +511,7 @@ QHeaderView::section{background-color: rgb(114, 159, 207)}
          <widget class="QGroupBox" name="groupBox_20">
           <property name="font">
            <font>
-            <family>MS Shell Dlg 2</family>
             <pointsize>12</pointsize>
-            <weight>50</weight>
             <italic>false</italic>
             <bold>false</bold>
            </font>
@@ -546,9 +536,7 @@ QHeaderView::section{background-color: rgb(114, 159, 207)}
              </property>
              <property name="font">
               <font>
-               <family>MS Shell Dlg 2</family>
                <pointsize>12</pointsize>
-               <weight>50</weight>
                <italic>false</italic>
                <bold>false</bold>
               </font>
@@ -592,9 +580,7 @@ QHeaderView::section{background-color: rgb(114, 159, 207)}
                <widget class="QLabel" name="label_28">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -647,9 +633,7 @@ QHeaderView::section{background-color: rgb(114, 159, 207)}
                <widget class="QGroupBox" name="groupBox_10">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -717,9 +701,7 @@ QLabel{
                        <widget class="QLabel" name="label_5">
                         <property name="font">
                          <font>
-                          <family>MS Shell Dlg 2</family>
                           <pointsize>9</pointsize>
-                          <weight>50</weight>
                           <italic>false</italic>
                           <bold>false</bold>
                          </font>
@@ -736,9 +718,7 @@ QLabel{
                        <widget class="QLabel" name="label_3">
                         <property name="font">
                          <font>
-                          <family>MS Shell Dlg 2</family>
                           <pointsize>12</pointsize>
-                          <weight>75</weight>
                           <italic>false</italic>
                           <bold>true</bold>
                          </font>
@@ -756,9 +736,7 @@ background-color: transparent;</string>
                        <widget class="QLabel" name="label_2">
                         <property name="font">
                          <font>
-                          <family>MS Shell Dlg 2</family>
                           <pointsize>12</pointsize>
-                          <weight>75</weight>
                           <italic>false</italic>
                           <bold>true</bold>
                          </font>
@@ -779,9 +757,7 @@ background-color: transparent;</string>
                        <widget class="QLabel" name="label">
                         <property name="font">
                          <font>
-                          <family>MS Shell Dlg 2</family>
                           <pointsize>12</pointsize>
-                          <weight>75</weight>
                           <italic>false</italic>
                           <bold>true</bold>
                          </font>
@@ -802,9 +778,7 @@ background-color: transparent;</string>
                        <widget class="QLabel" name="label_4">
                         <property name="font">
                          <font>
-                          <family>MS Shell Dlg 2</family>
                           <pointsize>9</pointsize>
-                          <weight>50</weight>
                           <italic>false</italic>
                           <bold>false</bold>
                          </font>
@@ -821,9 +795,7 @@ background-color: transparent;</string>
                        <widget class="QLabel" name="label_6">
                         <property name="font">
                          <font>
-                          <family>MS Shell Dlg 2</family>
                           <pointsize>9</pointsize>
-                          <weight>50</weight>
                           <italic>false</italic>
                           <bold>false</bold>
                          </font>
@@ -858,9 +830,7 @@ background-color: transparent;</string>
             <widget class="QGroupBox" name="groupBox_3">
              <property name="font">
               <font>
-               <family>MS Shell Dlg 2</family>
                <pointsize>12</pointsize>
-               <weight>50</weight>
                <italic>false</italic>
                <bold>false</bold>
               </font>
@@ -873,9 +843,7 @@ background-color: transparent;</string>
                <widget class="QLabel" name="label_outputPath">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -915,9 +883,7 @@ background-color: transparent;</string>
                <widget class="QLineEdit" name="lineEdit_userOutputPath">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -937,9 +903,7 @@ background-color: transparent;</string>
                <widget class="QPushButton" name="pushButton_selectOutputPath">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -982,9 +946,7 @@ background-color: transparent;</string>
                <widget class="QLabel" name="label_32">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -998,9 +960,7 @@ background-color: transparent;</string>
                <widget class="QCheckBox" name="checkBox_createSubFolder">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -1014,9 +974,7 @@ background-color: transparent;</string>
                <widget class="QCheckBox" name="checkBox_outputInSelectedPath">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -1030,9 +988,7 @@ background-color: transparent;</string>
                <widget class="QCheckBox" name="checkBox_signingOut">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -1126,9 +1082,7 @@ background-color: transparent;</string>
          <widget class="QGroupBox" name="groupBox_18">
           <property name="font">
            <font>
-            <family>MS Shell Dlg 2</family>
             <pointsize>12</pointsize>
-            <weight>50</weight>
             <italic>false</italic>
             <bold>false</bold>
            </font>
@@ -1147,9 +1101,7 @@ background-color: transparent;</string>
              </property>
              <property name="font">
               <font>
-               <family>MS Shell Dlg 2</family>
                <pointsize>12</pointsize>
-               <weight>50</weight>
                <italic>false</italic>
                <bold>false</bold>
               </font>
@@ -1162,9 +1114,7 @@ background-color: transparent;</string>
                <widget class="QRadioButton" name="radioButton_runSignedFilePDF">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -1178,9 +1128,7 @@ background-color: transparent;</string>
                <widget class="QRadioButton" name="radioButton_runSignedFile">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -1207,9 +1155,7 @@ background-color: transparent;</string>
                <widget class="QRadioButton" name="radioButton_runSourceFile">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -1236,9 +1182,7 @@ background-color: transparent;</string>
                <widget class="QLabel" name="label_21">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -1268,9 +1212,7 @@ background-color: transparent;</string>
             <widget class="QGroupBox" name="groupBox_15">
              <property name="font">
               <font>
-               <family>MS Shell Dlg 2</family>
                <pointsize>12</pointsize>
-               <weight>50</weight>
                <italic>false</italic>
                <bold>false</bold>
               </font>
@@ -1302,9 +1244,7 @@ background-color: rgb(114, 159, 207);
                <widget class="QLabel" name="label_26">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -1318,9 +1258,7 @@ background-color: rgb(114, 159, 207);
                <widget class="QPushButton" name="pushButton_addsign">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>16</pointsize>
-                  <weight>75</weight>
                   <italic>false</italic>
                   <bold>true</bold>
                  </font>
@@ -1369,9 +1307,7 @@ background-color: rgb(114, 159, 207);
             <widget class="QGroupBox" name="groupBox_19">
              <property name="font">
               <font>
-               <family>MS Shell Dlg 2</family>
                <pointsize>12</pointsize>
-               <weight>50</weight>
                <italic>false</italic>
                <bold>false</bold>
               </font>
@@ -1384,9 +1320,7 @@ background-color: rgb(114, 159, 207);
                <widget class="QPushButton" name="pushButton_addFile">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -1416,9 +1350,7 @@ background-color: rgb(114, 159, 207);
                <widget class="QLabel" name="label_9">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -1432,9 +1364,7 @@ background-color: rgb(114, 159, 207);
                <widget class="QPushButton" name="pushButton_removeFile">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -1464,9 +1394,7 @@ background-color: rgb(114, 159, 207);
                <widget class="QPushButton" name="pushButton_removeSignedFiles">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -1483,9 +1411,7 @@ background-color: rgb(114, 159, 207);
                <widget class="QPushButton" name="addFolderPushButton">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -1534,9 +1460,7 @@ background-color: rgb(114, 159, 207);
          <widget class="QGroupBox" name="groupBox_5">
           <property name="font">
            <font>
-            <family>MS Shell Dlg 2</family>
             <pointsize>12</pointsize>
-            <weight>50</weight>
             <italic>false</italic>
             <bold>false</bold>
            </font>
@@ -1668,8 +1592,8 @@ background-color: rgb(114, 159, 207);
                  </brush>
                 </colorrole>
                 <colorrole role="PlaceholderText">
-                 <brush brushstyle="NoBrush">
-                  <color alpha="128">
+                 <brush brushstyle="SolidPattern">
+                  <color alpha="255">
                    <red>32</red>
                    <green>74</green>
                    <blue>135</blue>
@@ -1787,8 +1711,8 @@ background-color: rgb(114, 159, 207);
                  </brush>
                 </colorrole>
                 <colorrole role="PlaceholderText">
-                 <brush brushstyle="NoBrush">
-                  <color alpha="128">
+                 <brush brushstyle="SolidPattern">
+                  <color alpha="255">
                    <red>32</red>
                    <green>74</green>
                    <blue>135</blue>
@@ -1906,8 +1830,8 @@ background-color: rgb(114, 159, 207);
                  </brush>
                 </colorrole>
                 <colorrole role="PlaceholderText">
-                 <brush brushstyle="NoBrush">
-                  <color alpha="128">
+                 <brush brushstyle="SolidPattern">
+                  <color alpha="255">
                    <red>32</red>
                    <green>74</green>
                    <blue>135</blue>
@@ -1975,9 +1899,7 @@ background-color: rgb(32, 74, 135);
          <widget class="QGroupBox" name="groupBox_12">
           <property name="font">
            <font>
-            <family>MS Shell Dlg 2</family>
             <pointsize>12</pointsize>
-            <weight>50</weight>
             <italic>false</italic>
             <bold>false</bold>
            </font>
@@ -1990,9 +1912,7 @@ background-color: rgb(32, 74, 135);
             <widget class="QGroupBox" name="groupBox_6">
              <property name="font">
               <font>
-               <family>MS Shell Dlg 2</family>
                <pointsize>12</pointsize>
-               <weight>50</weight>
                <italic>false</italic>
                <bold>false</bold>
               </font>
@@ -2005,9 +1925,7 @@ background-color: rgb(32, 74, 135);
                <widget class="QLabel" name="label_22">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -2146,9 +2064,7 @@ background-color: rgb(32, 74, 135);
             <widget class="QGroupBox" name="groupBox_8">
              <property name="font">
               <font>
-               <family>MS Shell Dlg 2</family>
                <pointsize>12</pointsize>
-               <weight>50</weight>
                <italic>false</italic>
                <bold>false</bold>
               </font>
@@ -2211,9 +2127,7 @@ background-color: rgb(32, 74, 135);
             <widget class="QGroupBox" name="groupBox_21">
              <property name="font">
               <font>
-               <family>MS Shell Dlg 2</family>
                <pointsize>12</pointsize>
-               <weight>50</weight>
                <italic>false</italic>
                <bold>false</bold>
               </font>
@@ -2386,9 +2300,7 @@ background-color: rgb(32, 74, 135);
             <widget class="QGroupBox" name="groupBox_13">
              <property name="font">
               <font>
-               <family>MS Shell Dlg 2</family>
                <pointsize>12</pointsize>
-               <weight>50</weight>
                <italic>false</italic>
                <bold>false</bold>
               </font>
@@ -2401,9 +2313,7 @@ background-color: rgb(32, 74, 135);
                <widget class="QCheckBox" name="checkBox_exportWordToPDF">
                 <property name="font">
                  <font>
-                  <family>MS Shell Dlg 2</family>
                   <pointsize>12</pointsize>
-                  <weight>50</weight>
                   <italic>false</italic>
                   <bold>false</bold>
                  </font>
@@ -2478,9 +2388,7 @@ background-color: rgb(32, 74, 135);
           </property>
           <property name="font">
            <font>
-            <family>MS Shell Dlg 2</family>
             <pointsize>12</pointsize>
-            <weight>50</weight>
             <italic>false</italic>
             <bold>false</bold>
            </font>
@@ -2601,9 +2509,7 @@ background-color: rgb(32, 74, 135);
          <widget class="QGroupBox" name="groupBox_7">
           <property name="font">
            <font>
-            <family>MS Shell Dlg 2</family>
             <pointsize>12</pointsize>
-            <weight>50</weight>
             <italic>false</italic>
             <bold>false</bold>
            </font>
@@ -2833,9 +2739,7 @@ background-color: rgb(32, 74, 135);
       </property>
       <property name="font">
        <font>
-        <family>MS Shell Dlg 2</family>
         <pointsize>12</pointsize>
-        <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
         <underline>false</underline>
@@ -2858,9 +2762,7 @@ background-color: rgb(32, 74, 135);
       </property>
       <property name="font">
        <font>
-        <family>MS Shell Dlg 2</family>
         <pointsize>12</pointsize>
-        <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
        </font>
