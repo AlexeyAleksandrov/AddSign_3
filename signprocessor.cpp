@@ -347,6 +347,105 @@ void SignProcessor::runProcessing()
                 emit newFileStatus(file, files_status::no_supported);
                 continue;
             }
+            else if (filesHendlerType == LIBRE_OFFICE)
+            {
+                // создаём временный файл
+                QString tempFile; // место хранения временного файла
+                tempFile = createFileCopy(file.sourceFile, WordOptions.getTempdir()); // создаем временный файл, который будет иметь такое же название как и исходный
+                AutoDeleter tempFileDirContol(tempFile); // автоматическое удаление файла
+                if(tempFile == "")
+                {
+                    qDebug() << "Произошла ошибка создания временного файла!";
+                    log.addToLog("Произошла ошибка создания временного файла!");
+                    emit newFileStatus(file, files_status::error_no_open);
+                    continue;
+                }
+
+                // экспортируем Excel в PDF
+                // получаем формат файла
+                LibreOffice::LibreOfficeFormats fileExtensionType = tempFile.endsWith(".xls")
+                        ? LibreOffice::LibreOfficeFormats::xls : tempFile.endsWith(".xlsx")
+                          ? LibreOffice::LibreOfficeFormats::xlsx :
+                            LibreOffice::LibreOfficeFormats::no_supported;
+                // если файл не подходящего формата
+                if(fileExtensionType == LibreOffice::LibreOfficeFormats::no_supported)
+                {
+                    emit newFileStatus(file, files_status::no_supported);
+                    return;;
+                }
+                // переводим в PDF
+                QString tempPdfFile = WordOptions.getTempdir() + getFileNameInPDFFormat(QFileInfo(file.sourceFile).fileName()); // создаем временный pdf файл
+                AutoDeleter tempPdfFileDirContol(tempPdfFile); // автоматическое удаление файла
+                bool succes = false;    // флаг успешности
+                LibreOffice libreOffice;
+                libreOffice.convertFile(tempFile, tempPdfFile, fileExtensionType, &succes); // пытаемся конвертировать файл
+                if(!succes) // если не успешно
+                {
+                    emit newFileStatus(file, files_status::error_pdf_no_export);
+                    return;
+                }
+
+                // получаем ориентацию книги
+                PDFCreator::orientation pdfPageOrientation = PDFCreator::Portrait; // ориентация страницы в PDF
+
+//                ExcelEditor excel; // создаем обработчик ворда
+//                excel.openBook(tempFile); // открываем документ
+//                int excelPageOrientation = excel.getPageOrientation(); // получаем ориентацию страницы
+
+//                QString tempPdfFile = WordOptions.getTempdir() + getFileNameInPDFFormat(QFileInfo(file.sourceFile).fileName()); // создаем временный pdf файл
+//                AutoDeleter tempPdfFileDirContol(tempPdfFile); // автоматическое удаление файла
+//                excel.saveBook();
+//                if(!excel.exportToPdf(tempPdfFile)) // экспортируем файл в PDF
+//                {
+//                    qDebug() << "Не удалось экспортировать файл в PDF";
+//                    log.addToLog("Не удалось экспортировать файл в PDF");
+//                    emit newFileStatus(file, files_status::error_pdf_no_export);
+//                    continue;
+//                }
+//                excel.closeBook(); // закрываем
+
+//                // получаем ориентацию книги
+//                PDFCreator::orientation pdfPageOrientation; // ориентация страницы в PDF
+//                if(excelPageOrientation == ExcelEditor::orientation::xlLandscape)
+//                {
+//                    pdfPageOrientation = PDFCreator::Landscape; // ставим альбомную ориентацию
+//                }
+//                else
+//                {
+//                    pdfPageOrientation = PDFCreator::Portrait; // ставим портретную ориентацию
+//                }
+
+                // стандартная вставка
+                if(WordOptions.insertType == insert_standart)
+                {
+                    // вставляем подпись в PDF по координатам
+                    int status = -1;
+                    addImageToPdfFileInEndOfFile(tempPdfFile, file.signPDFFile, WordOptions, PDFOptions, pdfPageOrientation, MIREA_LOGO_HTML, status);   // добавляем картинку по координатам
+                    assert(status != -1, "addImageToPdfFileInEndOfFile"); // если произошла критическая ошибка и статус файла == -1
+                    emit newFileStatus(file, status);  // отправляем сигнал обновления статуса файла
+                    check_file_status(status);  // проверяем статус файла и делаем continue, если необходимо
+                }
+
+                // вставка по координатам
+                else if (WordOptions.insertType == insert_in_exported_pdf)
+                {
+                    // вставляем подпись в PDF по координатам
+                    int status = -1;
+                    addImageToPdfFileInCoordinates(tempPdfFile, file.signPDFFile, WordOptions, PDFOptions, pdfPageOrientation, MIREA_LOGO_HTML, status);   // добавляем картинку по координатам
+                    assert(status != -1, "addImageToPdfFileInCoordinates"); // если произошла критическая ошибка и статус файла == -1
+                    emit newFileStatus(file, status);  // отправляем сигнал обновления статуса файла
+                    check_file_status(status);  // проверяем статус файла и делаем continue, если необходимо
+                }
+
+                // вставка по тэгу
+                else
+                {
+                    qDebug() << "Для данного типа файла невозможно выполнить действие " << file.sourceFile;
+                    log.addToLog("Для данного типа файла невозможно выполнить действие " + file.sourceFile);
+                    emit newFileStatus(file, files_status::no_supported);
+                    continue;
+                }
+            }
         }
 #endif
         else if (isPDFFile(file.sourceFile)) // обрабатываем PDF файл
