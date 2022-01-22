@@ -40,7 +40,14 @@ void LibreOffice::convertFile(QString inputFile, QString outputFile, LibreOffice
     QStringList params;
     params.append("--headless");
     params.append("--convert-to");
-    params.append("pdf:writer_pdf_Export");
+    if(inputFormat == docx || inputFormat == doc || inputFormat == rtf)
+    {
+       params.append("pdf:writer_pdf_Export");
+    }
+    else if(inputFormat == xlsx || inputFormat == xls)
+    {
+       params.append("pdf:calc_pdf_Export");
+    }
     params.append("--outdir");
     params.append(tempDir);
     params.append(inputFile);
