@@ -756,7 +756,7 @@ void SignProcessor::standartAddImageToWordFile(FileForSign &file, QString tempFi
                 }
 
                 fileStatus = files_status::in_process;    // возвращаем нормальный статус файла
-                return;
+//                return;
             }
 
             if(WordOptions.exportToPDF) // если надо экспортировать в PDF, то используем Libre Office
@@ -796,7 +796,7 @@ void SignProcessor::standartAddImageToWordFile(FileForSign &file, QString tempFi
                     qDebug() << "Не удалось добавить картинку к PDF файлу после обработки Libre Office" << file.sourceFile << " статус " << fileStatus;
                     log.addToLog("Не удалось добавить картинку к PDF файлу после обработки Libre Office - " + file.sourceFile + " статус " + fileStatus);
                     fileStatus = status;    // возвращаем статус файла
-                    return;
+//                    return;
                 }
             }
         }
