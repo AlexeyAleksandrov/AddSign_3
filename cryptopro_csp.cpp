@@ -195,6 +195,22 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
                             log.addToLog("Найдено начало действия: " + SignCMD.startDate.toString());
                         }
                     }
+                    else    // в новой версии CryptoPRO сделали разделитель в видео одног опробела, вместо двух
+                    {
+                        QStringList sublinbeList = subline.split(" ", SPLITTER);
+                        if(sublinbeList.size() >= 2) // 2 или больше. Нам важна только 1я часть, это дата
+                        {
+                            QString dateSting = sublinbeList.at(0);
+                            QStringList dateList = dateSting.split("/", SPLITTER); // запись сейчас в формате ДД/ММ/ГГГГ, парсим
+                            if(dateList.size() == 3)
+                            {
+                                QDate date(dateList.at(2).toInt(), dateList.at(1).toInt(), dateList.at(0).toInt());
+    //                            qDebug() << "Начало действия: " << date;
+                                SignCMD.startDate = date;
+                                log.addToLog("Найдено начало действия: " + SignCMD.startDate.toString());
+                            }
+                        }
+                    }
                 }
                 // дата окончания действия
                 if(line.contains("Not valid after") || line.contains("Истекает"))
@@ -212,6 +228,22 @@ QList<CryptoPRO_CSP::CryptoSignData>CryptoPRO_CSP::s_certmgr::getSertifactesList
 //                            qDebug() << "Конец действия: " << date;
                             SignCMD.finishDate = date;
                             log.addToLog("Найдено конец действия: " + SignCMD.startDate.toString());
+                        }
+                    }
+                    else    // в новой версии CryptoPRO сделали разделитель в видео одног опробела, вместо двух
+                    {
+                        QStringList sublinbeList = subline.split(" ", SPLITTER);
+                        if(sublinbeList.size() >= 2) // 2 или больше. Нам важна только 1я часть, это дата
+                        {
+                            QString dateSting = sublinbeList.at(0);
+                            QStringList dateList = dateSting.split("/", SPLITTER); // запись сейчас в формате ДД/ММ/ГГГГ, парсим
+                            if(dateList.size() == 3)
+                            {
+                                QDate date(dateList.at(2).toInt(), dateList.at(1).toInt(), dateList.at(0).toInt());
+    //                            qDebug() << "Конец действия: " << date;
+                                SignCMD.finishDate = date;
+                                log.addToLog("Найдено конец действия: " + SignCMD.startDate.toString());
+                            }
                         }
                     }
                 }
