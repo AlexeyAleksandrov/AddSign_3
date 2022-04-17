@@ -6,7 +6,7 @@
 #include <QDebug>
 #include <QPainter>
 #include <QList>
-#include <imagetransformer.h>
+#include <libs/imagetransformer.h>
 
 //#define DEBUGGING
 

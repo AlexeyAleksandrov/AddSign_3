@@ -513,26 +513,26 @@ void MainWindow::on_pushButton_addsign_clicked()
         return;
     }
 
-    int filesHandlerType = -1;    // тип обработчика файлов
-    if(ui->radioButton_com->isChecked())
-    {
-        filesHandlerType = SignProcessor::filesHandlers::MS_COM;
-    }
-    else if(ui->radioButton_poi->isChecked())
-    {
-        filesHandlerType = SignProcessor::filesHandlers::APACHI_POI;
-    }
-    else if(ui->radioButton_libreOffice->isChecked())
-    {
-        filesHandlerType = SignProcessor::filesHandlers::LIBRE_OFFICE;
-    }
-    if(filesHandlerType == -1)
-    {
-        QMessageBox::warning(this, "Ошибка", "Вы не выбрали тип обработчика!");
-        log.addToLog("Ошибка, Вы не выбрали тип обработчика!");
-        isAutomationTesting = false;
-        return;
-    }
+//    int filesHandlerType = -1;    // тип обработчика файлов
+//    if(ui->radioButton_com->isChecked())
+//    {
+//        filesHandlerType = SignProcessor::filesHandlers::MS_COM;
+//    }
+//    else if(ui->radioButton_poi->isChecked())
+//    {
+//        filesHandlerType = SignProcessor::filesHandlers::APACHI_POI;
+//    }
+//    else if(ui->radioButton_libreOffice->isChecked())
+//    {
+//        filesHandlerType = SignProcessor::filesHandlers::LIBRE_OFFICE;
+//    }
+//    if(filesHandlerType == -1)
+//    {
+//        QMessageBox::warning(this, "Ошибка", "Вы не выбрали тип обработчика!");
+//        log.addToLog("Ошибка, Вы не выбрали тип обработчика!");
+//        isAutomationTesting = false;
+//        return;
+//    }
 
     QStringList listAddedFiles = getAddedFiles(); // получаем список добавленных файлов
 
@@ -618,63 +618,72 @@ void MainWindow::on_pushButton_addsign_clicked()
         }
     }
 
-    bool exportToWord = ui->checkBox_signWordDocument->isChecked();
-    bool exportToPDF = ui->checkBox_exportWordToPDF->isChecked();
+//    bool exportToWord = ui->checkBox_signWordDocument->isChecked();
+//    bool exportToPDF = ui->checkBox_exportWordToPDF->isChecked();
 
-    int signType = SignProcessor::insert_standart; // тип подписи вордовского файла
-    if(ui->radioButton_usually_insert->isChecked()) signType = SignProcessor::insert_standart;
-    else if (ui->radioButton_insert_in_exported_pdf->isChecked()) signType = SignProcessor::insert_in_exported_pdf;
+//    int signType = SignProcessor::insert_standart; // тип подписи вордовского файла
+//    if(ui->radioButton_usually_insert->isChecked()) signType = SignProcessor::insert_standart;
+//    else if (ui->radioButton_insert_in_exported_pdf->isChecked()) signType = SignProcessor::insert_in_exported_pdf;
 
-    if(containsWordFiles) // если содержится хотя бы 1 файл word
+//    if(containsWordFiles) // если содержится хотя бы 1 файл word
+//    {
+//        if(!exportToWord && (signType == SignProcessor::insert_standart) && !exportToPDF)
+//        {
+//            QMessageBox::warning(this, "Ошибка", "Не выбраны действия с Word'ом");
+//            isAutomationTesting = false;
+//            return;
+//        }
+//    }
+
+//    QString qpdf_dir = QDir::currentPath() + QPDF_DIRECTORY;
+//    if(!QFile::exists(qpdf_dir))
+//    {
+//        QMessageBox::warning(this, "Ошибка", "Ошибка! Файл qpdf.exe не найден! + " + qpdf_dir);
+//        log.addToLog("Ошибка! Файл qpdf.exe не найден! + " + qpdf_dir);
+//        isAutomationTesting = false;
+//        return;
+//    }
+
+//    QString pdftopng_dir = QDir::currentPath() + PDFTOPNG_DIRECTORY;
+//    if(!QFile::exists(pdftopng_dir))
+//    {
+//        QMessageBox::warning(this, "Ошибка", "Ошибка! Файл pdftopng.exe не найден! + " + pdftopng_dir);
+//        log.addToLog("Ошибка! Файл pdftopng.exe не найден! + " + pdftopng_dir);
+//        isAutomationTesting = false;
+//        return;
+//    }
+
+    QString jarDir = QDir::currentPath() + "/application_jar/application.jar";
+    if(!QFile::exists(jarDir))
     {
-        if(!exportToWord && (signType == SignProcessor::insert_standart) && !exportToPDF)
-        {
-            QMessageBox::warning(this, "Ошибка", "Не выбраны действия с Word'ом");
-            isAutomationTesting = false;
-            return;
-        }
-    }
-
-    QString qpdf_dir = QDir::currentPath() + QPDF_DIRECTORY;
-    if(!QFile::exists(qpdf_dir))
-    {
-        QMessageBox::warning(this, "Ошибка", "Ошибка! Файл qpdf.exe не найден! + " + qpdf_dir);
-        log.addToLog("Ошибка! Файл qpdf.exe не найден! + " + qpdf_dir);
+        QMessageBox::warning(this, "Ошибка", "Ошибка! Файл application.jar не найден! + " + jarDir);
+        log.addToLog("Ошибка! Файл pdftopng.exe не найден! + " + jarDir);
         isAutomationTesting = false;
         return;
     }
 
-    QString pdftopng_dir = QDir::currentPath() + PDFTOPNG_DIRECTORY;
-    if(!QFile::exists(pdftopng_dir))
-    {
-        QMessageBox::warning(this, "Ошибка", "Ошибка! Файл pdftopng.exe не найден! + " + pdftopng_dir);
-        log.addToLog("Ошибка! Файл pdftopng.exe не найден! + " + pdftopng_dir);
-        isAutomationTesting = false;
-        return;
-    }
-
-#ifdef _WIN32
-    QString libpoi_dir = QDir::currentPath() + "/libpoi/libpoi.jar";
-    if(!QFile::exists(libpoi_dir))
-    {
-        QMessageBox::warning(this, "Ошибка", "Ошибка! Файл libpoi.jar не найден! + " + libpoi_dir);
-        log.addToLog("Ошибка! Файл libpoi.jar не найден! + " + libpoi_dir);
-        isAutomationTesting = false;
-        return;
-    }
-#endif
+//#ifdef _WIN32
+//    QString libpoi_dir = QDir::currentPath() + "/libpoi/libpoi.jar";
+//    if(!QFile::exists(libpoi_dir))
+//    {
+//        QMessageBox::warning(this, "Ошибка", "Ошибка! Файл libpoi.jar не найден! + " + libpoi_dir);
+//        log.addToLog("Ошибка! Файл libpoi.jar не найден! + " + libpoi_dir);
+//        isAutomationTesting = false;
+//        return;
+//    }
+//#endif
 
     // === ПОДГОТОВКА К ЗАПУСКУ ===
 
-    log.addToLog("Обработка превью превью в картинку");
-    //    // получавем картинку с виджета
-    QPixmap pixmap(ui->sign_widget->size());
-    ui->sign_widget->render(&pixmap);
+//    log.addToLog("Обработка превью превью в картинку");
+//    //    // получавем картинку с виджета
+//    QPixmap pixmap(ui->sign_widget->size());
+//    ui->sign_widget->render(&pixmap);
 
-    imageDir = QDir::current().currentPath() + TEMP_DIR + "/image.jpg"; // создаем директорию для хранения файла картинки
-    pixmap.save(imageDir);
+//    imageDir = QDir::current().currentPath() + TEMP_DIR + "/image.jpg"; // создаем директорию для хранения файла картинки
+//    pixmap.save(imageDir);
 
-    log.addToLog("Получена картинка с виджета");
+//    log.addToLog("Получена картинка с виджета");
 
     for (auto &&file : listAddedFiles)
     {
@@ -688,65 +697,113 @@ void MainWindow::on_pushButton_addsign_clicked()
     clearAllOutputsToolTipData(); // очищаем пути вывода для всех файлов в таблице
     QApplication::processEvents(); // прогружаем интерфейс
 
-    int insertType = 0;
+    DocumnetSignCreator docCreator; // обработчик документов на Java
+
     if(ui->radioButton_usually_insert->isChecked())
     {
-        insertType = SignProcessor::insert_standart;
+        docCreator.setInsertType("В конец документа");
     }
     else if (ui->radioButton_insert_in_exported_pdf->isChecked())
     {
-        insertType = SignProcessor::insert_in_exported_pdf;
+        docCreator.setInsertType("По координатам");
     }
     else if (ui->radioButton_signByTag->isChecked())
     {
-        insertType = SignProcessor::insert_by_tag_in_table;
+        docCreator.setInsertType("По тэгу");
     }
 
-    SignProcessor::WordParams word_settings;
-    word_settings.tempdir = tempFilesDir + "/"; // директория для хранения временных файлов
-    word_settings.outputdir = outputDir; // директория, в которую будем выводить
-    word_settings.imageDir = imageDir; // устанавливаем директорию, где находится картинка
-    word_settings.ignoreMovingToNextList = ui->checkBox_signingOut->isChecked(); // устанавливаем, игнорировать переходы на новую стриницу или нет
-    word_settings.exportToWord = exportToWord; // передаём, нужно-ли подписывать документ Word
-    word_settings.exportToPDF = exportToPDF; // устанавдиваем, нужно-ли экспортировать в PDF
-    word_settings.insertType = insertType; // подставляем тип вставки картинки
-    word_settings.noInsertImage = ui->checkBox_disableInsertImageToWord->isChecked(); // вставлять или не вставлять картинку в word (при стандартной вставке)
-    word_settings.signImageTag = SIGN_IMAGE_TAG;
-    word_settings.signFioTag = SIGN_FIO_TAG;
+    SignProcessor oldSignProcessor;    // старый обработчик файлов
+
+    QString dateStart = currentSign.startDate.toString("dd.MM.yyyy");
+    QString dateEnd = currentSign.finishDate.toString("dd.MM.yyyy");
+
+    docCreator.setJarFileName(jarDir);
+    docCreator.setSignOwner(labelList.at(LABEL_SIGN_HOSTER)->text().remove("Владелец: "));
+    docCreator.setSignCertificate(labelList.at(LABEL_CERTIFICATE)->text().remove("Сертификат: "));
+    docCreator.setSignDateFrom(dateStart);
+    docCreator.setSignDateTo(dateEnd);
+    docCreator.setDrawLogo(isDrawGerb());
+
+    CryptoPRO_CSP CryptoPRO; // создаем обработчик подписи
+    CryptoPRO.csptest.setCryptoProDirectory(CRYPTO_PRO_DIRECTORY); // устанавливаем директорию
+
+    for (auto &&file : listAddedFiles)
+    {
+        setFileStatus(file, files_status::in_process);
+        QString inputFileName = QFileInfo(file).fileName();
+        QString pdfOutputFileName =  oldSignProcessor.getFileNameInPDFFormat(outputDir + inputFileName); // получаем путь к выходному файлу в папке вывода
+
+        // запускаем обработку
+        QString inputFile = file;
+        QString outputFile = pdfOutputFileName;
+        bool result = docCreator.processDocument(inputFile, outputFile);
+
+        if(result)
+        {
+            setFileStatus(file, files_status::image_added);
+
+            // генерируем подпись для этого документа
+            bool signCreated = CryptoPRO.csptest.createSign(pdfOutputFileName, currentSign);
+            if(signCreated)
+            {
+                setFileStatus(file, files_status::no_errors);
+            }
+            else
+            {
+                setFileStatus(file, files_status::no_signed);
+            }
+        }
+        else
+        {
+            setFileStatus(file, files_status::error_pdf_no_export);
+        }
+    }
+
+//    SignProcessor::WordParams word_settings;
+//    word_settings.tempdir = tempFilesDir + "/"; // директория для хранения временных файлов
+//    word_settings.outputdir = outputDir; // директория, в которую будем выводить
+//    word_settings.imageDir = imageDir; // устанавливаем директорию, где находится картинка
+//    word_settings.ignoreMovingToNextList = ui->checkBox_signingOut->isChecked(); // устанавливаем, игнорировать переходы на новую стриницу или нет
+//    word_settings.exportToWord = exportToWord; // передаём, нужно-ли подписывать документ Word
+//    word_settings.exportToPDF = exportToPDF; // устанавдиваем, нужно-ли экспортировать в PDF
+//    word_settings.insertType = insertType; // подставляем тип вставки картинки
+//    word_settings.noInsertImage = ui->checkBox_disableInsertImageToWord->isChecked(); // вставлять или не вставлять картинку в word (при стандартной вставке)
+//    word_settings.signImageTag = SIGN_IMAGE_TAG;
+//    word_settings.signFioTag = SIGN_FIO_TAG;
 
 
-    SignProcessor::signPreset pdfSignPreset;
-    pdfSignPreset.alignment = ui->horizontalSlider->value();
-    pdfSignPreset.paragraphOffset = ui->verticalSlider->value();
+//    SignProcessor::signPreset pdfSignPreset;
+//    pdfSignPreset.alignment = ui->horizontalSlider->value();
+//    pdfSignPreset.paragraphOffset = ui->verticalSlider->value();
 
-    SignProcessor::PDFParams PDF_settings;
-    PDF_settings.image_dir = ":/images/images/MIREA_logo.png";
-    PDF_settings.qpdf_dir = qpdf_dir;
-    PDF_settings.drawLogo = isDrawGerb();
-    PDF_settings.pdf_preset = pdfSignPreset;
-    PDF_settings.htmlParams.lineSertificate = labelList.at(LABEL_CERTIFICATE)->text();
-    PDF_settings.htmlParams.lineOwner = labelList.at(LABEL_SIGN_HOSTER)->text();
-    PDF_settings.htmlParams.lineDate = labelList.at(LABEL_VALID_TIME)->text();
+//    SignProcessor::PDFParams PDF_settings;
+//    PDF_settings.image_dir = ":/images/images/MIREA_logo.png";
+//    PDF_settings.qpdf_dir = qpdf_dir;
+//    PDF_settings.drawLogo = isDrawGerb();
+//    PDF_settings.pdf_preset = pdfSignPreset;
+//    PDF_settings.htmlParams.lineSertificate = labelList.at(LABEL_CERTIFICATE)->text();
+//    PDF_settings.htmlParams.lineOwner = labelList.at(LABEL_SIGN_HOSTER)->text();
+//    PDF_settings.htmlParams.lineDate = labelList.at(LABEL_VALID_TIME)->text();
 
-    SignProcessor::CryptoPROParams CryptoPRO_settings;
-    CryptoPRO_settings.sign = currentSign;
+//    SignProcessor::CryptoPROParams CryptoPRO_settings;
+//    CryptoPRO_settings.sign = currentSign;
 
     ui->closeButton->setDisabled(true);
 
-    processor.setWordOptions(word_settings);
-    processor.setPDFOptions(PDF_settings);
-    processor.setCryptoPROOptions(CryptoPRO_settings);
-    processor.setFilesHendlerType(filesHandlerType);
-    processor.setFilesList(listAddedFiles);
+//    processor.setWordOptions(word_settings);
+//    processor.setPDFOptions(PDF_settings);
+//    processor.setCryptoPROOptions(CryptoPRO_settings);
+//    processor.setFilesHendlerType(filesHandlerType);
+//    processor.setFilesList(listAddedFiles);
 
-    connect(&processor, &SignProcessor::newFileStatus, this, &MainWindow::fileReady);
+//    connect(&processor, &SignProcessor::newFileStatus, this, &MainWindow::fileReady);
 
     SigningInProcess = false;
     log.addToLog("Запущена обработка файлов");
     ui->pushButton_addsign->setText("Отмена");
 
-    processor.closing = &isClosing;
-    processor.runProcessing();
+//    processor.closing = &isClosing;
+//    processor.runProcessing();
 
     isClosing = false;
     ui->pushButton_addsign->setText("Добавить подпись");

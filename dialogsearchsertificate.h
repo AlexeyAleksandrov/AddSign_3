@@ -2,7 +2,7 @@
 #define DIALOGSEARCHSERTIFICATE_H
 
 #include <QDialog>
-#include <cryptopro_csp.h>
+#include <libs/cryptopro_csp.h>
 #include <QTableWidgetItem>
 #include <QMessageBox>
 

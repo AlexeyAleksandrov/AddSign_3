@@ -3,7 +3,7 @@
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QTextCodec>
-#include "systemwin32.h"
+#include "libs/systemwin32.h"
 
 int main(int argc, char *argv[])
 {

@@ -16,9 +16,9 @@
 #include <QCloseEvent>
 //#include <preset.h>
 #include <QTextCodec>
-#include "logclass.h"
-#include "files_status.h"
-#include "uidatasaver.h"
+#include "libs/logclass.h"
+#include "libs/files_status.h"
+#include "libs/uidatasaver.h"
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDebug>
@@ -27,10 +27,12 @@
 #include <QPaintEvent>
 #include "m_widget.h"
 //#include <filesignprocessor.h>
-#include <imagetransformer.h>
-#include "uipreset.h"
-#include <signprocessor.h>
+#include <libs/imagetransformer.h>
+#include "libs/uipreset.h"
+#include <old_libs/signprocessor.h>
 #include "dialogsearchsertificate.h"
+#include <libs/cryptopro_csp.h>
+#include <libs/documnetsigncreator.h>
 
 //#define DEBUGGING
 //#define INSERT_IN_CENTER
@@ -112,7 +114,7 @@ private:
     bool closeOnEnd = false;
 //    bool wordCancel = false;
 
-    SignProcessor processor;
+//    SignProcessor processor;
 
     bool ifFileContains(QString file); // проверяет, существет-ли файл в директории
     void setTableWidgetFiles(QStringList listParamFiles, int status = files_status::waiting); // устанавливает файлы в таблице

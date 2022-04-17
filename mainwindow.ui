@@ -500,7 +500,7 @@ QHeaderView::section{background-color: rgb(114, 159, 207)}
        <string notr="true"/>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_preview">
        <property name="styleSheet">
@@ -2780,7 +2780,7 @@ background-color: rgb(32, 74, 135);
   <customwidget>
    <class>signPrewiew</class>
    <extends>QWidget</extends>
-   <header location="global">signprewiew.h</header>
+   <header location="global">libs/signprewiew.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
